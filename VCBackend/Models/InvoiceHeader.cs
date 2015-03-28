@@ -11,5 +11,12 @@ namespace VCBackend.Models
         public String Name { get; set; }
         public String NIF { get; set; }
         public Address Addr { get; set; }
+
+        public InvoiceHeader(String Name, String NIF, Address Addr)
+        {
+            this.Name = Name;
+            this.NIF = NIF;
+            this.Addr = Addr;
+        }
     }
 }

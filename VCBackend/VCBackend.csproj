@@ -86,7 +86,9 @@
   <ItemGroup>
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Business Rules\Api\BRulesApi.cs" />
-    <Compile Include="Business Rules\Users.cs" />
+    <Compile Include="Business Rules\Users\MalformedUserDetails.cs" />
+    <Compile Include="Business Rules\Users\UserAlreadyExistException.cs" />
+    <Compile Include="Business Rules\Users\UserManager.cs" />
     <Compile Include="Controllers\UsersController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>

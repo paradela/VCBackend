@@ -12,5 +12,13 @@ namespace VCBackend.Models
         String ZipCode { get; set; }
         String Locality { get; set; }
         String Country { get; set; }
+
+        public Address(String[] Addressline, String ZipCode, String Locality, String Country)
+        {
+            this.AddressLine = AddressLine;
+            this.ZipCode = ZipCode;
+            this.Locality = Locality;
+            this.Country = Country;
+        }
     }
 }
