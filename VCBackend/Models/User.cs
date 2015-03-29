@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations;
 
 namespace VCBackend.Models
 {
-    class User : IEntity
+    public partial class User : IEntity
     {
+        [Key]
+        public int Id { get; set; }
         public String Uid { get; set; }
         public String Name { get; set; }
         public String Email { get; set; }
@@ -15,6 +18,8 @@ namespace VCBackend.Models
         public bool AllowMarketing { get; set; }
         public InvoiceHeader InvoiceData { get; set; }
         public String Password { get; set; }
+
+        public User() { }
 
         public User ( String Uid, String Name, String Email, String Password, String Phone, bool AllowMarketing, InvoiceHeader InvoiceData )
         {

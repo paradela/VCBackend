@@ -13,7 +13,7 @@ namespace VCBackend.Business_Rules
      * This class implements the façade design pattern. http://en.wikipedia.org/wiki/Facade_pattern
      * This class will have a public interface which will be used by the Controllers layer.
      */
-    class BRulesApi
+    public class BRulesApi
     {
         /********************************
          * User Creation and Update
@@ -21,9 +21,7 @@ namespace VCBackend.Business_Rules
         public static void CreateUser ( String Name, String Email, String Password, String Phone, bool AllowMarketing, String NIF, String Address, String ZipCode, String Locality, String Country ) 
         {
             UserManager um = UserManager.getUserManagerSingleton();
-            String[] AddrLines = Address.Split('\n');
-            Address addr = new Address(AddrLines, ZipCode, Locality, Country);
-            InvoiceHeader invoice = new InvoiceHeader(Name, NIF, addr);
+            InvoiceHeader invoice = new InvoiceHeader(Name, NIF, Address, ZipCode, Locality, Country);
             
             um.CreateUser(Name, Email, Password, Phone, AllowMarketing, invoice);
         }

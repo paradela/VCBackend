@@ -7,8 +7,9 @@ using System.Data.Entity;
 
 namespace VCBackend.Models
 {
-    class UsersContext : DbContext
+    public class VCardContext : DbContext
     {
+        public VCardContext() { }
         public DbSet<User> Users { get; set; }
     }
 }
