@@ -18,6 +18,7 @@ namespace VCBackend.Models
         public bool AllowMarketing { get; set; }
         public InvoiceHeader InvoiceData { get; set; }
         public String Password { get; set; }
+        public String Token { get; set; }
 
         public User() { }
 

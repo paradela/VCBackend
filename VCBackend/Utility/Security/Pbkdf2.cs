@@ -4,7 +4,7 @@ using System.Linq;
 using System.Web;
 using CryptSharp;
 
-namespace VCBackend.Security
+namespace VCBackend.Utility.Security
 {
     public class Pbkdf2
     {

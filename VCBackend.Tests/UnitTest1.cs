@@ -27,6 +27,9 @@ namespace VCBackend.Tests
 
             IRepository<User> ur = new UserRepository();
             IEnumerable<User> users = ur.List;
+            Device i = new PartialDevice();
+            PartialDevice a = new PartialDevice();
+            a.Token = "asd";
 
 
 

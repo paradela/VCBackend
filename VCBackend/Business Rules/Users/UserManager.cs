@@ -4,7 +4,7 @@ using System.Linq;
 using System.Web;
 using VCBackend.Models;
 using VCBackend.Repositories;
-using VCBackend.Security;
+using VCBackend.Utility.Security;
 
 namespace VCBackend.Business_Rules.Users
 {
