@@ -18,18 +18,21 @@ namespace VCBackend.Models
         public bool AllowMarketing { get; set; }
         public InvoiceHeader InvoiceData { get; set; }
         public String Password { get; set; }
-        public String Token { get; set; }
+        public ICollection<Device> Devices { get; set; }
 
         public User() { }
 
-        public User ( String Uid, String Name, String Email, String Password, String Phone, bool AllowMarketing, InvoiceHeader InvoiceData )
+        public User ( String Uid, String Name, String Email, String Password, String Phone, bool AllowMarketing, InvoiceHeader InvoiceData, Device DefaultDevice)
         {
+            this.Uid = Uid;
             this.Name = Name;
             this.Email = Email;
             this.Phone = Phone;
             this.AllowMarketing = AllowMarketing;
             this.InvoiceData = InvoiceData;
             this.Password = Password;
+            this.Devices = new List<Device>();
+            this.Devices.Add(DefaultDevice);
         }
 
     }

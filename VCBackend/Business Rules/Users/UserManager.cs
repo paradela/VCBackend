@@ -56,8 +56,12 @@ namespace VCBackend.Business_Rules.Users
              */
             //TODO call the "Portal Viva" create user
             String uid = "123"; //The user id returned by PV
-            
-            User newUser = new User(uid, Name, Email, Pbkdf2.DeriveKey(Password), Phone, AllowMarketing, InvoiceData);
+            /*
+             * A PartialAccessDevice is used to login with browsers.
+             * They will not have full access to the API
+             */
+            Device device = Device.CreatePartialAccessDevice("tokens012");
+            User newUser = new User(uid, Name, Email, Pbkdf2.DeriveKey(Password), Phone, AllowMarketing, InvoiceData, device);
 
             rep.Add(newUser);
 
