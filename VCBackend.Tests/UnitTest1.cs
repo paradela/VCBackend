@@ -26,11 +26,16 @@ namespace VCBackend.Tests
                 "Portugal");
 
             IRepository<User> ur = new UserRepository();
-            IEnumerable<User> users = ur.List;
+            User user = ur.FindById(1);
+            ICollection<Device> devices = user.Devices;
 
+            foreach(Device d in devices)
+                Assert.AreNotEqual(d.Type, DeviceType.MOBILE_DEVICE);
 
-
+            Assert.AreEqual("Jose Silva", user.Name);
+            Assert.AreNotEqual("P4ssw0rd", user.Password);
             
         }
+
     }
 }

@@ -6,36 +6,29 @@ using System.Threading.Tasks;
 
 namespace VCBackend.Models
 {
+    public enum DeviceType
+    {
+        DEFAULT_DEVICE,
+        MOBILE_DEVICE
+    }
+
     public class Device
     {
         public int Id { get; set; }
+        public DeviceType Type { get; set; }
+        public String Name { get; set; }
         public String DeviceId { get; set; }
         public String Token { get; set; }
-        public Boolean FullDevice { get; set; }
 
-        public Device() { }
-
-        private Device(String DeviceId, String Token, Boolean FullDevice)
+        public Device() 
         {
-            this.DeviceId = DeviceId;
-            this.Token = Token;
-            this.FullDevice = FullDevice;
+            Type = DeviceType.DEFAULT_DEVICE;
         }
 
-        public static Device CreateFullAccessDevice(String DeviceId, String Token)
+        public Device(String devId)
         {
-            return new Device(DeviceId, Token, true);
+            Type = DeviceType.MOBILE_DEVICE;
+            DeviceId = devId;
         }
-
-        public static Device CreatePartialAccessDevice(String Token)
-        {
-            return new Device(null, Token, false);
-        }
-
-        public Boolean HasFullAccess()
-        {
-            return FullDevice;
-        }
-
     }
 }

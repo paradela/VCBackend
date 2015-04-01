@@ -18,7 +18,7 @@ namespace VCBackend.Models
         public bool AllowMarketing { get; set; }
         public InvoiceHeader InvoiceData { get; set; }
         public String Password { get; set; }
-        public ICollection<Device> Devices { get; set; }
+        public virtual ICollection<Device> Devices { get; set; }
 
         public User() { }
 

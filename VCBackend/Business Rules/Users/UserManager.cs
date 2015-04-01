@@ -60,8 +60,12 @@ namespace VCBackend.Business_Rules.Users
              * A PartialAccessDevice is used to login with browsers.
              * They will not have full access to the API
              */
-            Device device = Device.CreatePartialAccessDevice("tokens012");
+            Device device = new Device();
+            device.Name = "Default";
             User newUser = new User(uid, Name, Email, Pbkdf2.DeriveKey(Password), Phone, AllowMarketing, InvoiceData, device);
+
+            //Generates a token that should be used next to register a device.
+            device.Token = AuthToken.GenerateToken(newUser, device);
 
             rep.Add(newUser);
 
