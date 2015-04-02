@@ -11,28 +11,22 @@ namespace VCBackend.Models
     {
         [Key]
         public int Id { get; set; }
-        public String Uid { get; set; }
+        [Required]
         public String Name { get; set; }
+        [Required]
         public String Email { get; set; }
-        public String Phone { get; set; }
-        public bool AllowMarketing { get; set; }
-        public InvoiceHeader InvoiceData { get; set; }
+        [Required]
         public String Password { get; set; }
         public virtual ICollection<Device> Devices { get; set; }
 
         public User() { }
 
-        public User ( String Uid, String Name, String Email, String Password, String Phone, bool AllowMarketing, InvoiceHeader InvoiceData, Device DefaultDevice)
+        public User(String Name, String Email, String Password)
         {
-            this.Uid = Uid;
             this.Name = Name;
             this.Email = Email;
-            this.Phone = Phone;
-            this.AllowMarketing = AllowMarketing;
-            this.InvoiceData = InvoiceData;
             this.Password = Password;
             this.Devices = new List<Device>();
-            this.Devices.Add(DefaultDevice);
         }
 
     }

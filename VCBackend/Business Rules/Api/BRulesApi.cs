@@ -18,27 +18,27 @@ namespace VCBackend.Business_Rules
         /********************************
          * User Creation and Update
          ********************************/
-        public static String CreateUser ( String Name, String Email, String Password, String Phone, bool AllowMarketing, String NIF, String Address, String ZipCode, String Locality, String Country ) 
+        public static String CreateUser ( String Name, String Email, String Password) 
         {
             UserManager um = UserManager.getUserManagerSingleton();
-            InvoiceHeader invoice = new InvoiceHeader(Name, NIF, Address, ZipCode, Locality, Country);
-            
-            User user = um.CreateUser(Name, Email, Password, Phone, AllowMarketing, invoice);
+
+            User user = um.CreateUser(Name, Email, Password);
 
             //returns a token for authentication!
             //It returns the First device, because the account was just created and it only has one device that is the default one!
             return user.Devices.First<Device>().Token;
         }
 
-        public static void UpdateUser ( String Name, String Email, String Password, String Phone, bool AllowMarketing, InvoiceHeader InvoiceData )
+        public static void UpdateUser ( String Name, String Email, String Password)
         {
-            //TODO: implementation
+            UserManager um = UserManager.getUserManagerSingleton();
+            
         }
 
         /********************************
          * User Login
          ********************************/
-        public static String Login ( String Username, String TransformedPwd )
+        public static String Login ( String Username, String Password )
         {
             //TODO: implementation
             return "token";

@@ -16,14 +16,7 @@ namespace VCBackend.Tests
             BRulesApi.CreateUser(
                 "Jose Silva",
                 "ea@asd.pt",
-                "P4ssw0rd",
-                "92924556",
-                true,
-                "9356678976543",
-                "Rua Fixe de Baixo\nnº83 5esq",
-                "5370-642",
-                "Lisboa",
-                "Portugal");
+                "P4$$w0rd");
 
             IRepository<User> ur = new UserRepository();
             User user = ur.FindById(1);
@@ -33,7 +26,7 @@ namespace VCBackend.Tests
                 Assert.AreNotEqual(d.Type, DeviceType.MOBILE_DEVICE);
 
             Assert.AreEqual("Jose Silva", user.Name);
-            Assert.AreNotEqual("P4ssw0rd", user.Password);
+            Assert.AreNotEqual("P4$$w0rd", user.Password);
             
         }
 
