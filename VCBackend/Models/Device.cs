@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace VCBackend.Models
 {
@@ -12,9 +13,11 @@ namespace VCBackend.Models
         MOBILE_DEVICE
     }
 
-    public class Device
+    public class Device : IEntity
     {
-        public int Id { get; set; }
+        
+        //[ForeignKey("OwnerId")]
+        public virtual User Owner { get; set; }
         public DeviceType Type { get; set; }
         public String Name { get; set; }
         public String DeviceId { get; set; }

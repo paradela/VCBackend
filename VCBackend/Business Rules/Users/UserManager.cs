@@ -27,7 +27,7 @@ namespace VCBackend.Business_Rules.Users
             return userManager;
         }
 
-        private void AddDeviceToUser(User user, String Name = "Default", String DeviceId = null)
+        private Device CreateDeviceToUser(User user, String Name = "Default", String DeviceId = null)
         {
             Device device;
 
@@ -38,11 +38,16 @@ namespace VCBackend.Business_Rules.Users
             device.Name = Name;
             //Generates a token that should be used next to register a device.
             device.Token = AuthToken.GenerateToken(user, device);
-            user.Devices.Add(device);
+            //device.Owner = user;
+            //IRepository<Device> dr = new DeviceRepository();
+            //dr.Add(device);
+            user.AddDevice(device);
+            //user.Devices.Add(device);
+            return device;
         }
 
         //http://stackoverflow.com/questions/5859632/regular-expression-for-password-validation
-        static bool ValidatePassword(string password)
+        private static bool ValidatePassword(string password)
         {
             const int MIN_LENGTH = 6;
             const int MAX_LENGTH = 40;
@@ -76,8 +81,17 @@ namespace VCBackend.Business_Rules.Users
             Regex nameRgx = new Regex(@"[A-zÀ-ú-]{2}[A-zÀ-ú-\s]*");
             Regex emailRgx = new Regex(@"^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$");
             bool validName = (Name != null) ? nameRgx.IsMatch(Name) : true;
-            bool validEmail = Email != null && emailRgx.IsMatch(Email);
-            return validName && validEmail && ValidatePassword(Password);
+            bool validEmail = (Email != null) ? emailRgx.IsMatch(Email) : true;
+            return validName && validEmail && (Password != null) ? ValidatePassword(Password) : true;
+        }
+
+        private bool ValidateDeviceData(String Name, String DevId)
+        {
+            Regex nameRgx = new Regex(@"[A-zÀ-ú-]{2}[A-zÀ-ú-\s]*");
+            Regex idRgx = new Regex(@"[A-z1-9]{4}[A-z1-9]*");
+            bool validName = (Name != null) ? nameRgx.IsMatch(Name) : true;
+            bool validId = (DevId != null) ? idRgx.IsMatch(DevId) : true;
+            return validName && validId;
         }
 
         private bool ExistUserWithEmail(String Email)
@@ -114,9 +128,12 @@ namespace VCBackend.Business_Rules.Users
              */
             User newUser = new User(Name, Email, Pbkdf2.DeriveKey(Password));
 
-            AddDeviceToUser(newUser);
-            
+            //rep.Add(newUser);
+
+            CreateDeviceToUser(newUser);
+
             rep.Add(newUser);
+            //rep.Update(newUser);
 
             return newUser;
         }
@@ -189,6 +206,45 @@ namespace VCBackend.Business_Rules.Users
 
             return token;
 
+        }
+
+        /*
+         * This method creates a new @MOBILE_DEVICE with name @DevName and id @DevId.
+         * Then it will be added to the user @User.
+         * It @returns a new authentication token to authenticate in this device.
+         */
+        public String AddDeviceToUser(User User, String DevName, String DevId)
+        {
+            if (!ValidateDeviceData(DevName, DevId))
+                throw new ManagingDeviceException("Invalid device name or Id.");
+
+            //Check if the user already have a Device with id @DevId
+            var devCount = (from d in User.Devices
+                           where d.DeviceId == DevId
+                           select d).Count();
+
+            if (devCount == 0)
+            {
+                Device dev = CreateDeviceToUser(User, DevName, DevId);
+                rep.Update(User);
+                return dev.Token;
+            }
+            else throw new ManagingDeviceException("Device Id already registered.");
+        }
+
+        public void RemoveDevice(User User, String DevId)
+        {
+            if (!ValidateDeviceData(null, DevId))
+                throw new ManagingDeviceException("Invalid id format");
+
+            var dev = (from d in User.Devices
+                      where d.DeviceId == DevId
+                      select d).First();
+            if (dev == null)
+                throw new ManagingDeviceException("Device with given Id does not exist");
+
+            User.Devices.Remove(dev);
+            rep.Update(User);
         }
     }
 }

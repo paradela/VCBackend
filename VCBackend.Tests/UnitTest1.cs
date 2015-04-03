@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using VCBackend.Models;
 using VCBackend.Business_Rules;
+using VCBackend.Business_Rules.Users;
 using VCBackend.Repositories;
 using System.Collections.Generic;
 
@@ -29,6 +31,32 @@ namespace VCBackend.Tests
             Assert.AreNotEqual("P4$$w0rd", user.Password);
             
         }
+        [TestMethod]
+        public void TestLogin()
+        {
+            try
+            {
 
+                String token = BRulesApi.Login("ea@asd.pt", "P4$$w0rd", null);
+
+            }
+            catch (InvalidCredentialsException)
+            {
+                throw new AssertFailedException();
+            }
+            
+        }
+
+        [TestMethod]
+        public void TestAddDevice()
+        {
+            IRepository<Device> rep = new DeviceRepository();
+            IEnumerable<Device> devices = rep.List;
+
+            var dev = (from d in devices
+                       where d.Token == ""
+                       select d).FirstOrDefault();
+
+        }
     }
 }

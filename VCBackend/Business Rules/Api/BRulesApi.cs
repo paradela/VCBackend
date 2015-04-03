@@ -38,10 +38,10 @@ namespace VCBackend.Business_Rules
         /********************************
          * User Login
          ********************************/
-        public static String Login ( String Username, String Password )
+        public static String Login ( String Username, String Password, String DeviceId)
         {
-            //TODO: implementation
-            return "token";
+            UserManager um = UserManager.getUserManagerSingleton();
+            return um.UserLogin(Username, Password, DeviceId);
         }
 
         /********************************

@@ -9,8 +9,6 @@ namespace VCBackend.Models
 {
     public partial class User : IEntity
     {
-        [Key]
-        public int Id { get; set; }
         [Required]
         public String Name { get; set; }
         [Required]
@@ -27,6 +25,12 @@ namespace VCBackend.Models
             this.Email = Email;
             this.Password = Password;
             this.Devices = new List<Device>();
+        }
+
+        public void AddDevice(Device device)
+        {
+            device.Owner = this;
+            Devices.Add(device);
         }
 
     }
