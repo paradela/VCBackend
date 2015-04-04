@@ -18,7 +18,10 @@ namespace VCBackend.Business_Rules.Users
         private UserManager() {
             rep = UserRepository.getRepositorySingleton();
         }
-
+        /// <summary>
+        /// A static method for getting a unique instance of UserManager.
+        /// </summary>
+        /// <returns>UserManager singleton.</returns>
         public static UserManager getUserManagerSingleton()
         {
             if (userManager == null)
@@ -27,9 +30,14 @@ namespace VCBackend.Business_Rules.Users
             return userManager;
         }
 
-        /*
-         * This method creates a new device with the given name and device id. 
-         */
+        /// <summary>
+        /// This method creates a new device with the given name and device id. 
+        /// </summary>
+        /// <param name="user">The authenticated user.</param>
+        /// <param name="Name">The new device name</param>
+        /// <param name="DeviceId">The new device identifier. If it is @null a default without
+        /// full access to the API will be created!</param>
+        /// <returns>The created Device.</returns>
         private Device CreateDeviceToUser(User user, String Name = "Default", String DeviceId = null)
         {
             Device device;
@@ -46,7 +54,7 @@ namespace VCBackend.Business_Rules.Users
         }
 
         //http://stackoverflow.com/questions/5859632/regular-expression-for-password-validation
-        private static bool ValidatePassword(string password)
+        private bool ValidatePassword(string password)
         {
             const int MIN_LENGTH = 6;
             const int MAX_LENGTH = 40;
@@ -106,6 +114,18 @@ namespace VCBackend.Business_Rules.Users
             else return false;
         }
 
+        /********************************
+        * User & Device management
+        ********************************/
+        /// <summary>
+        /// Generates a new user in the system. A default device to access the rest of the API will be generated.
+        /// </summary>
+        /// <param name="Name">The new user full name.</param>
+        /// <param name="Email">The new user email. This will be used for user login.</param>
+        /// <param name="Password">The new user password.</param>
+        /// <returns>JWT Authentication token for the created users.</returns>
+        /// <exception cref="MalformedUserDetailsException">One or more of the details passed have an incorrect format.</exception>
+        /// <exception cref="UserAlreadyExistException">Email already in use.</exception>
         public String CreateUser(String Name, String Email, String Password)
         {
             /*
@@ -135,7 +155,15 @@ namespace VCBackend.Business_Rules.Users
 
             return token;
         }
-
+        /// <summary>
+        /// Updates the user data, like the name, email or password.
+        /// </summary>
+        /// <param name="User">The authenticated user.</param>
+        /// <param name="Name">The new name.</param>
+        /// <param name="Email">The new email.</param>
+        /// <param name="Password">The new password.</param>
+        /// <exception cref="MalformedUserDetailsException">One or more of the details passed have an incorrect format.</exception>
+        /// <exception cref="UserAlreadyExistException">Email already in use.</exception>
         public void UpdateUser(User User, String Name, String Email, String Password)
         {
             /*
@@ -157,6 +185,15 @@ namespace VCBackend.Business_Rules.Users
             rep.Update(User);
         }
 
+        /// <summary>
+        /// Authenticates a user with the given email and password. The device id is optional, although
+        /// if it is not passed, the given token doesn't have access to the whole API.
+        /// </summary>
+        /// <param name="Email">The user email.</param>
+        /// <param name="Password">The user password.</param>
+        /// <param name="DeviceId">The device id.</param>
+        /// <returns>JWT Authentication token for the default device, or for the device with the given Id.</returns>
+        /// <exception cref="InvalidCredentialsException"></exception>
         public String UserLogin(String Email, String Password, String DeviceId = null)
         {
             String token = null;
@@ -206,11 +243,15 @@ namespace VCBackend.Business_Rules.Users
 
         }
 
-        /*
-         * This method creates a new @MOBILE_DEVICE with name @DevName and id @DevId.
-         * Then it will be added to the user @User.
-         * It @returns a new authentication token to authenticate in this device.
-         */
+        /// <summary>
+        /// This method creates a new mobile device for access the API. This device will allow the 
+        /// access of the whole API.
+        /// </summary>
+        /// <param name="User">The authenticated user.</param>
+        /// <param name="DevName">The device name. Just used for identification.</param>
+        /// <param name="DevId">The device id.</param>
+        /// <returns>JWT Authentication token for the created device.</returns>
+        /// <exception cref="ManagingDeviceException"></exception>
         public String AddDeviceToUser(User User, String DevName, String DevId)
         {
             if (!ValidateDeviceData(DevName, DevId))
@@ -230,7 +271,14 @@ namespace VCBackend.Business_Rules.Users
             else throw new ManagingDeviceException("Device Id already registered.");
         }
 
-        public void RemoveDevice(User User, String DevId)
+        /// <summary>
+        /// This method removes a device from the User's devices. After the removal, the device 
+        /// won't be able to access the private API methods.
+        /// </summary>
+        /// <param name="User">The authenticated user.</param>
+        /// <param name="DevId">The device Id.</param>
+        /// <exception cref="ManagingDeviceException"></exception>
+        public void RemoveDeviceFromUser(User User, String DevId)
         {
             if (!ValidateDeviceData(null, DevId))
                 throw new ManagingDeviceException("Invalid id format");
@@ -245,6 +293,11 @@ namespace VCBackend.Business_Rules.Users
             rep.Update(User);
         }
 
+        /// <summary>
+        /// List all the devices that the user has registered.
+        /// </summary>
+        /// <param name="user">The authenticated user.</param>
+        /// <returns>A list of devices.</returns>
         public ICollection<Device> GetUserDevices(User user)
         {
             return user.Devices;

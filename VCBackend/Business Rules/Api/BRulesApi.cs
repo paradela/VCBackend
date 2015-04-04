@@ -65,7 +65,7 @@ namespace VCBackend.Business_Rules
         public static void RemoveDevice(User User, String DeviceId)
         {
             UserManager um = UserManager.getUserManagerSingleton();
-            um.RemoveDevice(User, DeviceId);
+            um.RemoveDeviceFromUser(User, DeviceId);
         }
 
         public static ICollection<DeviceDto> GetAllDevices(User User)
