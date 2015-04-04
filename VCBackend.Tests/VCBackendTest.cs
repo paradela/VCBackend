@@ -2,6 +2,7 @@
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using VCBackend.Models;
+using VCBackend.Models.Dto;
 using VCBackend.Business_Rules;
 using VCBackend.Business_Rules.Users;
 using VCBackend.Repositories;
@@ -10,7 +11,7 @@ using System.Collections.Generic;
 namespace VCBackend.Tests
 {
     [TestClass]
-    public class UnitTest1
+    public class VCBackendTest
     {
         [TestMethod]
         public void TestUserCreation()
@@ -53,15 +54,30 @@ namespace VCBackend.Tests
             IRepository<User> ur = UserRepository.getRepositorySingleton();
             User user = ur.FindById(1);
             String token = BRulesApi.AddDevice(user, "Teste", "12312ASBD");
-            //using (var db = new VCardContext())
-            //{
-            //    User user = db.Users.First();
-            //    Device d = new Device("1231231kljnk123");
-            //    d.Name = "Name";
-            //    d.Token = "asd,lçal,dç,,admakndbhjb";
-            //    user.Devices.Add(d);
-            //    db.SaveChanges();
-            //}
+            user = ur.FindById(1);
+            Assert.AreEqual(user.Devices.Count(), 2);
+        }
+
+        [TestMethod]
+        public void TestGetAllDevices()
+        {
+            IRepository<User> ur = UserRepository.getRepositorySingleton();
+            User user = ur.FindById(1);
+            ICollection<DeviceDto> devices = BRulesApi.GetAllDevices(user);
+            Assert.AreEqual(devices.Count(), 2);
+            Assert.AreEqual(devices.ElementAt(0).Name, "Default");
+            Assert.AreEqual(devices.ElementAt(1).Name, "Teste");
+        }
+
+        [TestMethod]
+        public void TestRemoveDevice()
+        {
+            IRepository<User> ur = UserRepository.getRepositorySingleton();
+            User user = ur.FindById(1);
+            BRulesApi.RemoveDevice(user, "12312ASBD");
+            user = ur.FindById(1);
+            Assert.AreEqual(user.Devices.Count(), 1);
+            Assert.AreEqual(user.Devices.First().Name, "Default");
         }
     }
 }

@@ -244,5 +244,10 @@ namespace VCBackend.Business_Rules.Users
             User.Devices.Remove(dev);
             rep.Update(User);
         }
+
+        public ICollection<Device> GetUserDevices(User user)
+        {
+            return user.Devices;
+        }
     }
 }

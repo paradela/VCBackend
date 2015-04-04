@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using VCBackend.Models;
+using VCBackend.Models.Dto;
 using VCBackend.Business_Rules.Users;
 
 namespace VCBackend.Business_Rules
@@ -36,6 +37,13 @@ namespace VCBackend.Business_Rules
             um.UpdateUser(User, Name, Email, Password);
         }
 
+        public static UserDto GetUser(User user)
+        {
+            UserDto dto = new UserDto();
+            dto.Serialize(user);
+            return dto;
+        }
+
         /********************************
          * User Login
          ********************************/
@@ -46,12 +54,32 @@ namespace VCBackend.Business_Rules
         }
 
         /********************************
-         * 
+         * Device Management
          ********************************/
         public static String AddDevice(User User, String DeviceName, String DeviceId)
         {
             UserManager um = UserManager.getUserManagerSingleton();
             return um.AddDeviceToUser(User, DeviceName, DeviceId);
+        }
+
+        public static void RemoveDevice(User User, String DeviceId)
+        {
+            UserManager um = UserManager.getUserManagerSingleton();
+            um.RemoveDevice(User, DeviceId);
+        }
+
+        public static ICollection<DeviceDto> GetAllDevices(User User)
+        {
+            UserManager um = UserManager.getUserManagerSingleton();
+            ICollection<Device> devices = um.GetUserDevices(User);
+            ICollection<DeviceDto> devDto = new List<DeviceDto>();
+            foreach (Device d in devices)
+            {
+                DeviceDto dto = new DeviceDto();
+                dto.Serialize(d);
+                devDto.Add(dto);
+            }
+            return devDto;
         }
     }
 }
