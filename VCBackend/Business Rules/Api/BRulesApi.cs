@@ -18,27 +18,28 @@ namespace VCBackend.Business_Rules
         /********************************
          * User Creation and Update
          ********************************/
-        public static String CreateUser ( String Name, String Email, String Password) 
+        public static String CreateUser (String Name, String Email, String Password) 
         {
             UserManager um = UserManager.getUserManagerSingleton();
 
-            User user = um.CreateUser(Name, Email, Password);
+            String token = um.CreateUser(Name, Email, Password);
 
             //returns a token for authentication!
             //It returns the First device, because the account was just created and it only has one device that is the default one!
-            return user.Devices.First<Device>().Token;
+            return token;
         }
 
-        public static void UpdateUser ( String Name, String Email, String Password)
+        public static void UpdateUser (User User, String Name, String Email, String Password)
         {
             UserManager um = UserManager.getUserManagerSingleton();
-            
+
+            um.UpdateUser(User, Name, Email, Password);
         }
 
         /********************************
          * User Login
          ********************************/
-        public static String Login ( String Username, String Password, String DeviceId)
+        public static String Login (String Username, String Password, String DeviceId)
         {
             UserManager um = UserManager.getUserManagerSingleton();
             return um.UserLogin(Username, Password, DeviceId);
@@ -47,6 +48,10 @@ namespace VCBackend.Business_Rules
         /********************************
          * 
          ********************************/
-            
+        public static String AddDevice(User User, String DeviceName, String DeviceId)
+        {
+            UserManager um = UserManager.getUserManagerSingleton();
+            return um.AddDeviceToUser(User, DeviceName, DeviceId);
+        }
     }
 }

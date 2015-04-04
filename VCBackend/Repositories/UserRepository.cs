@@ -8,11 +8,21 @@ namespace VCBackend.Repositories
 {
     public class UserRepository : IRepository<User>
     {
-        VCardContext usersCtx;
+        private VCardContext usersCtx;
+        private static UserRepository rep = null;
 
-        public UserRepository ()
+
+        private UserRepository ()
         {
             usersCtx = new VCardContext();
+        }
+
+        public static UserRepository getRepositorySingleton()
+        {
+            if (rep == null)
+                rep = new UserRepository();
+
+            return rep;
         }
 
         IEnumerable<User> IRepository<User>.List
@@ -37,7 +47,6 @@ namespace VCBackend.Repositories
 
         void IRepository<User>.Update(User entity)
         {
-            usersCtx.Entry(entity).State = System.Data.Entity.EntityState.Modified;
             usersCtx.SaveChanges();   
         }
 

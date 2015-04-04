@@ -20,7 +20,7 @@ namespace VCBackend.Tests
                 "ea@asd.pt",
                 "P4$$w0rd");
 
-            IRepository<User> ur = new UserRepository();
+            IRepository<User> ur = UserRepository.getRepositorySingleton();
             User user = ur.FindById(1);
             ICollection<Device> devices = user.Devices;
 
@@ -50,13 +50,18 @@ namespace VCBackend.Tests
         [TestMethod]
         public void TestAddDevice()
         {
-            IRepository<Device> rep = new DeviceRepository();
-            IEnumerable<Device> devices = rep.List;
-
-            var dev = (from d in devices
-                       where d.Token == ""
-                       select d).FirstOrDefault();
-
+            IRepository<User> ur = UserRepository.getRepositorySingleton();
+            User user = ur.FindById(1);
+            String token = BRulesApi.AddDevice(user, "Teste", "12312ASBD");
+            //using (var db = new VCardContext())
+            //{
+            //    User user = db.Users.First();
+            //    Device d = new Device("1231231kljnk123");
+            //    d.Name = "Name";
+            //    d.Token = "asd,lçal,dç,,admakndbhjb";
+            //    user.Devices.Add(d);
+            //    db.SaveChanges();
+            //}
         }
     }
 }

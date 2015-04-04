@@ -29,7 +29,7 @@ namespace VCBackend.Models
 
         public void AddDevice(Device device)
         {
-            device.Owner = this;
+            //device.Owner = this;
             Devices.Add(device);
         }
 

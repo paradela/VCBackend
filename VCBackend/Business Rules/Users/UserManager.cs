@@ -16,7 +16,7 @@ namespace VCBackend.Business_Rules.Users
         private IRepository<User> rep;
 
         private UserManager() {
-            rep = new UserRepository(); 
+            rep = UserRepository.getRepositorySingleton();
         }
 
         public static UserManager getUserManagerSingleton()
@@ -27,6 +27,9 @@ namespace VCBackend.Business_Rules.Users
             return userManager;
         }
 
+        /*
+         * This method creates a new device with the given name and device id. 
+         */
         private Device CreateDeviceToUser(User user, String Name = "Default", String DeviceId = null)
         {
             Device device;
@@ -38,11 +41,7 @@ namespace VCBackend.Business_Rules.Users
             device.Name = Name;
             //Generates a token that should be used next to register a device.
             device.Token = AuthToken.GenerateToken(user, device);
-            //device.Owner = user;
-            //IRepository<Device> dr = new DeviceRepository();
-            //dr.Add(device);
             user.AddDevice(device);
-            //user.Devices.Add(device);
             return device;
         }
 
@@ -107,7 +106,7 @@ namespace VCBackend.Business_Rules.Users
             else return false;
         }
 
-        public User CreateUser(String Name, String Email, String Password)
+        public String CreateUser(String Name, String Email, String Password)
         {
             /*
              * Validate if the new user details are well formed
@@ -130,12 +129,11 @@ namespace VCBackend.Business_Rules.Users
 
             //rep.Add(newUser);
 
-            CreateDeviceToUser(newUser);
+            String token = CreateDeviceToUser(newUser).Token;
 
             rep.Add(newUser);
-            //rep.Update(newUser);
 
-            return newUser;
+            return token;
         }
 
         public void UpdateUser(User User, String Name, String Email, String Password)
