@@ -1,20 +1,36 @@
 ﻿<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <title>Product App</title>
+  <title>Virtual Card</title>
 </head>
 <body>
 
-  <div>
-    <h2>All Products</h2>
-    <ul id="products" />
-  </div>
-  <div>
-    <h2>Search by ID</h2>
-    <input type="text" id="prodId" size="5" />
-    <input type="button" value="Search" onclick="find();" />
-    <p id="product" />
-  </div>
+    <!--<div>
+        <h2>All Products</h2>
+        <ul id="products" />
+    </div>
+    <div>
+        <h2>Search by ID</h2>
+        <input type="text" id="prodId" size="5" />
+        <input type="button" value="Search" onclick="find();" />
+        <p id="product" />
+    </div>-->
+    <div>
+        <p id="token" />
+    </div>
+    <div>
+        <h2>Create User</h2>
+        <input type="text" id="name" />
+        <input type="email" id="email" />
+        <input type="password" id="password" />
+        <input type="button" value="Create" onclick="createUser();" />
+    </div>
+    <div>
+        <h2>Login</h2>
+        <input type="email" id="username"/>
+        <input type="password" id="pwd"/>
+        <input type="button" value="Login" onclick="login()" />
+    </div>
 
   <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-2.0.3.min.js"></script>
   <script>
@@ -48,6 +64,40 @@
               .fail(function (jqXHR, textStatus, err) {
                   $('#product').text('Error: ' + err);
               });
+      }
+
+      function createUser() {
+          var name = $('#name').val();
+          var email = $('#email').val();
+          var password = $('#password').val();
+          var uri = "api/user?n="
+              + name + "&e="
+              + email + "&p="
+              + password;
+          $.post(uri,
+              null,
+              function (value) {
+                  $('#token').text('Token: ' + value);
+                  localStorage.token = value;
+              },
+              "json"
+              );
+      }
+
+      function login() {
+          var username = $('#username').val();
+          var pwd = $('#pwd').val();
+          var uri = "api/user?u="
+              + username + "&p="
+              + pwd;
+          $.post(uri,
+              null,
+              function (value) {
+                  $('#token').text('Token: ' + value);
+                  localStorage.token = value;
+              },
+              "json"
+              );
       }
   </script>
 </body>

@@ -10,11 +10,18 @@ using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using VCBackend.Models;
 using VCBackend.Repositories;
+using System.Web.Http.Controllers;
 
 namespace VCBackend.Filters
 {
     public class AuthenticationFilter : Attribute, IAuthenticationFilter 
     {
+        public static String AUTH_DEVICE = "AuthDevice";
+
+        public static Device GetAuthenticatedDevice(HttpActionContext context)
+        {
+            return (Device)context.Request.Properties[AuthenticationFilter.AUTH_DEVICE];
+        }
 
         public System.Threading.Tasks.Task AuthenticateAsync(HttpAuthenticationContext context, System.Threading.CancellationToken cancellationToken)
         {
@@ -43,7 +50,7 @@ namespace VCBackend.Filters
             if (dev == null)
                 return null;
 
-            context.Request.Properties.Add("AuthDevice", dev);
+            context.Request.Properties.Add(AUTH_DEVICE, dev);
             
             return Task.FromResult(0);
         }
