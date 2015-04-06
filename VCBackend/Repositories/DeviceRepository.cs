@@ -46,5 +46,11 @@ namespace VCBackend.Repositories
             var result = (from r in Ctx.Devices where r.Id == Id select r).FirstOrDefault();
             return result;   
         }
+
+
+        ICollection<Device> IRepository<Device>.ExecuteSQL(string SQL)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

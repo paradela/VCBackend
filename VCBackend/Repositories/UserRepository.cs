@@ -55,5 +55,11 @@ namespace VCBackend.Repositories
             var result = (from r in usersCtx.Users where r.Id == Id select r).FirstOrDefault();
             return result;   
         }
+
+
+        ICollection<User> IRepository<User>.ExecuteSQL(string SqlQuery)
+        {
+            return usersCtx.Users.SqlQuery(SqlQuery).ToList();
+        }
     }
 }

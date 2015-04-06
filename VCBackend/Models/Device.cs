@@ -15,7 +15,7 @@ namespace VCBackend.Models
 
     public class Device : IEntity
     {
-        //public virtual User Owner { get; set; }
+        public virtual User Owner { get; set; }
         public DeviceType Type { get; set; }
         public String Name { get; set; }
         public String DeviceId { get; set; }
