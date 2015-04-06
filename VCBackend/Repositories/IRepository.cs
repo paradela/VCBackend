@@ -14,6 +14,5 @@ namespace VCBackend.Repositories
         void Delete(T entity);
         void Update(T entity);
         T FindById(int Id);
-        ICollection<T> ExecuteSQL(String SQL);
     }
 }

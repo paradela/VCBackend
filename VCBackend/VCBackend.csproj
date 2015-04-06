@@ -107,7 +107,7 @@
     <Compile Include="Business Rules\Users\UserAlreadyExistException.cs" />
     <Compile Include="Business Rules\Users\UserManager.cs" />
     <Compile Include="Controllers\UsersController.cs" />
-    <Compile Include="Filters\AuthenticationFilter.cs" />
+    <Compile Include="Filters\VCAuthenticate.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>

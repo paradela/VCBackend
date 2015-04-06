@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using VCBackend.Models;
+using VCBackend.Models.Dto;
 using VCBackend.Repositories;
 using VCBackend.Utility.Security;
 using System.Text.RegularExpressions;
@@ -188,6 +189,18 @@ namespace VCBackend.Business_Rules.Users
         }
 
         /// <summary>
+        /// Returns a authenticated user info.
+        /// </summary>
+        /// <param name="user">The authenticated user.</param>
+        /// <returns>A Dto with the user info.</returns>
+        public UserDto GetUser(User User)
+        {
+            UserDto dto = new UserDto();
+            dto.Serialize(User);
+            return dto;
+        }
+
+        /// <summary>
         /// Authenticates a user with the given email and password. The device id is optional, although
         /// if it is not passed, the given token doesn't have access to the whole API.
         /// </summary>
@@ -198,52 +211,26 @@ namespace VCBackend.Business_Rules.Users
         /// <exception cref="InvalidCredentialsException"></exception>
         public String UserLogin(String Email, String Password, String DeviceId = null)
         {
-            Stopwatch sw = new Stopwatch();
-
-            sw.Start();
-            Pbkdf2.DeriveKey(Password);
-            sw.Stop();
-            var t = sw.Elapsed;
-            sw.Reset();
-            sw.Start();
             String token = null;
             IEnumerable<User> users = rep.List;
             var u = from user in users
                     where user.Email == Email
                     && user.Password == Pbkdf2.DeriveKey(Password)
                     select user;
-            var count = u.Count();
 
-            //var users = rep.ExecuteSQL(
-            //    "SELECT * FROM Users WHERE Email='" + Email + "' AND Password='" + Pbkdf2.DeriveKey(Password) + "';"
-            //    );
-
-            //var count = users.Count();
-
-            sw.Stop();
-            System.Diagnostics.Debug.WriteLine("Find user with email and password: {0}", sw.Elapsed);
-            sw.Reset();
-            if (count == 1)
+            if (u.Count() == 1)
             {
                 User user = u.First<User>();
                 ICollection<Device> devices = user.Devices;
 
                 if (DeviceId != null)
                 {
-                    sw.Start();
                     var q = (from dev in devices
                              where dev.DeviceId == DeviceId
                              select dev).FirstOrDefault();
-                    sw.Stop();
-                    System.Diagnostics.Debug.WriteLine("Find device from ID: {0}", sw.Elapsed);
-                    sw.Reset();
                     if (q != null)
                     {
-                        sw.Start();
                         q.Token = AuthToken.GenerateToken(user, q);
-                        sw.Stop();
-                        System.Diagnostics.Debug.WriteLine("Generate Token 1 {0}", sw.Elapsed);
-                        sw.Reset();
                         token = q.Token;
                     }
                     else throw new InvalidCredentialsException("Invalid DeviceId");
@@ -251,29 +238,18 @@ namespace VCBackend.Business_Rules.Users
                 }
                 else
                 {
-                    sw.Start();
                     var q = (from dev in devices
                              where dev.Type == DeviceType.DEFAULT_DEVICE
                              select dev).FirstOrDefault();
-                    sw.Stop();
-                    System.Diagnostics.Debug.WriteLine("Find default device {0}", sw.Elapsed);
-                    sw.Reset();
                     if (q != null)
                     {
-                        sw.Start();
                         q.Token = AuthToken.GenerateToken(user, q);
-                        sw.Stop();
-                        System.Diagnostics.Debug.WriteLine("Generate Token 2 {0}", sw.Elapsed);
-                        sw.Reset();
                         token = q.Token;
                     }
                     else throw new InvalidCredentialsException("Internal error, no devices to authenticate");
                 }
 
-                sw.Start();
                 rep.Update(user);
-                sw.Stop();
-                System.Diagnostics.Debug.WriteLine("Update user in DB: {0}", sw.Elapsed);
 
             }
             else throw new InvalidCredentialsException();

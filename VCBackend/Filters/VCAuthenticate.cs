@@ -14,13 +14,13 @@ using System.Web.Http.Controllers;
 
 namespace VCBackend.Filters
 {
-    public class AuthenticationFilter : Attribute, IAuthenticationFilter 
+    public class VCAuthenticate : Attribute, IAuthenticationFilter 
     {
         public static String AUTH_DEVICE = "AuthDevice";
 
         public static Device GetAuthenticatedDevice(HttpActionContext context)
         {
-            return (Device)context.Request.Properties[AuthenticationFilter.AUTH_DEVICE];
+            return (Device)context.Request.Properties[VCAuthenticate.AUTH_DEVICE];
         }
 
         public System.Threading.Tasks.Task AuthenticateAsync(HttpAuthenticationContext context, System.Threading.CancellationToken cancellationToken)

@@ -62,9 +62,9 @@ namespace VCBackend.Business_Rules
         /// <returns>A Dto with the user info.</returns>
         public static UserDto GetUser(User user)
         {
-            UserDto dto = new UserDto();
-            dto.Serialize(user);
-            return dto;
+            UserManager um = UserManager.getUserManagerSingleton();
+
+            return um.GetUser(user);
         }
 
         /********************************
