@@ -167,7 +167,7 @@ namespace VCBackend.Business_Rules.Users
         /// <param name="Password">The new password.</param>
         /// <exception cref="MalformedUserDetailsException">One or more of the details passed have an incorrect format.</exception>
         /// <exception cref="UserAlreadyExistException">Email already in use.</exception>
-        public void UpdateUser(User User, String Name, String Email, String Password)
+        public UserDto UpdateUser(User User, String Name, String Email, String Password)
         {
             /*
              * Validate if the new user details are well formed
@@ -186,6 +186,10 @@ namespace VCBackend.Business_Rules.Users
                 User.Password = Pbkdf2.DeriveKey(Password);
 
             rep.Update(User);
+
+            UserDto dto = new UserDto();
+            dto.Serialize(User);
+            return dto;
         }
 
         /// <summary>

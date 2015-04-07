@@ -18,87 +18,117 @@ namespace VCBackend.Controllers
     {
         //POST api/user?n="Name"&e="email@mail.pt"&p="passw0rd"
         [Route("")]
-        public IHttpActionResult PostNewUser([FromUri] String n, [FromUri] String e, [FromUri] String p)
+        public TokenDto PostNewUser([FromUri] String n, [FromUri] String e, [FromUri] String p)
         {
             try
             {
-                String token = BRulesApi.CreateUser(n, e, p);
-                return Ok(token);
+                TokenDto token = BRulesApi.CreateUser(n, e, p);
+                return token;
             }
             catch (MalformedUserDetailsException ex)
             {
-                return BadRequest(ex.Message);
+                var resp = new HttpResponseMessage(HttpStatusCode.Forbidden)
+                {
+                    Content = new StringContent(ex.Message),
+                    ReasonPhrase = ex.Message
+                };
+                throw new HttpResponseException(resp);
             }
             catch (UserAlreadyExistException ex)
             {
-                return BadRequest(ex.Message);
+                var resp = new HttpResponseMessage(HttpStatusCode.Forbidden)
+                {
+                    Content = new StringContent(ex.Message),
+                    ReasonPhrase = ex.Message
+                };
+                throw new HttpResponseException(resp);
             }
         }
 
         //POST api/user?u=email@mail.pt&p=Pa$$w0rd
         [Route("")]
-        public IHttpActionResult PostLogin([FromUri] String u, [FromUri] String p, [FromUri] String id = null)
+        public TokenDto PostLogin([FromUri] String u, [FromUri] String p, [FromUri] String id = null)
         {
             try
             {
-                String token = BRulesApi.Login(u, p, id);
-                return Ok(token);
+                TokenDto token = BRulesApi.Login(u, p, id);
+                return token;
             }
             catch (InvalidCredentialsException ex)
             {
-                return BadRequest(ex.Message);
+                var resp = new HttpResponseMessage(HttpStatusCode.Forbidden)
+                {
+                    Content = new StringContent(ex.Message),
+                    ReasonPhrase = ex.Message
+                };
+                throw new HttpResponseException(resp);
             }
         }
 
         //POST api/user/edit?t=123token&n=Jon Doe&e=jon.doe@mail.pt&p=Pa$$w0rd
         [Route("edit")]
         [VCAuthenticate]
-        public IHttpActionResult PostUpdateUser([FromUri] String n = null, [FromUri] String e = null, [FromUri] String p = null)
+        public UserDto PostUpdateUser([FromUri] String n = null, [FromUri] String e = null, [FromUri] String p = null)
         {
             User authUser = VCAuthenticate.GetAuthenticatedDevice(ActionContext).Owner;
 
             try
             {
-                BRulesApi.UpdateUser(authUser, n, e, p);
-                return Ok();
+                UserDto dto = BRulesApi.UpdateUser(authUser, n, e, p);
+                return dto;
             }
             catch (MalformedUserDetailsException ex)
             {
-                return BadRequest(ex.Message);
+                var resp = new HttpResponseMessage(HttpStatusCode.Forbidden)
+                {
+                    Content = new StringContent(ex.Message),
+                    ReasonPhrase = ex.Message
+                };
+                throw new HttpResponseException(resp);
             }
             catch (UserAlreadyExistException ex)
             {
-                return BadRequest(ex.Message);
+                var resp = new HttpResponseMessage(HttpStatusCode.Forbidden)
+                {
+                    Content = new StringContent(ex.Message),
+                    ReasonPhrase = ex.Message
+                };
+                throw new HttpResponseException(resp);
             }
         }
 
         //GET api/user?t=123token
         [Route("")]
         [VCAuthenticate]
-        public IHttpActionResult GetUser()
+        public UserDto GetUser()
         {
             User authUser = VCAuthenticate.GetAuthenticatedDevice(ActionContext).Owner;
 
             UserDto dto = BRulesApi.GetUser(authUser);
 
-            return Ok(dto);
+            return dto;
         }
 
         //POST api/user/device?t=123token
         [Route("device")]
         [VCAuthenticate]
-        public IHttpActionResult PostAddDevice([FromUri] String n, [FromUri] String id)
+        public TokenDto PostAddDevice([FromUri] String n, [FromUri] String id)
         {
             User authUser = VCAuthenticate.GetAuthenticatedDevice(ActionContext).Owner;
 
             try
             {
-                String token = BRulesApi.AddDevice(authUser, n, id);
-                return Ok(token);
+                TokenDto token = BRulesApi.AddDevice(authUser, n, id);
+                return token;
             }
             catch (ManagingDeviceException ex)
             {
-                return BadRequest(ex.Message);
+                var resp = new HttpResponseMessage(HttpStatusCode.Forbidden)
+                {
+                    Content = new StringContent(ex.Message),
+                    ReasonPhrase = ex.Message
+                };
+                throw new HttpResponseException(resp);
             }
         }
 
