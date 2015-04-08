@@ -114,6 +114,7 @@
     <Compile Include="Models\Device.cs" />
     <Compile Include="Models\Dto\DeviceDto.cs" />
     <Compile Include="Models\Dto\IDto.cs" />
+    <Compile Include="Models\Dto\TokenDto.cs" />
     <Compile Include="Models\Dto\UserDto.cs" />
     <Compile Include="Models\IEntity.cs" />
     <Compile Include="Models\VCardContext.cs" />

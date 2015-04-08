@@ -28,15 +28,17 @@ namespace VCBackend.Business_Rules
         /// <returns>JWT Authentication token for the created users.</returns>
         /// <exception cref="MalformedUserDetailsException">One or more of the details passed have an incorrect format.</exception>
         /// <exception cref="UserAlreadyExistException">Email already in use.</exception>
-        public static String CreateUser (String Name, String Email, String Password) 
+        public static TokenDto CreateUser (String Name, String Email, String Password) 
         {
             UserManager um = UserManager.getUserManagerSingleton();
 
             String token = um.CreateUser(Name, Email, Password);
 
+            TokenDto dto = new TokenDto(token);
+
             //returns a token for authentication!
             //It returns the First device, because the account was just created and it only has one device that is the default one!
-            return token;
+            return dto;
         }
 
         /// <summary>
@@ -46,13 +48,14 @@ namespace VCBackend.Business_Rules
         /// <param name="Name">The new name.</param>
         /// <param name="Email">The new email.</param>
         /// <param name="Password">The new password.</param>
+        /// <returns>A UserDto with the actual user data.</returns>
         /// <exception cref="MalformedUserDetailsException">One or more of the details passed have an incorrect format.</exception>
         /// <exception cref="UserAlreadyExistException">Email already in use.</exception>
-        public static void UpdateUser (User User, String Name, String Email, String Password)
+        public static UserDto UpdateUser (User User, String Name, String Email, String Password)
         {
             UserManager um = UserManager.getUserManagerSingleton();
 
-            um.UpdateUser(User, Name, Email, Password);
+            return um.UpdateUser(User, Name, Email, Password);
         }
 
         /// <summary>
@@ -79,10 +82,12 @@ namespace VCBackend.Business_Rules
         /// <param name="DeviceId">The device id.</param>
         /// <returns>JWT Authentication token for the default device, or for the device with the given Id.</returns>
         /// <exception cref="InvalidCredentialsException"></exception>
-        public static String Login (String Username, String Password, String DeviceId)
+        public static TokenDto Login(String Username, String Password, String DeviceId)
         {
             UserManager um = UserManager.getUserManagerSingleton();
-            return um.UserLogin(Username, Password, DeviceId);
+            String token = um.UserLogin(Username, Password, DeviceId);
+            TokenDto dto = new TokenDto(token);
+            return dto;
         }
 
         /********************************
@@ -97,10 +102,12 @@ namespace VCBackend.Business_Rules
         /// <param name="DevId">The device id.</param>
         /// <returns>JWT Authentication token for the created device.</returns>
         /// <exception cref="ManagingDeviceException"></exception>
-        public static String AddDevice(User User, String DeviceName, String DeviceId)
+        public static TokenDto AddDevice(User User, String DeviceName, String DeviceId)
         {
             UserManager um = UserManager.getUserManagerSingleton();
-            return um.AddDeviceToUser(User, DeviceName, DeviceId);
+            String token = um.AddDeviceToUser(User, DeviceName, DeviceId);
+            TokenDto dto = new TokenDto(token);
+            return dto;
         }
 
         /// <summary>
