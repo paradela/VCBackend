@@ -119,5 +119,17 @@ namespace VCBackend.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        //GET api/user/device?t=123token
+        [Route("device")]
+        [VCAuthenticate]
+        public IHttpActionResult GetAllDevices() 
+        {
+            User authUser = VCAuthenticate.GetAuthenticatedDevice(ActionContext).Owner;
+
+            ICollection<DeviceDto> devices = BRulesApi.GetAllDevices(authUser);
+            return Ok(devices);
+        }
+
     }
 }

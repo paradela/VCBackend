@@ -107,12 +107,12 @@ namespace VCBackend.Business_Rules.Users
         private bool ExistUserWithEmail(String Email)
         {
             IEnumerable<User> users = rep.List;
-            var query =
-                from user in users
+            var list =
+                (from user in users
                 where user.Email == Email
-                select user;
+                select user).ToList();
 
-            if (query.Count() > 0)
+            if (list.Count() > 0)
                 return true;
             else return false;
         }
