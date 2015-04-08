@@ -25,7 +25,7 @@ namespace VCBackend.Utility.Security
             };
 
             
-            if (Device.Type == DeviceType.DEFAULT_DEVICE)
+            if (Device.Type == Device.DEFAULT_DEVICE)
             {
                 payload["exp"] = now + VALIDITY;
             }

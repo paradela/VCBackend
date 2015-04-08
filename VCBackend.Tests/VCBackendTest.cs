@@ -26,7 +26,7 @@ namespace VCBackend.Tests
             ICollection<Device> devices = user.Devices;
 
             foreach(Device d in devices)
-                Assert.AreNotEqual(d.Type, DeviceType.MOBILE_DEVICE);
+                Assert.AreNotEqual(d.Type, Device.MOBILE_DEVICE);
 
             Assert.AreEqual("Jose Silva", user.Name);
             Assert.AreNotEqual("P4$$w0rd", user.Password);

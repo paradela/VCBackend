@@ -7,28 +7,25 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace VCBackend.Models
 {
-    public enum DeviceType
-    {
-        DEFAULT_DEVICE,
-        MOBILE_DEVICE
-    }
-
     public class Device : IEntity
     {
+        public readonly static int DEFAULT_DEVICE = 1;
+        public readonly static int MOBILE_DEVICE = 2;
+
         public virtual User Owner { get; set; }
-        public DeviceType Type { get; set; }
+        public int Type { get; set; }
         public String Name { get; set; }
         public String DeviceId { get; set; }
         public String Token { get; set; }
 
         public Device() 
         {
-            Type = DeviceType.DEFAULT_DEVICE;
+            Type = DEFAULT_DEVICE;
         }
 
         public Device(String devId)
         {
-            Type = DeviceType.MOBILE_DEVICE;
+            Type = MOBILE_DEVICE;
             DeviceId = devId;
         }
     }
