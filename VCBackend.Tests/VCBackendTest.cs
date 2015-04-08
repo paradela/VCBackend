@@ -38,7 +38,7 @@ namespace VCBackend.Tests
             try
             {
 
-                String token = BRulesApi.Login("ea@asd.pt", "P4$$w0rd", null);
+                TokenDto token = BRulesApi.Login("ea@asd.pt", "P4$$w0rd", null);
 
             }
             catch (InvalidCredentialsException)
@@ -53,7 +53,7 @@ namespace VCBackend.Tests
         {
             IRepository<User> ur = UserRepository.getRepositorySingleton();
             User user = ur.FindById(1);
-            String token = BRulesApi.AddDevice(user, "Teste", "12312ASBD");
+            TokenDto token = BRulesApi.AddDevice(user, "Teste", "12312ASBD");
             user = ur.FindById(1);
             Assert.AreEqual(user.Devices.Count(), 2);
         }
