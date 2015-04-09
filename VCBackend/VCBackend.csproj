@@ -17,7 +17,7 @@
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
     <UseIISExpress>false</UseIISExpress>
-    <IISExpressSSLPort />
+    <IISExpressSSLPort>44300</IISExpressSSLPort>
     <IISExpressAnonymousAuthentication />
     <IISExpressWindowsAuthentication />
     <IISExpressUseClassicPipelineMode />
@@ -132,6 +132,8 @@
     <Compile Include="Business Rules\Users\ManagingDeviceException.cs" />
     <Compile Include="Business Rules\Users\UserAlreadyExistException.cs" />
     <Compile Include="Business Rules\Users\UserManager.cs" />
+    <Compile Include="Business Rules\VCard\TSMFakeProxy.cs" />
+    <Compile Include="Business Rules\VCard\VCardManager.cs" />
     <Compile Include="Controllers\UsersController.cs" />
     <Compile Include="Filters\VCAuthenticate.cs" />
     <Compile Include="Global.asax.cs">
@@ -143,12 +145,14 @@
     <Compile Include="Models\Dto\TokenDto.cs" />
     <Compile Include="Models\Dto\UserDto.cs" />
     <Compile Include="Models\IEntity.cs" />
+    <Compile Include="Models\VCard.cs" />
     <Compile Include="Models\VCardContext.cs" />
     <Compile Include="Models\User.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repositories\DeviceRepository.cs" />
     <Compile Include="Repositories\IRepository.cs" />
     <Compile Include="Repositories\UserRepository.cs" />
+    <Compile Include="Repositories\VCardRepository.cs" />
     <Compile Include="Utility\Security\AuthToken.cs" />
     <Compile Include="Utility\Security\Pbkdf2.cs" />
     <Compile Include="VCardService.svc.cs">

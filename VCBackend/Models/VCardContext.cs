@@ -12,5 +12,6 @@ namespace VCBackend.Models
         public VCardContext() { }
         public DbSet<User> Users { get; set; }
         public DbSet<Device> Devices { get; set; }
+        public DbSet<VCard> Cards { get; set; }
     }
 }
