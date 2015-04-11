@@ -35,7 +35,7 @@ namespace VCBackend.Business_Rules.VCard
         }
         
         //Init Card (Add Serial number)
-        public bool InitCard(int CId, byte[] SerialNumber)
+        public bool InitCard(uint CId, byte[] SerialNumber)
         {
             Models.VCard card = rep.FindById(CId);
             if (card != null || SerialNumber.Length == 4)

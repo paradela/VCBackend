@@ -17,7 +17,7 @@ namespace VCBackend.Repositories
             usersCtx = new VCardContext();
         }
 
-        public static UserRepository getRepositorySingleton()
+        public static IRepository<User> getRepositorySingleton()
         {
             if (rep == null)
                 rep = new UserRepository();
@@ -50,7 +50,7 @@ namespace VCBackend.Repositories
             usersCtx.SaveChanges();   
         }
 
-        User IRepository<User>.FindById(int Id)
+        User IRepository<User>.FindById(uint Id)
         {
             var result = (from r in usersCtx.Users where r.Id == Id select r).FirstOrDefault();
             return result;   

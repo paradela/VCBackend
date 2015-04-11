@@ -8,11 +8,21 @@ namespace VCBackend.Repositories
 {
     public class DeviceRepository : IRepository<Device>
     {
-        VCardContext Ctx;
+        private static DeviceRepository rep = null;
+        private VCardContext Ctx;
 
-        public DeviceRepository()
+        private DeviceRepository()
         {
             Ctx = new VCardContext();
+        }
+
+        public static IRepository<Device> getRepositorySingleton()
+        {
+            if (rep == null)
+            {
+                rep = new DeviceRepository();
+            }
+            return rep;
         }
 
         IEnumerable<Device> IRepository<Device>.List

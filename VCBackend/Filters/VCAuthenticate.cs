@@ -25,7 +25,7 @@ namespace VCBackend.Filters
 
         public System.Threading.Tasks.Task AuthenticateAsync(HttpAuthenticationContext context, System.Threading.CancellationToken cancellationToken)
         {
-            IRepository<Device> rep = new DeviceRepository();
+            IRepository<Device> rep = DeviceRepository.getRepositorySingleton();
 
             //1. Get query key/value map to get the authentication data
             var query = context.ActionContext.Request.RequestUri.Query;

@@ -8,7 +8,7 @@ using VCBackend.Repositories;
 using VCBackend.Utility.Security;
 using System.Text.RegularExpressions;
 
-using System.Diagnostics;
+using VCBackend.Business_Rules.Devices;
 
 namespace VCBackend.Business_Rules.Users
 {
@@ -18,7 +18,8 @@ namespace VCBackend.Business_Rules.Users
 
         private IRepository<User> rep;
 
-        private UserManager() {
+        private UserManager() 
+        {
             rep = UserRepository.getRepositorySingleton();
         }
         /// <summary>
@@ -33,28 +34,8 @@ namespace VCBackend.Business_Rules.Users
             return userManager;
         }
 
-        /// <summary>
-        /// This method creates a new device with the given name and device id. 
-        /// </summary>
-        /// <param name="user">The authenticated user.</param>
-        /// <param name="Name">The new device name</param>
-        /// <param name="DeviceId">The new device identifier. If it is @null a default without
-        /// full access to the API will be created!</param>
-        /// <returns>The created Device.</returns>
-        private Device CreateDeviceToUser(User user, String Name = "Default", String DeviceId = null)
-        {
-            Device device;
-
-            if (DeviceId == null)
-                device = new Device();
-            else device = new Device(DeviceId);
-
-            device.Name = Name;
-            //Generates a token that should be used next to register a device.
-            device.Token = AuthToken.GenerateToken(user, device);
-            user.AddDevice(device);
-            return device;
-        }
+        
+        
 
         //http://stackoverflow.com/questions/5859632/regular-expression-for-password-validation
         private bool ValidatePassword(string password)
@@ -131,6 +112,7 @@ namespace VCBackend.Business_Rules.Users
         /// <exception cref="UserAlreadyExistException">Email already in use.</exception>
         public String CreateUser(String Name, String Email, String Password)
         {
+            DeviceManager deviceManager = DeviceManager.getManagerSingleton();
             /*
              * Validate if the new user details are well formed
              */
@@ -150,11 +132,12 @@ namespace VCBackend.Business_Rules.Users
              */
             User newUser = new User(Name, Email, Pbkdf2.DeriveKey(Password));
 
-            //rep.Add(newUser);
-
-            String token = CreateDeviceToUser(newUser).Token;
-
             rep.Add(newUser);
+
+            String token = deviceManager.CreateDeviceToUser(newUser).Token;
+
+
+            rep.Update(newUser);
 
             return token;
         }
@@ -273,6 +256,8 @@ namespace VCBackend.Business_Rules.Users
         /// <exception cref="ManagingDeviceException"></exception>
         public String AddDeviceToUser(User User, String DevName, String DevId)
         {
+            DeviceManager deviceManager = DeviceManager.getManagerSingleton();
+
             if (!ValidateDeviceData(DevName, DevId))
                 throw new ManagingDeviceException("Invalid device name or Id.");
 
@@ -283,7 +268,7 @@ namespace VCBackend.Business_Rules.Users
 
             if (devCount == 0)
             {
-                Device dev = CreateDeviceToUser(User, DevName, DevId);
+                Device dev = deviceManager.CreateDeviceToUser(User, DevName, DevId);
                 rep.Update(User);
                 return dev.Token;
             }
@@ -299,6 +284,8 @@ namespace VCBackend.Business_Rules.Users
         /// <exception cref="ManagingDeviceException"></exception>
         public void RemoveDeviceFromUser(User User, String DevId)
         {
+            DeviceManager devMngr = DeviceManager.getManagerSingleton();
+
             if (!ValidateDeviceData(null, DevId))
                 throw new ManagingDeviceException("Invalid id format");
 
@@ -309,6 +296,9 @@ namespace VCBackend.Business_Rules.Users
                 throw new ManagingDeviceException("Device with given Id does not exist");
 
             User.Devices.Remove(dev);
+
+            devMngr.RemoveDevice(dev);
+
             rep.Update(User);
         }
 

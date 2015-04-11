@@ -126,7 +126,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="Business Rules\Account\AccountManager.cs" />
     <Compile Include="Business Rules\Api\BRulesApi.cs" />
+    <Compile Include="Business Rules\Devices\DeviceManager.cs" />
     <Compile Include="Business Rules\Users\InvalidCredentialsException.cs" />
     <Compile Include="Business Rules\Users\MalformedUserDetailsException.cs" />
     <Compile Include="Business Rules\Users\ManagingDeviceException.cs" />
