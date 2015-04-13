@@ -50,7 +50,7 @@ namespace VCBackend.Repositories
             usersCtx.SaveChanges();   
         }
 
-        User IRepository<User>.FindById(uint Id)
+        User IRepository<User>.FindById(int Id)
         {
             var result = (from r in usersCtx.Users where r.Id == Id select r).FirstOrDefault();
             return result;   

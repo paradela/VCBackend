@@ -9,6 +9,7 @@ using VCBackend.Utility.Security;
 using System.Text.RegularExpressions;
 
 using VCBackend.Business_Rules.Devices;
+using VCBackend.Business_Rules.Accounts;
 
 namespace VCBackend.Business_Rules.Users
 {
@@ -113,6 +114,8 @@ namespace VCBackend.Business_Rules.Users
         public String CreateUser(String Name, String Email, String Password)
         {
             DeviceManager deviceManager = DeviceManager.getManagerSingleton();
+            AccountManager accountManager = AccountManager.getManagerSingleton();
+
             /*
              * Validate if the new user details are well formed
              */
@@ -136,8 +139,17 @@ namespace VCBackend.Business_Rules.Users
 
             String token = deviceManager.CreateDeviceToUser(newUser).Token;
 
+            Account account = accountManager.CreateAccount();
+
+            newUser.Account = account;
 
             rep.Update(newUser);
+
+            accountManager.InitializeAccount(account.Id);
+
+            //newUser.Account = account;
+
+            //rep.Update(newUser);
 
             return token;
         }
@@ -217,7 +229,7 @@ namespace VCBackend.Business_Rules.Users
                              select dev).FirstOrDefault();
                     if (q != null)
                     {
-                        q.Token = AuthToken.GenerateToken(user, q);
+                        q.Token = AuthToken.GetAPIAccessToken(user, q);
                         token = q.Token;
                     }
                     else throw new InvalidCredentialsException("Invalid DeviceId");
@@ -230,7 +242,7 @@ namespace VCBackend.Business_Rules.Users
                              select dev).FirstOrDefault();
                     if (q != null)
                     {
-                        q.Token = AuthToken.GenerateToken(user, q);
+                        q.Token = AuthToken.GetAPIAccessToken(user, q);
                         token = q.Token;
                     }
                     else throw new InvalidCredentialsException("Internal error, no devices to authenticate");
@@ -295,11 +307,9 @@ namespace VCBackend.Business_Rules.Users
             if (dev == null)
                 throw new ManagingDeviceException("Device with given Id does not exist");
 
+            devMngr.RemoveDevice(dev.Id);
+            
             User.Devices.Remove(dev);
-
-            devMngr.RemoveDevice(dev);
-
-            rep.Update(User);
         }
 
         /// <summary>

@@ -13,6 +13,6 @@ namespace VCBackend.Repositories
         void Add(T entity);
         void Delete(T entity);
         void Update(T entity);
-        T FindById(uint Id);
+        T FindById(int Id);
     }
 }

@@ -9,9 +9,15 @@ namespace VCBackend.Models
 {
     public class VCardContext : DbContext
     {
-        public VCardContext() { }
+
+        public VCardContext()
+        {
+            Database.SetInitializer<VCardContext>(new DropCreateDatabaseAlways<VCardContext>());
+        }
+
         public DbSet<User> Users { get; set; }
         public DbSet<Device> Devices { get; set; }
+        public DbSet<Account> Accounts { get; set; }
         public DbSet<VCard> Cards { get; set; }
     }
 }

@@ -47,27 +47,21 @@ namespace VCBackend.Business_Rules.Devices
 
             device.Name = Name;
             //Generates a token that should be used next to register a device.
-            device.Token = AuthToken.GenerateToken(user, device);
+            device.Token = AuthToken.GetAPIAccessToken(user, device);
 
             user.AddDevice(device);
 
-            rep.Add(device); // store device on Database
+            //rep.Add(device); // store device on Database
 
             return device;
         }
 
-        public void RemoveDevice(uint EntityId)
+        public void RemoveDevice(int EntityId)
         {
             Device dev = rep.FindById(EntityId);
 
             if (dev != null)
                 rep.Delete(dev);
-        }
-
-        public void RemoveDevice(Device Device)
-        {
-            if (Device != null)
-                rep.Delete(Device);
         }
 
     }

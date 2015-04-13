@@ -79,5 +79,20 @@ namespace VCBackend.Tests
             Assert.AreEqual(user.Devices.Count(), 1);
             Assert.AreEqual(user.Devices.First().Name, "Default");
         }
+
+        [TestMethod]
+        public void TestEditCard()
+        {
+            IRepository<VCard> rep = VCardRepository.getRepositorySingleton();
+            byte[] array = new byte[] { 0x01, 0x02, 0x03 , 0x00, 0x00, 0x00};
+
+            VCard card = new VCard(array);
+
+            rep.Add(card);
+
+            card.Write(0, new byte[] { 0x04 }, 1);
+
+            rep.Update(card);
+        }
     }
 }

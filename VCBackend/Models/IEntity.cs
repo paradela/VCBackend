@@ -7,6 +7,6 @@ namespace VCBackend.Models
 {
     public class IEntity
     {
-        public uint Id { get; set; }
+        public int Id { get; set; }
     }
 }

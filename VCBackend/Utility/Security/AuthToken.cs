@@ -11,9 +11,10 @@ namespace VCBackend.Utility.Security
         //should be loaded from a file!
         private static string AuthTokenSecret = "GQDstcKsx0NHjPOuXOYg5MbeJ1XT0uFiwDVvVBrk";
 
-        private static int VALIDITY = 1800; // 1 hour
+        private static int API_KEY_VALIDITY = 1800; // 1 hour
+        private static int CARD_KEY_VALIDITY = 60; // 1 min
 
-        public static String GenerateToken(User User, Device Device)
+        public static String GetAPIAccessToken(User User, Device Device)
         {
             var now = Math.Round((DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds);
 
@@ -27,7 +28,7 @@ namespace VCBackend.Utility.Security
             
             if (Device.Type == Device.DEFAULT_DEVICE)
             {
-                payload["exp"] = now + VALIDITY;
+                payload["exp"] = now + API_KEY_VALIDITY;
             }
 
             string token = JWT.JsonWebToken.Encode(payload, AuthTokenSecret, JWT.JwtHashAlgorithm.HS512);
@@ -35,19 +36,35 @@ namespace VCBackend.Utility.Security
             return token;
         }
 
-        public static bool ValidateToken(String Token)
+        public static IDictionary<string, object> ValidateToken(String Token)
         {
             try
             {
-                JWT.JsonWebToken.Decode(Token, AuthTokenSecret, true);
+                var payload = JWT.JsonWebToken.DecodeToObject(Token, AuthTokenSecret, true) 
+                    as IDictionary<string, object>;
                 //didn't threw an exception, is valid!!
-                return true;
+                return payload;
             }
             catch (JWT.SignatureVerificationException)
             {
-                return false;
+                return null;
             }
 
+        }
+
+        public static String GetCardAccessToken(VCard Card)
+        {
+            var now = Math.Round((DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds);
+
+            var payload = new Dictionary<string, object>()
+            {
+                { "card_id", Card.Id },
+                { "exp", now + CARD_KEY_VALIDITY }
+            };
+
+            string token = JWT.JsonWebToken.Encode(payload, AuthTokenSecret, JWT.JwtHashAlgorithm.HS512);
+
+            return token;
         }
     }
 }

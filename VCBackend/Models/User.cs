@@ -16,6 +16,7 @@ namespace VCBackend.Models
         [Required]
         public String Password { get; set; }
         public virtual ICollection<Device> Devices { get; set; }
+        public virtual Account Account { get; set; }
 
         public User() { }
 

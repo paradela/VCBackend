@@ -50,7 +50,7 @@ namespace VCBackend.Repositories
             Ctx.SaveChanges();   
         }
 
-        VCard IRepository<VCard>.FindById(uint Id)
+        VCard IRepository<VCard>.FindById(int Id)
         {
             var result = (from r in Ctx.Cards where r.Id == Id select r).FirstOrDefault();
             return result;  

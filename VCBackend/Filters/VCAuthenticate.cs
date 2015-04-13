@@ -33,21 +33,22 @@ namespace VCBackend.Filters
 
             var token = queryStringCollection["t"];
 
+
             //2. If the token is not available, nothing to do
             if (token == null || token == String.Empty)
                 return null;
 
+            var payload = AuthToken.ValidateToken(token);
             //3. Validate the token
-            if (!AuthToken.ValidateToken(token))
+            if (payload == null)
                 return null;
 
-            IEnumerable<Device> devices = rep.List;
+            var uid = payload["user_id"];
+            var did = payload["device_id"];
 
-            var dev = (from d in devices
-                      where d.Token == token
-                      select d).FirstOrDefault();
-
-            if (dev == null)
+            Device dev = rep.FindById((int)did);
+            
+            if (dev == null || dev.Owner.Id != (int)uid || dev.Token != token)
                 return null;
 
             context.Request.Properties.Add(AUTH_DEVICE, dev);

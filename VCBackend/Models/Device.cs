@@ -7,7 +7,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace VCBackend.Models
 {
-    public class Device : IEntity
+    public partial class Device : IEntity
     {
         public readonly static int DEFAULT_DEVICE = 1;
         public readonly static int MOBILE_DEVICE = 2;
