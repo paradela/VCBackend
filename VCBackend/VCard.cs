@@ -15,10 +15,7 @@ namespace VCBackend
     public partial class VCard
     {
         public int Id { get; set; }
-        public int TokenizedId { get; set; }
         public string Data { get; set; }
-    
-        public virtual Online OnlineAccount { get; set; }
-        public virtual Tokenized TokenizedAccount { get; set; }
+        public int AccountId { get; set; }
     }
 }

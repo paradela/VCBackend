@@ -2,7 +2,7 @@
 -- --------------------------------------------------
 -- Entity Designer DDL Script for SQL Server 2005, 2008, 2012 and Azure
 -- --------------------------------------------------
--- Date Created: 04/14/2015 01:02:01
+-- Date Created: 04/15/2015 00:41:46
 -- Generated from EDMX file: C:\Users\Ricardo\Source\Repos\VCBackend\VCBackend\Model.edmx
 -- --------------------------------------------------
 
@@ -17,11 +17,47 @@ GO
 -- Dropping existing FOREIGN KEY constraints
 -- --------------------------------------------------
 
+IF OBJECT_ID(N'[dbo].[FK_UserDevice]', 'F') IS NOT NULL
+    ALTER TABLE [dbo].[DeviceSet] DROP CONSTRAINT [FK_UserDevice];
+GO
+IF OBJECT_ID(N'[dbo].[FK_AccountVCard]', 'F') IS NOT NULL
+    ALTER TABLE [dbo].[VCardSet] DROP CONSTRAINT [FK_AccountVCard];
+GO
+IF OBJECT_ID(N'[dbo].[FK_UserAccount]', 'F') IS NOT NULL
+    ALTER TABLE [dbo].[AccountSet] DROP CONSTRAINT [FK_UserAccount];
+GO
+IF OBJECT_ID(N'[dbo].[FK_AccountTokens]', 'F') IS NOT NULL
+    ALTER TABLE [dbo].[VCardSet] DROP CONSTRAINT [FK_AccountTokens];
+GO
+IF OBJECT_ID(N'[dbo].[FK_Default_inherits_Device]', 'F') IS NOT NULL
+    ALTER TABLE [dbo].[DeviceSet_Default] DROP CONSTRAINT [FK_Default_inherits_Device];
+GO
+IF OBJECT_ID(N'[dbo].[FK_Mobile_inherits_Device]', 'F') IS NOT NULL
+    ALTER TABLE [dbo].[DeviceSet_Mobile] DROP CONSTRAINT [FK_Mobile_inherits_Device];
+GO
 
 -- --------------------------------------------------
 -- Dropping existing tables
 -- --------------------------------------------------
 
+IF OBJECT_ID(N'[dbo].[UserSet]', 'U') IS NOT NULL
+    DROP TABLE [dbo].[UserSet];
+GO
+IF OBJECT_ID(N'[dbo].[AccountSet]', 'U') IS NOT NULL
+    DROP TABLE [dbo].[AccountSet];
+GO
+IF OBJECT_ID(N'[dbo].[DeviceSet]', 'U') IS NOT NULL
+    DROP TABLE [dbo].[DeviceSet];
+GO
+IF OBJECT_ID(N'[dbo].[VCardSet]', 'U') IS NOT NULL
+    DROP TABLE [dbo].[VCardSet];
+GO
+IF OBJECT_ID(N'[dbo].[DeviceSet_Default]', 'U') IS NOT NULL
+    DROP TABLE [dbo].[DeviceSet_Default];
+GO
+IF OBJECT_ID(N'[dbo].[DeviceSet_Mobile]', 'U') IS NOT NULL
+    DROP TABLE [dbo].[DeviceSet_Mobile];
+GO
 
 -- --------------------------------------------------
 -- Creating all tables
@@ -40,7 +76,8 @@ GO
 CREATE TABLE [dbo].[AccountSet] (
     [Id] int IDENTITY(1,1) NOT NULL,
     [Balance] float  NOT NULL,
-    [User_Id] int  NOT NULL
+    [IsOnline] bit  NOT NULL,
+    [UserAccount_Account_Id] int  NOT NULL
 );
 GO
 
@@ -48,32 +85,18 @@ GO
 CREATE TABLE [dbo].[DeviceSet] (
     [Id] int IDENTITY(1,1) NOT NULL,
     [UserId] int  NOT NULL,
-    [DeviceId] nvarchar(max)  NOT NULL,
     [Name] nvarchar(max)  NOT NULL,
-    [Token] nvarchar(max)  NOT NULL
+    [Token] nvarchar(max)  NOT NULL,
+    [DeviceId] nvarchar(max)  NOT NULL
 );
 GO
 
 -- Creating table 'VCardSet'
 CREATE TABLE [dbo].[VCardSet] (
     [Id] int IDENTITY(1,1) NOT NULL,
-    [TokenizedId] int  NOT NULL,
-    [Data] nvarchar(max)  NOT NULL
-);
-GO
-
--- Creating table 'AccountSet_Online'
-CREATE TABLE [dbo].[AccountSet_Online] (
-    [OnlineId] int IDENTITY(1,1) NOT NULL,
-    [Id] int  NOT NULL,
-    [VCard_Id] int  NOT NULL
-);
-GO
-
--- Creating table 'AccountSet_Tokenized'
-CREATE TABLE [dbo].[AccountSet_Tokenized] (
-    [TokenizedId] int IDENTITY(1,1) NOT NULL,
-    [Id] int  NOT NULL
+    [Data] nvarchar(max)  NOT NULL,
+    [AccountId] int  NOT NULL,
+    [AccountVCard_VCard_Id] int  NOT NULL
 );
 GO
 
@@ -117,18 +140,6 @@ ADD CONSTRAINT [PK_VCardSet]
     PRIMARY KEY CLUSTERED ([Id] ASC);
 GO
 
--- Creating primary key on [Id] in table 'AccountSet_Online'
-ALTER TABLE [dbo].[AccountSet_Online]
-ADD CONSTRAINT [PK_AccountSet_Online]
-    PRIMARY KEY CLUSTERED ([Id] ASC);
-GO
-
--- Creating primary key on [Id] in table 'AccountSet_Tokenized'
-ALTER TABLE [dbo].[AccountSet_Tokenized]
-ADD CONSTRAINT [PK_AccountSet_Tokenized]
-    PRIMARY KEY CLUSTERED ([Id] ASC);
-GO
-
 -- Creating primary key on [Id] in table 'DeviceSet_Default'
 ALTER TABLE [dbo].[DeviceSet_Default]
 ADD CONSTRAINT [PK_DeviceSet_Default]
@@ -160,10 +171,25 @@ ON [dbo].[DeviceSet]
     ([UserId]);
 GO
 
--- Creating foreign key on [User_Id] in table 'AccountSet'
+-- Creating foreign key on [AccountVCard_VCard_Id] in table 'VCardSet'
+ALTER TABLE [dbo].[VCardSet]
+ADD CONSTRAINT [FK_AccountVCard]
+    FOREIGN KEY ([AccountVCard_VCard_Id])
+    REFERENCES [dbo].[AccountSet]
+        ([Id])
+    ON DELETE NO ACTION ON UPDATE NO ACTION;
+GO
+
+-- Creating non-clustered index for FOREIGN KEY 'FK_AccountVCard'
+CREATE INDEX [IX_FK_AccountVCard]
+ON [dbo].[VCardSet]
+    ([AccountVCard_VCard_Id]);
+GO
+
+-- Creating foreign key on [UserAccount_Account_Id] in table 'AccountSet'
 ALTER TABLE [dbo].[AccountSet]
 ADD CONSTRAINT [FK_UserAccount]
-    FOREIGN KEY ([User_Id])
+    FOREIGN KEY ([UserAccount_Account_Id])
     REFERENCES [dbo].[UserSet]
         ([Id])
     ON DELETE NO ACTION ON UPDATE NO ACTION;
@@ -172,55 +198,22 @@ GO
 -- Creating non-clustered index for FOREIGN KEY 'FK_UserAccount'
 CREATE INDEX [IX_FK_UserAccount]
 ON [dbo].[AccountSet]
-    ([User_Id]);
+    ([UserAccount_Account_Id]);
 GO
 
--- Creating foreign key on [VCard_Id] in table 'AccountSet_Online'
-ALTER TABLE [dbo].[AccountSet_Online]
-ADD CONSTRAINT [FK_OnlineVCard]
-    FOREIGN KEY ([VCard_Id])
-    REFERENCES [dbo].[VCardSet]
-        ([Id])
-    ON DELETE NO ACTION ON UPDATE NO ACTION;
-GO
-
--- Creating non-clustered index for FOREIGN KEY 'FK_OnlineVCard'
-CREATE INDEX [IX_FK_OnlineVCard]
-ON [dbo].[AccountSet_Online]
-    ([VCard_Id]);
-GO
-
--- Creating foreign key on [TokenizedId] in table 'VCardSet'
+-- Creating foreign key on [AccountId] in table 'VCardSet'
 ALTER TABLE [dbo].[VCardSet]
-ADD CONSTRAINT [FK_TokenizedVCard]
-    FOREIGN KEY ([TokenizedId])
-    REFERENCES [dbo].[AccountSet_Tokenized]
+ADD CONSTRAINT [FK_AccountTokens]
+    FOREIGN KEY ([AccountId])
+    REFERENCES [dbo].[AccountSet]
         ([Id])
     ON DELETE NO ACTION ON UPDATE NO ACTION;
 GO
 
--- Creating non-clustered index for FOREIGN KEY 'FK_TokenizedVCard'
-CREATE INDEX [IX_FK_TokenizedVCard]
+-- Creating non-clustered index for FOREIGN KEY 'FK_AccountTokens'
+CREATE INDEX [IX_FK_AccountTokens]
 ON [dbo].[VCardSet]
-    ([TokenizedId]);
-GO
-
--- Creating foreign key on [Id] in table 'AccountSet_Online'
-ALTER TABLE [dbo].[AccountSet_Online]
-ADD CONSTRAINT [FK_Online_inherits_Account]
-    FOREIGN KEY ([Id])
-    REFERENCES [dbo].[AccountSet]
-        ([Id])
-    ON DELETE CASCADE ON UPDATE NO ACTION;
-GO
-
--- Creating foreign key on [Id] in table 'AccountSet_Tokenized'
-ALTER TABLE [dbo].[AccountSet_Tokenized]
-ADD CONSTRAINT [FK_Tokenized_inherits_Account]
-    FOREIGN KEY ([Id])
-    REFERENCES [dbo].[AccountSet]
-        ([Id])
-    ON DELETE CASCADE ON UPDATE NO ACTION;
+    ([AccountId]);
 GO
 
 -- Creating foreign key on [Id] in table 'DeviceSet_Default'

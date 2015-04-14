@@ -10,33 +10,23 @@
     <EntitySet Name="AccountSet" EntityType="Model.Store.AccountSet" store:Type="Tables" Schema="dbo" />
     <EntitySet Name="DeviceSet" EntityType="Model.Store.DeviceSet" store:Type="Tables" Schema="dbo" />
     <EntitySet Name="VCardSet" EntityType="Model.Store.VCardSet" store:Type="Tables" Schema="dbo" />
-    <EntitySet Name="AccountSet_Online" EntityType="Model.Store.AccountSet_Online" store:Type="Tables" Schema="dbo" />
-    <EntitySet Name="AccountSet_Tokenized" EntityType="Model.Store.AccountSet_Tokenized" store:Type="Tables" Schema="dbo" />
     <EntitySet Name="DeviceSet_Default" EntityType="Model.Store.DeviceSet_Default" store:Type="Tables" Schema="dbo" />
     <EntitySet Name="DeviceSet_Mobile" EntityType="Model.Store.DeviceSet_Mobile" store:Type="Tables" Schema="dbo" />
     <AssociationSet Name="UserDevice" Association="Model.Store.UserDevice">
       <End Role="User" EntitySet="UserSet" />
       <End Role="Device" EntitySet="DeviceSet" />
     </AssociationSet>
+    <AssociationSet Name="AccountVCard" Association="Model.Store.AccountVCard">
+      <End Role="Account" EntitySet="AccountSet" />
+      <End Role="VCard" EntitySet="VCardSet" />
+    </AssociationSet>
     <AssociationSet Name="UserAccount" Association="Model.Store.UserAccount">
       <End Role="User" EntitySet="UserSet" />
       <End Role="Account" EntitySet="AccountSet" />
     </AssociationSet>
-    <AssociationSet Name="OnlineVCard" Association="Model.Store.OnlineVCard">
-      <End Role="Online" EntitySet="AccountSet_Online" />
-      <End Role="VCard" EntitySet="VCardSet" />
-    </AssociationSet>
-    <AssociationSet Name="TokenizedVCard" Association="Model.Store.TokenizedVCard">
-      <End Role="Tokenized" EntitySet="AccountSet_Tokenized" />
-      <End Role="VCard" EntitySet="VCardSet" />
-    </AssociationSet>
-    <AssociationSet Name="FK_Online_inherits_Account" Association="Model.Store.FK_Online_inherits_Account">
+    <AssociationSet Name="AccountTokens" Association="Model.Store.AccountTokens">
       <End Role="Account" EntitySet="AccountSet" />
-      <End Role="Online" EntitySet="AccountSet_Online" />
-    </AssociationSet>
-    <AssociationSet Name="FK_Tokenized_inherits_Account" Association="Model.Store.FK_Tokenized_inherits_Account">
-      <End Role="Account" EntitySet="AccountSet" />
-      <End Role="Tokenized" EntitySet="AccountSet_Tokenized" />
+      <End Role="VCard" EntitySet="VCardSet" />
     </AssociationSet>
     <AssociationSet Name="FK_Default_inherits_Device" Association="Model.Store.FK_Default_inherits_Device">
       <End Role="Device" EntitySet="DeviceSet" />
@@ -62,7 +52,8 @@
     </Key>
     <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
     <Property Name="Balance" Type="float" Nullable="false" />
-    <Property Name="User_Id" Type="int" Nullable="false" />
+    <Property Name="IsOnline" Type="bit" Nullable="false" />
+    <Property Name="UserAccount_Account_Id" Type="int" Nullable="false" />
   </EntityType>
   <EntityType Name="DeviceSet">
     <Key>
@@ -70,32 +61,18 @@
     </Key>
     <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
     <Property Name="UserId" Type="int" Nullable="false" />
-    <Property Name="DeviceId" Type="nvarchar(max)" Nullable="false" />
     <Property Name="Name" Type="nvarchar(max)" Nullable="false" />
     <Property Name="Token" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="DeviceId" Type="nvarchar(max)" Nullable="false" />
   </EntityType>
   <EntityType Name="VCardSet">
     <Key>
       <PropertyRef Name="Id" />
     </Key>
     <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-    <Property Name="TokenizedId" Type="int" Nullable="false" />
     <Property Name="Data" Type="nvarchar(max)" Nullable="false" />
-  </EntityType>
-  <EntityType Name="AccountSet_Online">
-    <Key>
-      <PropertyRef Name="Id" />
-    </Key>
-    <Property Name="OnlineId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-    <Property Name="Id" Type="int" Nullable="false" />
-    <Property Name="VCard_Id" Type="int" Nullable="false" />
-  </EntityType>
-  <EntityType Name="AccountSet_Tokenized">
-    <Key>
-      <PropertyRef Name="Id" />
-    </Key>
-    <Property Name="TokenizedId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-    <Property Name="Id" Type="int" Nullable="false" />
+    <Property Name="AccountId" Type="int" Nullable="false" />
+    <Property Name="AccountVCard_VCard_Id" Type="int" Nullable="false" />
   </EntityType>
   <EntityType Name="DeviceSet_Default">
     <Key>
@@ -121,6 +98,18 @@
       </Dependent>
     </ReferentialConstraint>
   </Association>
+  <Association Name="AccountVCard">
+    <End Role="Account" Type="Model.Store.AccountSet" Multiplicity="1" />
+    <End Role="VCard" Type="Model.Store.VCardSet" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Account">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="VCard">
+        <PropertyRef Name="AccountVCard_VCard_Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
   <Association Name="UserAccount">
     <End Role="User" Type="Model.Store.UserSet" Multiplicity="1" />
     <End Role="Account" Type="Model.Store.AccountSet" Multiplicity="*" />
@@ -129,59 +118,19 @@
         <PropertyRef Name="Id" />
       </Principal>
       <Dependent Role="Account">
-        <PropertyRef Name="User_Id" />
+        <PropertyRef Name="UserAccount_Account_Id" />
       </Dependent>
     </ReferentialConstraint>
   </Association>
-  <Association Name="OnlineVCard">
-    <End Role="Online" Type="Model.Store.AccountSet_Online" Multiplicity="*" />
-    <End Role="VCard" Type="Model.Store.VCardSet" Multiplicity="1" />
-    <ReferentialConstraint>
-      <Principal Role="VCard">
-        <PropertyRef Name="Id" />
-      </Principal>
-      <Dependent Role="Online">
-        <PropertyRef Name="VCard_Id" />
-      </Dependent>
-    </ReferentialConstraint>
-  </Association>
-  <Association Name="TokenizedVCard">
-    <End Role="Tokenized" Type="Model.Store.AccountSet_Tokenized" Multiplicity="1" />
+  <Association Name="AccountTokens">
+    <End Role="Account" Type="Model.Store.AccountSet" Multiplicity="1" />
     <End Role="VCard" Type="Model.Store.VCardSet" Multiplicity="*" />
     <ReferentialConstraint>
-      <Principal Role="Tokenized">
+      <Principal Role="Account">
         <PropertyRef Name="Id" />
       </Principal>
       <Dependent Role="VCard">
-        <PropertyRef Name="TokenizedId" />
-      </Dependent>
-    </ReferentialConstraint>
-  </Association>
-  <Association Name="FK_Online_inherits_Account">
-    <End Role="Account" Type="Model.Store.AccountSet" Multiplicity="1">
-      <OnDelete Action="Cascade" />
-    </End>
-    <End Role="Online" Type="Model.Store.AccountSet_Online" Multiplicity="0..1" />
-    <ReferentialConstraint>
-      <Principal Role="Account">
-        <PropertyRef Name="Id" />
-      </Principal>
-      <Dependent Role="Online">
-        <PropertyRef Name="Id" />
-      </Dependent>
-    </ReferentialConstraint>
-  </Association>
-  <Association Name="FK_Tokenized_inherits_Account">
-    <End Role="Account" Type="Model.Store.AccountSet" Multiplicity="1">
-      <OnDelete Action="Cascade" />
-    </End>
-    <End Role="Tokenized" Type="Model.Store.AccountSet_Tokenized" Multiplicity="0..1" />
-    <ReferentialConstraint>
-      <Principal Role="Account">
-        <PropertyRef Name="Id" />
-      </Principal>
-      <Dependent Role="Tokenized">
-        <PropertyRef Name="Id" />
+        <PropertyRef Name="AccountId" />
       </Dependent>
     </ReferentialConstraint>
   </Association>
@@ -226,19 +175,19 @@
             <End Role="User" EntitySet="UserSet" />
             <End Role="Device" EntitySet="DeviceSet" />
           </AssociationSet>
+          <AssociationSet Name="AccountVCard" Association="Model.AccountVCard">
+            <End Role="Account" EntitySet="AccountSet" />
+            <End Role="VCard" EntitySet="VCardSet" />
+          </AssociationSet>
           <AssociationSet Name="UserAccount" Association="Model.UserAccount">
             <End Role="User" EntitySet="UserSet" />
             <End Role="Account" EntitySet="AccountSet" />
           </AssociationSet>
-          <AssociationSet Name="OnlineVCard" Association="Model.OnlineVCard">
-            <End Role="Online" EntitySet="AccountSet" />
+          <AssociationSet Name="AccountTokens" Association="Model.AccountTokens">
+            <End Role="Account" EntitySet="AccountSet" />
             <End Role="VCard" EntitySet="VCardSet" />
           </AssociationSet>
-          <AssociationSet Name="TokenizedVCard" Association="Model.TokenizedVCard">
-            <End Role="Tokenized" EntitySet="AccountSet" />
-            <End Role="VCard" EntitySet="VCardSet" />
-          </AssociationSet>
-        </EntityContainer>
+          </EntityContainer>
         <EntityType Name="User">
           <Key>
             <PropertyRef Name="Id" />
@@ -255,37 +204,29 @@
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <NavigationProperty Name="User" Relationship="Model.UserAccount" FromRole="Account" ToRole="User" />
           <Property Name="Balance" Type="Double" Nullable="false" />
+          <NavigationProperty Name="VCard" Relationship="Model.AccountVCard" FromRole="Account" ToRole="VCard" />
+          <NavigationProperty Name="Tokens" Relationship="Model.AccountTokens" FromRole="Account" ToRole="VCard" />
+          <Property Name="IsOnline" Type="Boolean" Nullable="false" cg:SetterAccess="Private" />
         </EntityType>
-        <EntityType Name="Device">
+        <EntityType Name="Device" Abstract="true">
           <Key>
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <NavigationProperty Name="Owner" Relationship="Model.UserDevice" FromRole="Device" ToRole="User" />
           <Property Name="UserId" Type="Int32" Nullable="false" />
-          <Property Name="DeviceId" Type="String" Nullable="false" cg:SetterAccess="Private" />
           <Property Name="Name" Type="String" Nullable="false" />
           <Property Name="Token" Type="String" Nullable="false" />
+          <Property Name="DeviceId" Type="String" Nullable="false" cg:SetterAccess="Internal" />
         </EntityType>
         <EntityType Name="VCard">
           <Key>
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <NavigationProperty Name="OnlineAccount" Relationship="Model.OnlineVCard" FromRole="VCard" ToRole="Online" />
-          <NavigationProperty Name="TokenizedAccount" Relationship="Model.TokenizedVCard" FromRole="VCard" ToRole="Tokenized" />
-          <Property Name="TokenizedId" Type="Int32" Nullable="false" />
           <Property Name="Data" Type="String" Nullable="false" />
-        </EntityType>
-        <EntityType Name="Online" BaseType="Model.Account">
-          <Property Name="OnlineId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <NavigationProperty Name="VCard" Relationship="Model.OnlineVCard" FromRole="Online" ToRole="VCard" />
-        </EntityType>
-        <EntityType Name="Tokenized" BaseType="Model.Account">
-          <Property Name="TokenizedId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <NavigationProperty Name="Tokens" Relationship="Model.TokenizedVCard" FromRole="Tokenized" ToRole="VCard" />
+          <Property Name="AccountId" Type="Int32" Nullable="false" />
         </EntityType>
         <EntityType Name="Default" BaseType="Model.Device">
         </EntityType>
@@ -303,23 +244,23 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="AccountVCard">
+          <End Type="Model.Account" Role="Account" Multiplicity="1" />
+          <End Type="Model.VCard" Role="VCard" Multiplicity="0..1" />
+        </Association>
         <Association Name="UserAccount">
           <End Type="Model.User" Role="User" Multiplicity="1" />
           <End Type="Model.Account" Role="Account" Multiplicity="0..1" />
         </Association>
-        <Association Name="OnlineVCard">
-          <End Type="Model.Online" Role="Online" Multiplicity="1" />
-          <End Type="Model.VCard" Role="VCard" Multiplicity="1" />
-        </Association>
-        <Association Name="TokenizedVCard">
-          <End Type="Model.Tokenized" Role="Tokenized" Multiplicity="1" />
+        <Association Name="AccountTokens">
+          <End Type="Model.Account" Role="Account" Multiplicity="1" />
           <End Type="Model.VCard" Role="VCard" Multiplicity="*" />
           <ReferentialConstraint>
-            <Principal Role="Tokenized">
+            <Principal Role="Account">
               <PropertyRef Name="Id" />
             </Principal>
             <Dependent Role="VCard">
-              <PropertyRef Name="TokenizedId" />
+              <PropertyRef Name="AccountId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -344,18 +285,7 @@
         <MappingFragment StoreEntitySet="AccountSet">
           <ScalarProperty Name="Id" ColumnName="Id" />
           <ScalarProperty Name="Balance" ColumnName="Balance" />
-        </MappingFragment>
-      </EntityTypeMapping>
-      <EntityTypeMapping TypeName="IsTypeOf(Model.Online)">
-        <MappingFragment StoreEntitySet="AccountSet_Online">
-          <ScalarProperty Name="Id" ColumnName="Id" />
-          <ScalarProperty Name="OnlineId" ColumnName="OnlineId" />
-        </MappingFragment>
-      </EntityTypeMapping>
-      <EntityTypeMapping TypeName="IsTypeOf(Model.Tokenized)">
-        <MappingFragment StoreEntitySet="AccountSet_Tokenized">
-          <ScalarProperty Name="Id" ColumnName="Id" />
-          <ScalarProperty Name="TokenizedId" ColumnName="TokenizedId" />
+          <ScalarProperty Name="IsOnline" ColumnName="IsOnline" />
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>
@@ -364,9 +294,9 @@
         <MappingFragment StoreEntitySet="DeviceSet">
           <ScalarProperty Name="Id" ColumnName="Id" />
           <ScalarProperty Name="UserId" ColumnName="UserId" />
-          <ScalarProperty Name="DeviceId" ColumnName="DeviceId" />
           <ScalarProperty Name="Name" ColumnName="Name" />
           <ScalarProperty Name="Token" ColumnName="Token" />
+          <ScalarProperty Name="DeviceId" ColumnName="DeviceId" />
         </MappingFragment>
       </EntityTypeMapping>
       <EntityTypeMapping TypeName="IsTypeOf(Model.Default)">
@@ -384,24 +314,24 @@
       <EntityTypeMapping TypeName="IsTypeOf(Model.VCard)">
         <MappingFragment StoreEntitySet="VCardSet">
           <ScalarProperty Name="Id" ColumnName="Id" />
-          <ScalarProperty Name="TokenizedId" ColumnName="TokenizedId" />
           <ScalarProperty Name="Data" ColumnName="Data" />
+          <ScalarProperty Name="AccountId" ColumnName="AccountId" />
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>
-    <AssociationSetMapping Name="UserAccount" TypeName="Model.UserAccount" StoreEntitySet="AccountSet">
-      <EndProperty Name="User">
-        <ScalarProperty Name="Id" ColumnName="User_Id" />
-      </EndProperty>
+    <AssociationSetMapping Name="AccountVCard" TypeName="Model.AccountVCard" StoreEntitySet="VCardSet">
       <EndProperty Name="Account">
+        <ScalarProperty Name="Id" ColumnName="AccountVCard_VCard_Id" />
+      </EndProperty>
+      <EndProperty Name="VCard">
         <ScalarProperty Name="Id" ColumnName="Id" />
       </EndProperty>
     </AssociationSetMapping>
-    <AssociationSetMapping Name="OnlineVCard" TypeName="Model.OnlineVCard" StoreEntitySet="AccountSet_Online">
-      <EndProperty Name="VCard">
-        <ScalarProperty Name="Id" ColumnName="VCard_Id" />
+    <AssociationSetMapping Name="UserAccount" TypeName="Model.UserAccount" StoreEntitySet="AccountSet">
+      <EndProperty Name="User">
+        <ScalarProperty Name="Id" ColumnName="UserAccount_Account_Id" />
       </EndProperty>
-      <EndProperty Name="Online">
+      <EndProperty Name="Account">
         <ScalarProperty Name="Id" ColumnName="Id" />
       </EndProperty>
     </AssociationSetMapping>

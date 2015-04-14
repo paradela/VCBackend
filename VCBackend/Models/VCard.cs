@@ -3,15 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
-namespace VCBackend.Models
+namespace VCBackend
 {
     public partial class VCard : IEntity
     {
-        //Specific for Cards with CTS512B model
-        public String Data { get; set; }
-
-        public VCard() { }
-
         public VCard(byte[] Data)
         {
             this.Data = System.Convert.ToBase64String(Data);

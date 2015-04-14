@@ -55,7 +55,7 @@ namespace VCBackend.Business_Rules.Accounts
         {
             Account Account = rep.FindById(AccountId);
             if (Account == null) return false;
-            Account.Card = NewCard;
+            //Account. = NewCard;
             rep.Update(Account);
             return true;
         }
@@ -72,14 +72,14 @@ namespace VCBackend.Business_Rules.Accounts
 
         public String GetAuthToLoadCard(Account Account)
         {
-            if (Account.Type == ValidationType.ONLINE)
-                return AuthToken.GetCardAccessToken(Account.Card);
+            if (Account.IsOnline)
+                return AuthToken.GetCardAccessToken(Account.VCard);
             else throw new Exception(); // Create Exception
         }
 
         public String GetAuthToCreateToken(Account Account)
         {
-            if (Account.Type == ValidationType.TOKENIZED)
+            if (!Account.IsOnline)
                 return "token Account.Card.Id";
             else throw new Exception(); // Create Exception
         }

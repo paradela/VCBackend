@@ -238,7 +238,7 @@ namespace VCBackend.Business_Rules.Users
                 else
                 {
                     var q = (from dev in devices
-                             where dev.Type == Device.DEFAULT_DEVICE
+                             where dev.IsDefault()
                              select dev).FirstOrDefault();
                     if (q != null)
                     {

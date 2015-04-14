@@ -8,13 +8,14 @@ namespace VCBackend.Repositories
 {
     public class UserRepository : IRepository<User>
     {
-        private VCardContext usersCtx;
+        //private VCardContext usersCtx;
+        private ModelContainer usersCtx;
         private static UserRepository rep = null;
 
 
         private UserRepository ()
         {
-            usersCtx = new VCardContext();
+            usersCtx = new ModelContainer();
         }
 
         public static IRepository<User> getRepositorySingleton()
@@ -29,19 +30,19 @@ namespace VCBackend.Repositories
         {
             get 
             {
-                return usersCtx.Users.AsEnumerable<User>();
+                return usersCtx.UserSet.AsEnumerable<User>();
             }
         }
 
         void IRepository<User>.Add(User entity)
         {
-            usersCtx.Users.Add(entity);
+            usersCtx.UserSet.Add(entity);
             usersCtx.SaveChanges();
         }
 
         void IRepository<User>.Delete(User entity)
         {
-            usersCtx.Users.Remove(entity);
+            usersCtx.UserSet.Remove(entity);
             usersCtx.SaveChanges();
         }
 
@@ -52,7 +53,7 @@ namespace VCBackend.Repositories
 
         User IRepository<User>.FindById(int Id)
         {
-            var result = (from r in usersCtx.Users where r.Id == Id select r).FirstOrDefault();
+            var result = (from r in usersCtx.UserSet where r.Id == Id select r).FirstOrDefault();
             return result;   
         }
     }

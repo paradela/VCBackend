@@ -16,7 +16,7 @@ using VCBackend.Models;
 namespace VCBackend
 {
     [System.ServiceModel.ServiceBehavior(IncludeExceptionDetailInFaults = true)]
-    public class VCardService : EntityFrameworkDataService<VCardContext>
+    public class VCardService : EntityFrameworkDataService<ModelContainer>
     {
         // This method is called only once to initialize service-wide policies.
         public static void InitializeService(DataServiceConfiguration config)

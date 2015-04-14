@@ -8,13 +8,13 @@ namespace VCBackend.Repositories
 {
     public class VCardRepository : IRepository<VCard>
     {
-        private VCardContext Ctx;
+        private ModelContainer Ctx;
         private static VCardRepository rep = null;
 
 
         private VCardRepository()
         {
-            Ctx = new VCardContext();
+            Ctx = new ModelContainer();
         }
 
         public static VCardRepository getRepositorySingleton()
@@ -29,19 +29,19 @@ namespace VCBackend.Repositories
         {
             get
             {
-                return Ctx.Cards.AsEnumerable<VCard>();
+                return Ctx.VCardSet.AsEnumerable<VCard>();
             }
         }
 
         void IRepository<VCard>.Add(VCard entity)
         {
-            Ctx.Cards.Add(entity);
+            Ctx.VCardSet.Add(entity);
             Ctx.SaveChanges();
         }
 
         void IRepository<VCard>.Delete(VCard entity)
         {
-            Ctx.Cards.Remove(entity);
+            Ctx.VCardSet.Remove(entity);
             Ctx.SaveChanges();
         }
 
@@ -52,7 +52,7 @@ namespace VCBackend.Repositories
 
         VCard IRepository<VCard>.FindById(int Id)
         {
-            var result = (from r in Ctx.Cards where r.Id == Id select r).FirstOrDefault();
+            var result = (from r in Ctx.VCardSet where r.Id == Id select r).FirstOrDefault();
             return result;  
         }
     }

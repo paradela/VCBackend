@@ -37,13 +37,13 @@ namespace VCBackend.Business_Rules.Devices
         /// <param name="DeviceId">The new device identifier. If it is @null a default without
         /// full access to the API will be created!</param>
         /// <returns>The created Device.</returns>
-        public Device CreateDeviceToUser(User user, String Name = "Default", String DeviceId = null)
+        public Device CreateDeviceToUser(User user, String Name = null, String DeviceId = null)
         {
             Device device;
 
             if (DeviceId == null)
-                device = new Device();
-            else device = new Device(DeviceId);
+                device = new Default();
+            else device = new Mobile(DeviceId);
 
             device.Name = Name;
             //Generates a token that should be used next to register a device.

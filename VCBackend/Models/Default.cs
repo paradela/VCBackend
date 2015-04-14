@@ -5,8 +5,11 @@ using System.Web;
 
 namespace VCBackend
 {
-    public class IEntity
+    public partial class Default
     {
-        //public int Id { get; set; }
+        override public bool IsDefault()
+        {
+            return true;
+        }
     }
 }

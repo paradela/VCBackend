@@ -14,9 +14,18 @@ namespace VCBackend
     
     public partial class Account
     {
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
+        public Account()
+        {
+            this.Tokens = new HashSet<VCard>();
+        }
+    
         public int Id { get; set; }
         public double Balance { get; set; }
+        public bool IsOnline { get; private set; }
     
-        public virtual User User { get; set; }
+        public virtual VCard VCard { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<VCard> Tokens { get; set; }
     }
 }

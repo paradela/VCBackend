@@ -9,11 +9,11 @@ namespace VCBackend.Repositories
     public class DeviceRepository : IRepository<Device>
     {
         private static DeviceRepository rep = null;
-        private VCardContext Ctx;
+        private ModelContainer Ctx;
 
         private DeviceRepository()
         {
-            Ctx = new VCardContext();
+            Ctx = new ModelContainer();
         }
 
         public static IRepository<Device> getRepositorySingleton()
@@ -29,19 +29,19 @@ namespace VCBackend.Repositories
         {
             get
             {
-                return Ctx.Devices.AsEnumerable<Device>();
+                return Ctx.DeviceSet.AsEnumerable<Device>();
             }
         }
 
         void IRepository<Device>.Add(Device entity)
         {
-            Ctx.Devices.Add(entity);
+            Ctx.DeviceSet.Add(entity);
             Ctx.SaveChanges();
         }
 
         void IRepository<Device>.Delete(Device entity)
         {
-            Ctx.Devices.Remove(entity);
+            Ctx.DeviceSet.Remove(entity);
             Ctx.SaveChanges();
         }
 
@@ -53,7 +53,7 @@ namespace VCBackend.Repositories
 
         Device IRepository<Device>.FindById(int Id)
         {
-            var result = (from r in Ctx.Devices where r.Id == Id select r).FirstOrDefault();
+            var result = (from r in Ctx.DeviceSet where r.Id == Id select r).FirstOrDefault();
             return result;   
         }
     }
