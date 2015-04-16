@@ -126,13 +126,10 @@ namespace VCBackend.Business_Rules.Users
             if (ExistUserWithEmail(Email))
                 throw new UserAlreadyExistException("Email already in use.");
 
-            /*
-             * Then if the user doesn't exist, we can create the user
-             */
-            /*
-             * A DefaultDevice is used to login with browsers.
-             * They will not have full access to the API
-             */
+            
+            // Then if the user doesn't exist, we can create the user
+            // A DefaultDevice is used to login with browsers.
+            // They will not have full access to the API
             User newUser = new User(Name, Email, Pbkdf2.DeriveKey(Password));
 
             rep.Add(newUser);
@@ -144,6 +141,7 @@ namespace VCBackend.Business_Rules.Users
             newUser.Account = account;
 
             rep.Update(newUser);
+            
 
             accountManager.InitializeAccount(account.Id);
 

@@ -2,13 +2,13 @@
 -- --------------------------------------------------
 -- Entity Designer DDL Script for SQL Server 2005, 2008, 2012 and Azure
 -- --------------------------------------------------
--- Date Created: 04/15/2015 00:41:46
+-- Date Created: 04/16/2015 01:08:08
 -- Generated from EDMX file: C:\Users\Ricardo\Source\Repos\VCBackend\VCBackend\Model.edmx
 -- --------------------------------------------------
 
 SET QUOTED_IDENTIFIER OFF;
 GO
-USE [VCBackend.Models.VCardContext];
+USE [ModelContainer];
 GO
 IF SCHEMA_ID(N'dbo') IS NULL EXECUTE(N'CREATE SCHEMA [dbo]');
 GO
@@ -87,7 +87,7 @@ CREATE TABLE [dbo].[DeviceSet] (
     [UserId] int  NOT NULL,
     [Name] nvarchar(max)  NOT NULL,
     [Token] nvarchar(max)  NOT NULL,
-    [DeviceId] nvarchar(max)  NOT NULL
+    [DeviceId] nvarchar(max)  NULL
 );
 GO
 

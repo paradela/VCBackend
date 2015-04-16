@@ -30,7 +30,8 @@ namespace VCBackend.Business_Rules.Accounts
         public Account CreateAccount()
         {
             Account account = new Account();
-
+            account.Balance = 0.0;
+            rep.Add(account);
             return account;
         }
 

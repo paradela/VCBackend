@@ -43,15 +43,14 @@ namespace VCBackend.Business_Rules.Devices
 
             if (DeviceId == null)
                 device = new Default();
-            else device = new Mobile(DeviceId);
+            else device = new Mobile(DeviceId, Name);
 
-            device.Name = Name;
             //Generates a token that should be used next to register a device.
             device.Token = AuthToken.GetAPIAccessToken(user, device);
 
             user.AddDevice(device);
 
-            //rep.Add(device); // store device on Database
+            rep.Add(device); // store device on Database
 
             return device;
         }

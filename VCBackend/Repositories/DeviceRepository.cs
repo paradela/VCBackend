@@ -36,7 +36,14 @@ namespace VCBackend.Repositories
         void IRepository<Device>.Add(Device entity)
         {
             Ctx.DeviceSet.Add(entity);
-            Ctx.SaveChanges();
+            try
+            {
+                Ctx.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                System.Console.Write("");
+            }
         }
 
         void IRepository<Device>.Delete(Device entity)

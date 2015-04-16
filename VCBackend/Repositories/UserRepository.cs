@@ -36,8 +36,18 @@ namespace VCBackend.Repositories
 
         void IRepository<User>.Add(User entity)
         {
-            usersCtx.UserSet.Add(entity);
-            usersCtx.SaveChanges();
+            using (var ct = new ModelContainer())
+            {
+                ct.UserSet.Add(entity);
+                try
+                {
+                    ct.SaveChanges();
+                }
+                catch (Exception ex)
+                {
+                    System.Console.Write("");
+                }
+            }
         }
 
         void IRepository<User>.Delete(User entity)

@@ -7,8 +7,9 @@ namespace VCBackend
 {
     public partial class Mobile
     {
-        public Mobile(String DeviceId)
+        public Mobile(String DeviceId, String Name)
         {
+            this.Name = Name;
             this.DeviceId = DeviceId;
         }
 
