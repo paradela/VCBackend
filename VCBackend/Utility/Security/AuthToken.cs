@@ -14,7 +14,7 @@ namespace VCBackend.Utility.Security
         private static int API_KEY_VALIDITY = 1800; // 1 hour
         private static int CARD_KEY_VALIDITY = 60; // 1 min
 
-        public static String GetAPIAccessToken(User User, Device Device)
+        public static String GetAPIAccessJwt(User User, Device Device)
         {
             var now = Math.Round((DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds);
 
@@ -52,12 +52,29 @@ namespace VCBackend.Utility.Security
 
         }
 
-        public static String GetCardAccessToken(VCard Card)
+        public static String GetCardAccessJwt(VCard Card)
         {
             var now = Math.Round((DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds);
 
             var payload = new Dictionary<string, object>()
             {
+                { "type", "card"},
+                { "card_id", Card.Id },
+                { "exp", now + CARD_KEY_VALIDITY }
+            };
+
+            string token = JWT.JsonWebToken.Encode(payload, AuthTokenSecret, JWT.JwtHashAlgorithm.HS512);
+
+            return token;
+        }
+
+        public static String GetCardTokenAccessJwt(VCardToken Card)
+        {
+            var now = Math.Round((DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds);
+
+            var payload = new Dictionary<string, object>()
+            {
+                { "type", "token"},
                 { "card_id", Card.Id },
                 { "exp", now + CARD_KEY_VALIDITY }
             };

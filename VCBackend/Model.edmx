@@ -269,6 +269,7 @@
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="Data" Type="String" Nullable="false" />
           <Property Name="AccountId" Type="Int32" Nullable="false" />
+          <Property Name="Validity" Type="Time" Nullable="false" />
         </EntityType>
         <Association Name="AccountVCardToken">
           <End Type="Model.Account" Role="Account" Multiplicity="1" />

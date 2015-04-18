@@ -32,7 +32,7 @@ namespace VCBackend.Business_Rules.Devices
             else device = new Mobile(DeviceId, Name);
 
             //Generates a token that should be used next to register a device.
-            device.Token = AuthToken.GetAPIAccessToken(user, device);
+            device.Token = AuthToken.GetAPIAccessJwt(user, device);
 
             user.AddDevice(device);
 

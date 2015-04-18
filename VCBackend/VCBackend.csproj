@@ -142,6 +142,7 @@
     <Compile Include="Business Rules\Users\UserAlreadyExistException.cs" />
     <Compile Include="Business Rules\Users\UserManager.cs" />
     <Compile Include="Business Rules\VCards\TSMFakeProxy.cs" />
+    <Compile Include="Business Rules\VCards\VCardException.cs" />
     <Compile Include="Business Rules\VCards\VCardManager.cs" />
     <Compile Include="Controllers\UsersController.cs" />
     <Compile Include="Default.cs">
@@ -191,6 +192,7 @@
     </Compile>
     <Compile Include="Utility\Security\AuthToken.cs" />
     <Compile Include="Utility\Security\Pbkdf2.cs" />
+    <Compile Include="Utility\Time\Time.cs" />
     <Compile Include="VCard.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>

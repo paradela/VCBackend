@@ -199,7 +199,7 @@ namespace VCBackend.Business_Rules.Users
                     var q = UnitOfWork.DeviceRepository.Get(filter: d => (d.Owner.Id == user.Id && d.DeviceId == DeviceId)).FirstOrDefault();
                     if (q != null)
                     {
-                        q.Token = AuthToken.GetAPIAccessToken(user, q);
+                        q.Token = AuthToken.GetAPIAccessJwt(user, q);
                         token = q.Token;
                     }
                     else throw new InvalidCredentialsException("Invalid DeviceId");
@@ -212,7 +212,7 @@ namespace VCBackend.Business_Rules.Users
                              select dev).FirstOrDefault();
                     if (q != null)
                     {
-                        q.Token = AuthToken.GetAPIAccessToken(user, q);
+                        q.Token = AuthToken.GetAPIAccessJwt(user, q);
                         token = q.Token;
                     }
                     else throw new InvalidCredentialsException("Internal error, no devices to authenticate");

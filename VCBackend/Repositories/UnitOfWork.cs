@@ -13,6 +13,7 @@ namespace VCBackend.Repositories
         private Repository<Device> deviceRepository;
         private Repository<Account> accountRepository;
         private Repository<VCard> vcardRepository;
+        private Repository<VCardToken> tokenRepository;
 
         public Repository<User> UserRepository
         {
@@ -61,6 +62,18 @@ namespace VCBackend.Repositories
                     this.vcardRepository = new Repository<VCard>(context);
                 }
                 return vcardRepository;
+            }
+        }
+
+        public Repository<VCardToken> VCardTokenRepository
+        {
+            get
+            {
+                if (this.tokenRepository == null)
+                {
+                    this.tokenRepository = new Repository<VCardToken>(context);
+                }
+                return tokenRepository;
             }
         }
 

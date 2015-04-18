@@ -29,5 +29,12 @@ namespace VCBackend
             }
             else return false;
         }
+
+        public byte[] GetBytes()
+        {
+            if (this.Data == null) return new byte[0];
+            byte[] card = System.Convert.FromBase64String(this.Data);
+            return card;
+        }
     }
 }

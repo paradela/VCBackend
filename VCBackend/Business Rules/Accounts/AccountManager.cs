@@ -45,6 +45,7 @@ namespace VCBackend.Business_Rules.Accounts
         {
             Account Account = UnitOfWork.AccountRepository.GetByID(AccountId);
             if (Account == null) return false;
+            NewCard.AccountId = AccountId;
             Account.VCard = NewCard;
             UnitOfWork.AccountRepository.Update(Account);
             UnitOfWork.Save();
@@ -64,7 +65,7 @@ namespace VCBackend.Business_Rules.Accounts
         public String GetAuthToLoadCard(Account Account)
         {
             if (Account.IsOnline)
-                return AuthToken.GetCardAccessToken(Account.VCard);
+                return AuthToken.GetCardAccessJwt(Account.VCard);
             else throw new Exception(); // Create Exception
         }
 
