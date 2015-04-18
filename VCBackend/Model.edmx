@@ -10,6 +10,7 @@
     <EntitySet Name="AccountSet" EntityType="Model.Store.AccountSet" store:Type="Tables" Schema="dbo" />
     <EntitySet Name="DeviceSet" EntityType="Model.Store.DeviceSet" store:Type="Tables" Schema="dbo" />
     <EntitySet Name="VCardSet" EntityType="Model.Store.VCardSet" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="VCardTokenSet" EntityType="Model.Store.VCardTokenSet" store:Type="Tables" Schema="dbo" />
     <EntitySet Name="DeviceSet_Default" EntityType="Model.Store.DeviceSet_Default" store:Type="Tables" Schema="dbo" />
     <EntitySet Name="DeviceSet_Mobile" EntityType="Model.Store.DeviceSet_Mobile" store:Type="Tables" Schema="dbo" />
     <AssociationSet Name="UserDevice" Association="Model.Store.UserDevice">
@@ -24,9 +25,9 @@
       <End Role="User" EntitySet="UserSet" />
       <End Role="Account" EntitySet="AccountSet" />
     </AssociationSet>
-    <AssociationSet Name="AccountTokens" Association="Model.Store.AccountTokens">
+    <AssociationSet Name="AccountVCardToken" Association="Model.Store.AccountVCardToken">
       <End Role="Account" EntitySet="AccountSet" />
-      <End Role="VCard" EntitySet="VCardSet" />
+      <End Role="VCardToken" EntitySet="VCardTokenSet" />
     </AssociationSet>
     <AssociationSet Name="FK_Default_inherits_Device" Association="Model.Store.FK_Default_inherits_Device">
       <End Role="Device" EntitySet="DeviceSet" />
@@ -73,6 +74,14 @@
     <Property Name="Data" Type="nvarchar(max)" Nullable="false" />
     <Property Name="AccountId" Type="int" Nullable="false" />
     <Property Name="AccountVCard_VCard_Id" Type="int" Nullable="false" />
+  </EntityType>
+  <EntityType Name="VCardTokenSet">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Data" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="AccountId" Type="int" Nullable="false" />
   </EntityType>
   <EntityType Name="DeviceSet_Default">
     <Key>
@@ -122,14 +131,14 @@
       </Dependent>
     </ReferentialConstraint>
   </Association>
-  <Association Name="AccountTokens">
+  <Association Name="AccountVCardToken">
     <End Role="Account" Type="Model.Store.AccountSet" Multiplicity="1" />
-    <End Role="VCard" Type="Model.Store.VCardSet" Multiplicity="*" />
+    <End Role="VCardToken" Type="Model.Store.VCardTokenSet" Multiplicity="*" />
     <ReferentialConstraint>
       <Principal Role="Account">
         <PropertyRef Name="Id" />
       </Principal>
-      <Dependent Role="VCard">
+      <Dependent Role="VCardToken">
         <PropertyRef Name="AccountId" />
       </Dependent>
     </ReferentialConstraint>
@@ -183,9 +192,10 @@
             <End Role="User" EntitySet="UserSet" />
             <End Role="Account" EntitySet="AccountSet" />
           </AssociationSet>
-          <AssociationSet Name="AccountTokens" Association="Model.AccountTokens">
+          <EntitySet Name="VCardTokenSet" EntityType="Model.VCardToken" />
+          <AssociationSet Name="AccountVCardToken" Association="Model.AccountVCardToken">
             <End Role="Account" EntitySet="AccountSet" />
-            <End Role="VCard" EntitySet="VCardSet" />
+            <End Role="VCardToken" EntitySet="VCardTokenSet" />
           </AssociationSet>
           </EntityContainer>
         <EntityType Name="User">
@@ -206,8 +216,8 @@
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="Balance" Type="Double" Nullable="false" />
           <NavigationProperty Name="VCard" Relationship="Model.AccountVCard" FromRole="Account" ToRole="VCard" />
-          <NavigationProperty Name="Tokens" Relationship="Model.AccountTokens" FromRole="Account" ToRole="VCard" />
           <Property Name="IsOnline" Type="Boolean" Nullable="false" cg:SetterAccess="Private" />
+          <NavigationProperty Name="VCardToken" Relationship="Model.AccountVCardToken" FromRole="Account" ToRole="VCardToken" />
         </EntityType>
         <EntityType Name="Device" Abstract="true">
           <Key>
@@ -252,14 +262,22 @@
           <End Type="Model.User" Role="User" Multiplicity="1" />
           <End Type="Model.Account" Role="Account" Multiplicity="0..1" />
         </Association>
-        <Association Name="AccountTokens">
+        <EntityType Name="VCardToken">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Data" Type="String" Nullable="false" />
+          <Property Name="AccountId" Type="Int32" Nullable="false" />
+        </EntityType>
+        <Association Name="AccountVCardToken">
           <End Type="Model.Account" Role="Account" Multiplicity="1" />
-          <End Type="Model.VCard" Role="VCard" Multiplicity="*" />
+          <End Type="Model.VCardToken" Role="VCardToken" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="Account">
               <PropertyRef Name="Id" />
             </Principal>
-            <Dependent Role="VCard">
+            <Dependent Role="VCardToken">
               <PropertyRef Name="AccountId" />
             </Dependent>
           </ReferentialConstraint>
@@ -313,6 +331,15 @@
     <EntitySetMapping Name="VCardSet">
       <EntityTypeMapping TypeName="IsTypeOf(Model.VCard)">
         <MappingFragment StoreEntitySet="VCardSet">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="Data" ColumnName="Data" />
+          <ScalarProperty Name="AccountId" ColumnName="AccountId" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="VCardTokenSet">
+      <EntityTypeMapping TypeName="IsTypeOf(Model.VCardToken)">
+        <MappingFragment StoreEntitySet="VCardTokenSet">
           <ScalarProperty Name="Id" ColumnName="Id" />
           <ScalarProperty Name="Data" ColumnName="Data" />
           <ScalarProperty Name="AccountId" ColumnName="AccountId" />

@@ -16,7 +16,8 @@
         <InheritanceConnector EntityType="Model.Mobile" />
         <AssociationConnector Association="Model.AccountVCard" />
         <AssociationConnector Association="Model.UserAccount" />
-        <AssociationConnector Association="Model.AccountTokens" />
+        <EntityTypeShape EntityType="Model.VCardToken" Width="1.5" PointX="2.5" PointY="6.25" />
+        <AssociationConnector Association="Model.AccountVCardToken" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

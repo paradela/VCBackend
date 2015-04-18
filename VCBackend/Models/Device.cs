@@ -7,7 +7,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace VCBackend
 {
-    public partial class Device : IEntity
+    public partial class Device
     {
         abstract public bool IsDefault();
     }

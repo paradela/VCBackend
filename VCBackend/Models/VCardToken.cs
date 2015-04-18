@@ -5,10 +5,10 @@ using System.Web;
 
 namespace VCBackend
 {
-    public partial class VCard
+    public partial class VCardToken
     {
-        public VCard() { }
-        public VCard(byte[] Data)
+        public VCardToken() { }
+        public VCardToken(byte[] Data)
         {
             this.Data = System.Convert.ToBase64String(Data);
         }

@@ -13,29 +13,12 @@ using VCBackend.Business_Rules.Accounts;
 
 namespace VCBackend.Business_Rules.Users
 {
-    public class UserManager
+    public class UserManager : Manager
     {
-        private static UserManager userManager = null;
-
-        private IRepository<User> rep;
-
-        private UserManager() 
+        public UserManager(UnitOfWork UnitOfWork) 
+            : base(UnitOfWork)
         {
-            rep = UserRepository.getRepositorySingleton();
         }
-        /// <summary>
-        /// A static method for getting a unique instance of UserManager.
-        /// </summary>
-        /// <returns>UserManager singleton.</returns>
-        public static UserManager getUserManagerSingleton()
-        {
-            if (userManager == null)
-                userManager = new UserManager();
-
-            return userManager;
-        }
-
-        
         
 
         //http://stackoverflow.com/questions/5859632/regular-expression-for-password-validation
@@ -88,13 +71,9 @@ namespace VCBackend.Business_Rules.Users
 
         private bool ExistUserWithEmail(String Email)
         {
-            IEnumerable<User> users = rep.List;
-            var list =
-                (from user in users
-                where user.Email == Email
-                select user).ToList();
+            IEnumerable<User> users = UnitOfWork.UserRepository.Get(filter: u => (u.Email == Email));
 
-            if (list.Count() > 0)
+            if (users.Count() > 0)
                 return true;
             else return false;
         }
@@ -113,8 +92,8 @@ namespace VCBackend.Business_Rules.Users
         /// <exception cref="UserAlreadyExistException">Email already in use.</exception>
         public String CreateUser(String Name, String Email, String Password)
         {
-            DeviceManager deviceManager = DeviceManager.getManagerSingleton();
-            AccountManager accountManager = AccountManager.getManagerSingleton();
+            DeviceManager deviceManager = new DeviceManager(UnitOfWork);
+            AccountManager accountManager = new AccountManager(UnitOfWork);
 
             /*
              * Validate if the new user details are well formed
@@ -132,7 +111,8 @@ namespace VCBackend.Business_Rules.Users
             // They will not have full access to the API
             User newUser = new User(Name, Email, Pbkdf2.DeriveKey(Password));
 
-            rep.Add(newUser);
+            UnitOfWork.UserRepository.Add(newUser);
+            UnitOfWork.Save();
 
             String token = deviceManager.CreateDeviceToUser(newUser).Token;
 
@@ -140,14 +120,10 @@ namespace VCBackend.Business_Rules.Users
 
             newUser.Account = account;
 
-            rep.Update(newUser);
-            
+            UnitOfWork.UserRepository.Update(newUser);
+            UnitOfWork.Save();
 
             accountManager.InitializeAccount(account.Id);
-
-            //newUser.Account = account;
-
-            //rep.Update(newUser);
 
             return token;
         }
@@ -178,7 +154,8 @@ namespace VCBackend.Business_Rules.Users
             if (Password != null)
                 User.Password = Pbkdf2.DeriveKey(Password);
 
-            rep.Update(User);
+            UnitOfWork.UserRepository.Update(User);
+            UnitOfWork.Save();
 
             UserDto dto = new UserDto();
             dto.Serialize(User);
@@ -209,22 +186,17 @@ namespace VCBackend.Business_Rules.Users
         public String UserLogin(String Email, String Password, String DeviceId = null)
         {
             String token = null;
-            IEnumerable<User> users = rep.List;
-            var u = from user in users
-                    where user.Email == Email
-                    && user.Password == Pbkdf2.DeriveKey(Password)
-                    select user;
+            String HashedPwd = Pbkdf2.DeriveKey(Password);
+            IEnumerable<User> users = UnitOfWork.UserRepository.Get(filter : q => (q.Email == Email && q.Password == HashedPwd));
 
-            if (u.Count() == 1)
+            if (users.Count() == 1)
             {
-                User user = u.First<User>();
+                User user = users.First<User>();
                 ICollection<Device> devices = user.Devices;
 
                 if (DeviceId != null)
                 {
-                    var q = (from dev in devices
-                             where dev.DeviceId == DeviceId
-                             select dev).FirstOrDefault();
+                    var q = UnitOfWork.DeviceRepository.Get(filter: d => (d.Owner.Id == user.Id && d.DeviceId == DeviceId)).FirstOrDefault();
                     if (q != null)
                     {
                         q.Token = AuthToken.GetAPIAccessToken(user, q);
@@ -246,8 +218,8 @@ namespace VCBackend.Business_Rules.Users
                     else throw new InvalidCredentialsException("Internal error, no devices to authenticate");
                 }
 
-                rep.Update(user);
-
+                UnitOfWork.UserRepository.Update(user);
+                UnitOfWork.Save();
             }
             else throw new InvalidCredentialsException();
 
@@ -266,7 +238,7 @@ namespace VCBackend.Business_Rules.Users
         /// <exception cref="ManagingDeviceException"></exception>
         public String AddDeviceToUser(User User, String DevName, String DevId)
         {
-            DeviceManager deviceManager = DeviceManager.getManagerSingleton();
+            DeviceManager deviceManager = new DeviceManager(UnitOfWork);
 
             if (!ValidateDeviceData(DevName, DevId))
                 throw new ManagingDeviceException("Invalid device name or Id.");
@@ -279,7 +251,8 @@ namespace VCBackend.Business_Rules.Users
             if (devCount == 0)
             {
                 Device dev = deviceManager.CreateDeviceToUser(User, DevName, DevId);
-                rep.Update(User);
+                UnitOfWork.UserRepository.Update(User);
+                UnitOfWork.Save();
                 return dev.Token;
             }
             else throw new ManagingDeviceException("Device Id already registered.");
@@ -294,7 +267,7 @@ namespace VCBackend.Business_Rules.Users
         /// <exception cref="ManagingDeviceException"></exception>
         public void RemoveDeviceFromUser(User User, String DevId)
         {
-            DeviceManager devMngr = DeviceManager.getManagerSingleton();
+            DeviceManager devMngr = new DeviceManager(UnitOfWork);
 
             if (!ValidateDeviceData(null, DevId))
                 throw new ManagingDeviceException("Invalid id format");
@@ -308,6 +281,9 @@ namespace VCBackend.Business_Rules.Users
             devMngr.RemoveDevice(dev.Id);
             
             User.Devices.Remove(dev);
+
+            UnitOfWork.UserRepository.Update(User);
+            UnitOfWork.Save();
         }
 
         /// <summary>

@@ -70,11 +70,11 @@ namespace VCBackend.Controllers
         [VCAuthenticate]
         public UserDto PostUpdateUser([FromUri] String n = null, [FromUri] String e = null, [FromUri] String p = null)
         {
-            User authUser = VCAuthenticate.GetAuthenticatedDevice(ActionContext).Owner;
+            int authDev = VCAuthenticate.GetAuthenticatedDevice(ActionContext);
 
             try
             {
-                UserDto dto = BRulesApi.UpdateUser(authUser, n, e, p);
+                UserDto dto = BRulesApi.UpdateUser(authDev, n, e, p);
                 return dto;
             }
             catch (MalformedUserDetailsException ex)
@@ -102,9 +102,9 @@ namespace VCBackend.Controllers
         [VCAuthenticate]
         public UserDto GetUser()
         {
-            User authUser = VCAuthenticate.GetAuthenticatedDevice(ActionContext).Owner;
+            int authDev = VCAuthenticate.GetAuthenticatedDevice(ActionContext);
 
-            UserDto dto = BRulesApi.GetUser(authUser);
+            UserDto dto = BRulesApi.GetUser(authDev);
 
             return dto;
         }
@@ -114,11 +114,11 @@ namespace VCBackend.Controllers
         [VCAuthenticate]
         public TokenDto PostAddDevice([FromUri] String n, [FromUri] String id)
         {
-            User authUser = VCAuthenticate.GetAuthenticatedDevice(ActionContext).Owner;
+            int authDev = VCAuthenticate.GetAuthenticatedDevice(ActionContext);
 
             try
             {
-                TokenDto token = BRulesApi.AddDevice(authUser, n, id);
+                TokenDto token = BRulesApi.AddDevice(authDev, n, id);
                 return token;
             }
             catch (ManagingDeviceException ex)
@@ -137,11 +137,11 @@ namespace VCBackend.Controllers
         [VCAuthenticate]
         public IHttpActionResult DeleteDevice([FromUri] String id)
         {
-            User authUser = VCAuthenticate.GetAuthenticatedDevice(ActionContext).Owner;
+            int authDev = VCAuthenticate.GetAuthenticatedDevice(ActionContext);
 
             try
             {
-                BRulesApi.RemoveDevice(authUser, id);
+                BRulesApi.RemoveDevice(authDev, id);
                 return Ok();
             }
             catch (ManagingDeviceException ex)
@@ -155,9 +155,9 @@ namespace VCBackend.Controllers
         [VCAuthenticate]
         public IHttpActionResult GetAllDevices() 
         {
-            User authUser = VCAuthenticate.GetAuthenticatedDevice(ActionContext).Owner;
+            int authDev = VCAuthenticate.GetAuthenticatedDevice(ActionContext);
 
-            ICollection<DeviceDto> devices = BRulesApi.GetAllDevices(authUser);
+            ICollection<DeviceDto> devices = BRulesApi.GetAllDevices(authDev);
             return Ok(devices);
         }
 

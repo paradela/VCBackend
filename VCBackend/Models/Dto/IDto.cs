@@ -5,8 +5,8 @@ using System.Web;
 
 namespace VCBackend.Models.Dto
 {
-    public interface IDto
+    public interface IDto <TEntity> where TEntity : class
     {
-        void Serialize(IEntity entity);
+        void Serialize(TEntity entity);
     }
 }

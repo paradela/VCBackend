@@ -29,5 +29,6 @@ namespace VCBackend
         public virtual DbSet<Account> AccountSet { get; set; }
         public virtual DbSet<Device> DeviceSet { get; set; }
         public virtual DbSet<VCard> VCardSet { get; set; }
+        public virtual DbSet<VCardToken> VCardTokenSet { get; set; }
     }
 }

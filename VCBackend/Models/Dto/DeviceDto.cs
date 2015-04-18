@@ -11,12 +11,12 @@ namespace VCBackend.Models.Dto
         DTO_MOBILE_DEVICE
     }
 
-    public class DeviceDto : IDto
+    public class DeviceDto : IDto<Device>
     {
         public DeviceTypeDto Type { get; set; }
         public String Name { get; set; }
 
-        public void Serialize(IEntity entity)
+        public void Serialize(Device entity)
         {
             Device dev = (Device)entity;
 

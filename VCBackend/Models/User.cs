@@ -7,7 +7,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace VCBackend
 {
-    public partial class User : IEntity
+    public partial class User
     {
         public User(String Name, String Email, String Password)
         {

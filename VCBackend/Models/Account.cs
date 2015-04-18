@@ -5,7 +5,7 @@ using System.Web;
 
 namespace VCBackend
 {
-    public partial class Account : IEntity
+    public partial class Account
     {
         private Account(Double Balance)
         {

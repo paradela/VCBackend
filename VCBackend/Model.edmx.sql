@@ -2,7 +2,7 @@
 -- --------------------------------------------------
 -- Entity Designer DDL Script for SQL Server 2005, 2008, 2012 and Azure
 -- --------------------------------------------------
--- Date Created: 04/16/2015 01:08:08
+-- Date Created: 04/18/2015 23:24:55
 -- Generated from EDMX file: C:\Users\Ricardo\Source\Repos\VCBackend\VCBackend\Model.edmx
 -- --------------------------------------------------
 
@@ -26,8 +26,8 @@ GO
 IF OBJECT_ID(N'[dbo].[FK_UserAccount]', 'F') IS NOT NULL
     ALTER TABLE [dbo].[AccountSet] DROP CONSTRAINT [FK_UserAccount];
 GO
-IF OBJECT_ID(N'[dbo].[FK_AccountTokens]', 'F') IS NOT NULL
-    ALTER TABLE [dbo].[VCardSet] DROP CONSTRAINT [FK_AccountTokens];
+IF OBJECT_ID(N'[dbo].[FK_AccountVCardToken]', 'F') IS NOT NULL
+    ALTER TABLE [dbo].[VCardTokenSet] DROP CONSTRAINT [FK_AccountVCardToken];
 GO
 IF OBJECT_ID(N'[dbo].[FK_Default_inherits_Device]', 'F') IS NOT NULL
     ALTER TABLE [dbo].[DeviceSet_Default] DROP CONSTRAINT [FK_Default_inherits_Device];
@@ -51,6 +51,9 @@ IF OBJECT_ID(N'[dbo].[DeviceSet]', 'U') IS NOT NULL
 GO
 IF OBJECT_ID(N'[dbo].[VCardSet]', 'U') IS NOT NULL
     DROP TABLE [dbo].[VCardSet];
+GO
+IF OBJECT_ID(N'[dbo].[VCardTokenSet]', 'U') IS NOT NULL
+    DROP TABLE [dbo].[VCardTokenSet];
 GO
 IF OBJECT_ID(N'[dbo].[DeviceSet_Default]', 'U') IS NOT NULL
     DROP TABLE [dbo].[DeviceSet_Default];
@@ -100,6 +103,14 @@ CREATE TABLE [dbo].[VCardSet] (
 );
 GO
 
+-- Creating table 'VCardTokenSet'
+CREATE TABLE [dbo].[VCardTokenSet] (
+    [Id] int IDENTITY(1,1) NOT NULL,
+    [Data] nvarchar(max)  NOT NULL,
+    [AccountId] int  NOT NULL
+);
+GO
+
 -- Creating table 'DeviceSet_Default'
 CREATE TABLE [dbo].[DeviceSet_Default] (
     [Id] int  NOT NULL
@@ -137,6 +148,12 @@ GO
 -- Creating primary key on [Id] in table 'VCardSet'
 ALTER TABLE [dbo].[VCardSet]
 ADD CONSTRAINT [PK_VCardSet]
+    PRIMARY KEY CLUSTERED ([Id] ASC);
+GO
+
+-- Creating primary key on [Id] in table 'VCardTokenSet'
+ALTER TABLE [dbo].[VCardTokenSet]
+ADD CONSTRAINT [PK_VCardTokenSet]
     PRIMARY KEY CLUSTERED ([Id] ASC);
 GO
 
@@ -201,18 +218,18 @@ ON [dbo].[AccountSet]
     ([UserAccount_Account_Id]);
 GO
 
--- Creating foreign key on [AccountId] in table 'VCardSet'
-ALTER TABLE [dbo].[VCardSet]
-ADD CONSTRAINT [FK_AccountTokens]
+-- Creating foreign key on [AccountId] in table 'VCardTokenSet'
+ALTER TABLE [dbo].[VCardTokenSet]
+ADD CONSTRAINT [FK_AccountVCardToken]
     FOREIGN KEY ([AccountId])
     REFERENCES [dbo].[AccountSet]
         ([Id])
     ON DELETE NO ACTION ON UPDATE NO ACTION;
 GO
 
--- Creating non-clustered index for FOREIGN KEY 'FK_AccountTokens'
-CREATE INDEX [IX_FK_AccountTokens]
-ON [dbo].[VCardSet]
+-- Creating non-clustered index for FOREIGN KEY 'FK_AccountVCardToken'
+CREATE INDEX [IX_FK_AccountVCardToken]
+ON [dbo].[VCardTokenSet]
     ([AccountId]);
 GO
 

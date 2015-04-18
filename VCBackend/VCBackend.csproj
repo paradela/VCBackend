@@ -135,6 +135,7 @@
     <Compile Include="Business Rules\Accounts\AccountManager.cs" />
     <Compile Include="Business Rules\Api\BRulesApi.cs" />
     <Compile Include="Business Rules\Devices\DeviceManager.cs" />
+    <Compile Include="Business Rules\Manager.cs" />
     <Compile Include="Business Rules\Users\InvalidCredentialsException.cs" />
     <Compile Include="Business Rules\Users\MalformedUserDetailsException.cs" />
     <Compile Include="Business Rules\Users\ManagingDeviceException.cs" />
@@ -178,16 +179,13 @@
     <Compile Include="Models\Dto\IDto.cs" />
     <Compile Include="Models\Dto\TokenDto.cs" />
     <Compile Include="Models\Dto\UserDto.cs" />
-    <Compile Include="Models\IEntity.cs" />
     <Compile Include="Models\Mobile.cs" />
     <Compile Include="Models\VCard.cs" />
     <Compile Include="Models\User.cs" />
+    <Compile Include="Models\VCardToken.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Repositories\AccountRepository.cs" />
-    <Compile Include="Repositories\DeviceRepository.cs" />
-    <Compile Include="Repositories\IRepository.cs" />
-    <Compile Include="Repositories\UserRepository.cs" />
-    <Compile Include="Repositories\VCardRepository.cs" />
+    <Compile Include="Repositories\Repository.cs" />
+    <Compile Include="Repositories\UnitOfWork.cs" />
     <Compile Include="User.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
@@ -198,6 +196,9 @@
     </Compile>
     <Compile Include="VCardService.svc.cs">
       <DependentUpon>VCardService.svc</DependentUpon>
+    </Compile>
+    <Compile Include="VCardToken.cs">
+      <DependentUpon>Model.tt</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>

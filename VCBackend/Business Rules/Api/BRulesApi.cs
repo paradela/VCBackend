@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using VCBackend.Models;
 using VCBackend.Models.Dto;
 using VCBackend.Business_Rules.Users;
+using VCBackend.Repositories;
 
 namespace VCBackend.Business_Rules
 {
@@ -30,11 +31,14 @@ namespace VCBackend.Business_Rules
         /// <exception cref="UserAlreadyExistException">Email already in use.</exception>
         public static TokenDto CreateUser (String Name, String Email, String Password) 
         {
-            UserManager um = UserManager.getUserManagerSingleton();
+            UnitOfWork uw = new UnitOfWork();
+            UserManager um = new UserManager(uw);
 
             String token = um.CreateUser(Name, Email, Password);
 
             TokenDto dto = new TokenDto(token);
+
+            uw.Dispose();
 
             //returns a token for authentication!
             //It returns the First device, because the account was just created and it only has one device that is the default one!
@@ -44,30 +48,43 @@ namespace VCBackend.Business_Rules
         /// <summary>
         /// Updates the user data, like the name, email or password.
         /// </summary>
-        /// <param name="User">The authenticated user.</param>
+        /// <param name="AuthDevice">The authenticated device.</param>
         /// <param name="Name">The new name.</param>
         /// <param name="Email">The new email.</param>
         /// <param name="Password">The new password.</param>
         /// <returns>A UserDto with the actual user data.</returns>
         /// <exception cref="MalformedUserDetailsException">One or more of the details passed have an incorrect format.</exception>
         /// <exception cref="UserAlreadyExistException">Email already in use.</exception>
-        public static UserDto UpdateUser (User User, String Name, String Email, String Password)
+        public static UserDto UpdateUser (int AuthDevice, String Name, String Email, String Password)
         {
-            UserManager um = UserManager.getUserManagerSingleton();
+            UnitOfWork uw = new UnitOfWork();
+            UserManager um = new UserManager(uw);
 
-            return um.UpdateUser(User, Name, Email, Password);
+            User User = uw.DeviceRepository.GetByID(AuthDevice).Owner;
+
+            UserDto dto = um.UpdateUser(User, Name, Email, Password);
+
+            uw.Dispose();
+
+            return dto;
         }
 
         /// <summary>
         /// Returns a authenticated user info.
         /// </summary>
-        /// <param name="user">The authenticated user.</param>
+        /// <param name="AuthDevice">The authenticated device id.</param>
         /// <returns>A Dto with the user info.</returns>
-        public static UserDto GetUser(User user)
+        public static UserDto GetUser(int AuthDevice)
         {
-            UserManager um = UserManager.getUserManagerSingleton();
+            UnitOfWork uw = new UnitOfWork();
+            UserManager um = new UserManager(uw);
+            User User = uw.DeviceRepository.GetByID(AuthDevice).Owner;
 
-            return um.GetUser(user);
+            UserDto dto = um.GetUser(User);
+
+            uw.Dispose();
+
+            return dto;
         }
 
         /********************************
@@ -84,9 +101,14 @@ namespace VCBackend.Business_Rules
         /// <exception cref="InvalidCredentialsException"></exception>
         public static TokenDto Login(String Username, String Password, String DeviceId)
         {
-            UserManager um = UserManager.getUserManagerSingleton();
+            UnitOfWork uw = new UnitOfWork();
+            UserManager um = new UserManager(uw);
+
             String token = um.UserLogin(Username, Password, DeviceId);
             TokenDto dto = new TokenDto(token);
+
+            uw.Dispose();
+
             return dto;
         }
 
@@ -102,11 +124,17 @@ namespace VCBackend.Business_Rules
         /// <param name="DevId">The device id.</param>
         /// <returns>JWT Authentication token for the created device.</returns>
         /// <exception cref="ManagingDeviceException"></exception>
-        public static TokenDto AddDevice(User User, String DeviceName, String DeviceId)
+        public static TokenDto AddDevice(int AuthDevice, String DeviceName, String DeviceId)
         {
-            UserManager um = UserManager.getUserManagerSingleton();
-            String token = um.AddDeviceToUser(User, DeviceName, DeviceId);
+            UnitOfWork uw = new UnitOfWork();
+            UserManager um = new UserManager(uw);
+            User user = uw.DeviceRepository.GetByID(AuthDevice).Owner;
+
+            String token = um.AddDeviceToUser(user, DeviceName, DeviceId);
             TokenDto dto = new TokenDto(token);
+
+            uw.Dispose();
+
             return dto;
         }
 
@@ -114,13 +142,18 @@ namespace VCBackend.Business_Rules
         /// This method removes a device from the User's devices. After the removal, the device 
         /// won't be able to access the private API methods.
         /// </summary>
-        /// <param name="User">The authenticated user.</param>
+        /// <param name="AuthDevice">The authenticated device id.</param>
         /// <param name="DevId">The device Id.</param>
         /// <exception cref="ManagingDeviceException"></exception>
-        public static void RemoveDevice(User User, String DeviceId)
+        public static void RemoveDevice(int AuthDevice, String DeviceId)
         {
-            UserManager um = UserManager.getUserManagerSingleton();
-            um.RemoveDeviceFromUser(User, DeviceId);
+            UnitOfWork uw = new UnitOfWork();
+            UserManager um = new UserManager(uw);
+            User user = uw.DeviceRepository.GetByID(AuthDevice).Owner;
+
+            um.RemoveDeviceFromUser(user, DeviceId);
+
+            uw.Dispose();
         }
 
         /// <summary>
@@ -128,10 +161,13 @@ namespace VCBackend.Business_Rules
         /// </summary>
         /// <param name="user">The authenticated user.</param>
         /// <returns>A list of devices.</returns>
-        public static ICollection<DeviceDto> GetAllDevices(User User)
+        public static ICollection<DeviceDto> GetAllDevices(int AuthDevice)
         {
-            UserManager um = UserManager.getUserManagerSingleton();
-            ICollection<Device> devices = um.GetUserDevices(User);
+            UnitOfWork uw = new UnitOfWork();
+            UserManager um = new UserManager(uw);
+            User user = uw.DeviceRepository.GetByID(AuthDevice).Owner;
+
+            ICollection<Device> devices = um.GetUserDevices(user);
             ICollection<DeviceDto> devDto = new List<DeviceDto>();
             foreach (Device d in devices)
             {
@@ -139,6 +175,9 @@ namespace VCBackend.Business_Rules
                 dto.Serialize(d);
                 devDto.Add(dto);
             }
+
+            uw.Dispose();
+
             return devDto;
         }
     }

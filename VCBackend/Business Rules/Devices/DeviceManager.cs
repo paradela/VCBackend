@@ -8,25 +8,11 @@ using VCBackend.Utility.Security;
 
 namespace VCBackend.Business_Rules.Devices
 {
-    public class DeviceManager
+    public class DeviceManager : Manager
     {
-
-        private static DeviceManager deviceManager = null;
-
-        private IRepository<Device> rep;
-
-        private DeviceManager()
+        public DeviceManager(UnitOfWork UnitOfWork)
+            : base(UnitOfWork)
         {
-            rep = DeviceRepository.getRepositorySingleton();
-        }
-
-        public static DeviceManager getManagerSingleton()
-        {
-            if (deviceManager == null)
-            {
-                deviceManager = new DeviceManager();
-            }
-            return deviceManager;
         }
 
         /// <summary>
@@ -50,17 +36,21 @@ namespace VCBackend.Business_Rules.Devices
 
             user.AddDevice(device);
 
-            rep.Add(device); // store device on Database
+            UnitOfWork.DeviceRepository.Add(device); // store device on Database
+            UnitOfWork.Save();
 
             return device;
         }
 
         public void RemoveDevice(int EntityId)
         {
-            Device dev = rep.FindById(EntityId);
+            Device dev = UnitOfWork.DeviceRepository.GetByID(EntityId);
 
             if (dev != null)
-                rep.Delete(dev);
+            {
+                UnitOfWork.DeviceRepository.Delete(dev);
+                UnitOfWork.Save();
+            }
         }
 
     }

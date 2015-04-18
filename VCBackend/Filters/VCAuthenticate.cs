@@ -18,14 +18,14 @@ namespace VCBackend.Filters
     {
         public static String AUTH_DEVICE = "AuthDevice";
 
-        public static Device GetAuthenticatedDevice(HttpActionContext context)
+        public static int GetAuthenticatedDevice(HttpActionContext context)
         {
-            return (Device)context.Request.Properties[VCAuthenticate.AUTH_DEVICE];
+            return (int)context.Request.Properties[VCAuthenticate.AUTH_DEVICE];
         }
 
         public System.Threading.Tasks.Task AuthenticateAsync(HttpAuthenticationContext context, System.Threading.CancellationToken cancellationToken)
         {
-            IRepository<Device> rep = DeviceRepository.getRepositorySingleton();
+            UnitOfWork uw = new UnitOfWork();
 
             //1. Get query key/value map to get the authentication data
             var query = context.ActionContext.Request.RequestUri.Query;
@@ -46,13 +46,15 @@ namespace VCBackend.Filters
             var uid = payload["user_id"];
             var did = payload["device_id"];
 
-            Device dev = rep.FindById((int)did);
+            Device dev = uw.DeviceRepository.GetByID((int)did);
             
             if (dev == null || dev.Owner.Id != (int)uid || dev.Token != token)
                 return null;
 
-            context.Request.Properties.Add(AUTH_DEVICE, dev);
-            
+            context.Request.Properties.Add(AUTH_DEVICE, did);
+
+            uw.Dispose();
+
             return Task.FromResult(0);
         }
 

@@ -9,39 +9,28 @@ using VCBackend.Utility.Security;
 
 namespace VCBackend.Business_Rules.Accounts
 {
-    public class AccountManager
+    public class AccountManager : Manager
     {
-        private static AccountManager accountManager = null;
-
-        private IRepository<Account> rep;
-
-        private AccountManager()
+        public AccountManager(UnitOfWork UnitOfWork)
+            : base(UnitOfWork)
         {
-            rep = AccountRepository.getRepositorySingleton();
-        }
-
-        public static AccountManager getManagerSingleton()
-        {
-            if (accountManager == null)
-                accountManager = new AccountManager();
-            return accountManager;
         }
 
         public Account CreateAccount()
         {
             Account account = new Account();
             account.Balance = 0.0;
-            rep.Add(account);
+            UnitOfWork.AccountRepository.Add(account);
             return account;
         }
 
         public bool InitializeAccount(int AccountId)
         {
-            Account Account = rep.FindById(AccountId);
+            Account Account = UnitOfWork.AccountRepository.GetByID(AccountId);
 
             if (Account == null) return false;
 
-            TSMFakeProxy proxy = TSMFakeProxy.getTSMFakeProxySingleton();
+            TSMFakeProxy proxy = new TSMFakeProxy();
 
             int card = proxy.InstallCard(Account.Id);
 
@@ -54,10 +43,11 @@ namespace VCBackend.Business_Rules.Accounts
 
         public bool SetCardToAccount(int AccountId, VCard NewCard)
         {
-            Account Account = rep.FindById(AccountId);
+            Account Account = UnitOfWork.AccountRepository.GetByID(AccountId);
             if (Account == null) return false;
-            //Account. = NewCard;
-            rep.Update(Account);
+            Account.VCard = NewCard;
+            UnitOfWork.AccountRepository.Update(Account);
+            UnitOfWork.Save();
             return true;
         }
 
