@@ -82,6 +82,7 @@
     <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
     <Property Name="Data" Type="nvarchar(max)" Nullable="false" />
     <Property Name="AccountId" Type="int" Nullable="false" />
+    <Property Name="Validity" Type="time" Nullable="false" />
   </EntityType>
   <EntityType Name="DeviceSet_Default">
     <Key>
@@ -344,6 +345,7 @@
           <ScalarProperty Name="Id" ColumnName="Id" />
           <ScalarProperty Name="Data" ColumnName="Data" />
           <ScalarProperty Name="AccountId" ColumnName="AccountId" />
+          <ScalarProperty Name="Validity" ColumnName="Validity" />
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>

@@ -2,7 +2,7 @@
 -- --------------------------------------------------
 -- Entity Designer DDL Script for SQL Server 2005, 2008, 2012 and Azure
 -- --------------------------------------------------
--- Date Created: 04/18/2015 23:24:55
+-- Date Created: 04/19/2015 15:04:09
 -- Generated from EDMX file: C:\Users\Ricardo\Source\Repos\VCBackend\VCBackend\Model.edmx
 -- --------------------------------------------------
 
@@ -107,7 +107,8 @@ GO
 CREATE TABLE [dbo].[VCardTokenSet] (
     [Id] int IDENTITY(1,1) NOT NULL,
     [Data] nvarchar(max)  NOT NULL,
-    [AccountId] int  NOT NULL
+    [AccountId] int  NOT NULL,
+    [Validity] time  NOT NULL
 );
 GO
 
