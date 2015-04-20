@@ -39,7 +39,7 @@ namespace VCBackend.Controllers
         {
         }
 
-        [Route("load/cancel")]
+        [Route("load/{method}/cancel")]
         [VCAuthenticate]
         public void DeleteLoadCard()
         {
