@@ -58,7 +58,6 @@
     </Key>
     <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
     <Property Name="Balance" Type="float" Nullable="false" />
-    <Property Name="IsOnline" Type="bit" Nullable="false" />
     <Property Name="UserAccount_Account_Id" Type="int" Nullable="false" />
   </EntityType>
   <EntityType Name="DeviceSet">

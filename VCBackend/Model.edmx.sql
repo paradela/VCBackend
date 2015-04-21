@@ -2,7 +2,7 @@
 -- --------------------------------------------------
 -- Entity Designer DDL Script for SQL Server 2005, 2008, 2012 and Azure
 -- --------------------------------------------------
--- Date Created: 04/21/2015 01:04:43
+-- Date Created: 04/22/2015 00:23:44
 -- Generated from EDMX file: C:\Users\Ricardo\Source\Repos\VCBackend\VCBackend\Model.edmx
 -- --------------------------------------------------
 
@@ -30,7 +30,7 @@ IF OBJECT_ID(N'[dbo].[FK_AccountVCardToken]', 'F') IS NOT NULL
     ALTER TABLE [dbo].[VCardTokenSet] DROP CONSTRAINT [FK_AccountVCardToken];
 GO
 IF OBJECT_ID(N'[dbo].[FK_AccountProdPayments]', 'F') IS NOT NULL
-    ALTER TABLE [dbo].[ProdPaymentsSet] DROP CONSTRAINT [FK_AccountProdPayments];
+    ALTER TABLE [dbo].[ProdPaymentSet] DROP CONSTRAINT [FK_AccountProdPayments];
 GO
 IF OBJECT_ID(N'[dbo].[FK_Default_inherits_Device]', 'F') IS NOT NULL
     ALTER TABLE [dbo].[DeviceSet_Default] DROP CONSTRAINT [FK_Default_inherits_Device];
@@ -58,8 +58,8 @@ GO
 IF OBJECT_ID(N'[dbo].[VCardTokenSet]', 'U') IS NOT NULL
     DROP TABLE [dbo].[VCardTokenSet];
 GO
-IF OBJECT_ID(N'[dbo].[ProdPaymentsSet]', 'U') IS NOT NULL
-    DROP TABLE [dbo].[ProdPaymentsSet];
+IF OBJECT_ID(N'[dbo].[ProdPaymentSet]', 'U') IS NOT NULL
+    DROP TABLE [dbo].[ProdPaymentSet];
 GO
 IF OBJECT_ID(N'[dbo].[DeviceSet_Default]', 'U') IS NOT NULL
     DROP TABLE [dbo].[DeviceSet_Default];
@@ -85,7 +85,6 @@ GO
 CREATE TABLE [dbo].[AccountSet] (
     [Id] int IDENTITY(1,1) NOT NULL,
     [Balance] float  NOT NULL,
-    [IsOnline] bit  NOT NULL,
     [UserAccount_Account_Id] int  NOT NULL
 );
 GO

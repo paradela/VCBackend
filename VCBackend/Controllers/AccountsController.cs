@@ -12,7 +12,7 @@ namespace VCBackend.Controllers
     public class AccountsController : ApiController
     {
 
-        [Route("/products")]
+        [Route("products")]
         [VCAuthenticate]
         public void /*List<ProductDto>*/ GetProductsList()
         {
