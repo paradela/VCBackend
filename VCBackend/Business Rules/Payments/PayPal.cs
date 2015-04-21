@@ -8,7 +8,7 @@ using PayPal.Api;
 
 namespace VCBackend.Business_Rules.Payments
 {
-    public class PayPal : IPaymentMethod
+    public class PayPal
     {
         private String ClientID, ClientSecret;
 
@@ -18,23 +18,20 @@ namespace VCBackend.Business_Rules.Payments
             ClientSecret = ConfigurationManager.AppSettings["PP_ClientSecret"];
         }
 
-        PaymentRequest IPaymentMethod.PaymentBegin(params string[] args)
-        {
-            
+        ProdPayment PaymentBegin(ProdPayment request)
+        {   
             OAuthTokenCredential tokenCredential =
                 new OAuthTokenCredential(ClientID, ClientSecret);
             var accessToken = tokenCredential.GetAccessToken();
 
             APIContext context = new APIContext(accessToken);
-            
 
             var payer = new Payer();
             payer.payment_method = "paypal";
-
             
             var amount = new Amount();
-            amount.currency = "EUR"; //passed in the arguments
-            amount.total = "10.0";
+            amount.currency = request.Currency;
+            amount.total = request.Price;
 
             var transaction = new Transaction();
             transaction.amount = amount;
@@ -52,17 +49,68 @@ namespace VCBackend.Business_Rules.Payments
 
             var createdPayment = payment.Create(context);
 
-            throw new NotImplementedException();
+            request.PaymentData = createdPayment.ConvertToJson();
+            request.PaymentMethod = "paypal";
+            request.State = createdPayment.state;
+
+            if (createdPayment.state == ProdPayment.STATE_CREATED)
+            {
+                request.RedirectURL = createdPayment.GetApprovalUrl();
+                request.PaymentId = createdPayment.id;
+                return request;
+            }
+            else throw new PayPalPaymentFailed(request, String.Format("PayPal payment {0}.", request.State));
         }
 
-        bool IPaymentMethod.PaymentEnd(PaymentRequest request)
+        ProdPayment PaymentEnd(ProdPayment request)
         {
-            throw new NotImplementedException();
+            OAuthTokenCredential tokenCredential =
+                new OAuthTokenCredential(ClientID, ClientSecret);
+
+            string accessToken = tokenCredential.GetAccessToken();
+
+            APIContext context = new APIContext(accessToken);
+
+            if (request.State == ProdPayment.STATE_CREATED)
+            {
+                Payment payment = Payment.Get(context, request.PaymentId);
+                
+                request.State = payment.state;
+
+                if (request.State == ProdPayment.STATE_APPROVED && request.PayerId != null)
+                {
+                    //payment.Execute(context,
+                    PaymentExecution paymentExecution = new PaymentExecution();
+                    paymentExecution.payer_id = request.PayerId;
+
+                    Payment executedPayment = payment.Execute(context, paymentExecution);
+
+                    request.State = executedPayment.state;
+
+                    if (request.State == ProdPayment.STATE_APPROVED)
+                        return request;
+                }
+            }
+
+            throw new PayPalPaymentFailed(request, String.Format("Paypal payment {0}.", request.State));
         }
 
-        bool IPaymentMethod.PaymentCancel(PaymentRequest request)
+        ProdPayment PaymentCancel(ProdPayment request)
         {
-            throw new NotImplementedException();
+            if (request.State != ProdPayment.STATE_APPROVED)
+                request.State = ProdPayment.STATE_CANCELED;
+            return request;
+        }
+    }
+
+    public class PayPalPaymentFailed : Exception
+    {
+        public ProdPayment Payment { get; set; }
+
+        public PayPalPaymentFailed(ProdPayment payment, String message)
+            : base(message)
+        {
+            this.Payment = payment;
         }
     }
 }

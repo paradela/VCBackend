@@ -7,15 +7,15 @@ namespace VCBackend.Business_Rules.Payments
 {
     public class PaymentGateway
     {
-        private IDictionary<String, IPaymentMethod> methods;
+        private IDictionary<String, object> methods;
 
         public PaymentGateway()
         {
-            methods = new Dictionary<String, IPaymentMethod>();
+            methods = new Dictionary<String, object>();
             methods["paypal"] = new PayPal();
         }
 
-        public IPaymentMethod GetPaymentMethodByName(String name)
+        public object GetPaymentMethodByName(String name)
         {
             var method = methods[name];
             if (method == null)

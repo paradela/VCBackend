@@ -11,6 +11,7 @@
     <EntitySet Name="DeviceSet" EntityType="Model.Store.DeviceSet" store:Type="Tables" Schema="dbo" />
     <EntitySet Name="VCardSet" EntityType="Model.Store.VCardSet" store:Type="Tables" Schema="dbo" />
     <EntitySet Name="VCardTokenSet" EntityType="Model.Store.VCardTokenSet" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="ProdPaymentSet" EntityType="Model.Store.ProdPaymentSet" store:Type="Tables" Schema="dbo" />
     <EntitySet Name="DeviceSet_Default" EntityType="Model.Store.DeviceSet_Default" store:Type="Tables" Schema="dbo" />
     <EntitySet Name="DeviceSet_Mobile" EntityType="Model.Store.DeviceSet_Mobile" store:Type="Tables" Schema="dbo" />
     <AssociationSet Name="UserDevice" Association="Model.Store.UserDevice">
@@ -28,6 +29,10 @@
     <AssociationSet Name="AccountVCardToken" Association="Model.Store.AccountVCardToken">
       <End Role="Account" EntitySet="AccountSet" />
       <End Role="VCardToken" EntitySet="VCardTokenSet" />
+    </AssociationSet>
+    <AssociationSet Name="AccountProdPayments" Association="Model.Store.AccountProdPayments">
+      <End Role="Account" EntitySet="AccountSet" />
+      <End Role="ProdPayments" EntitySet="ProdPaymentSet" />
     </AssociationSet>
     <AssociationSet Name="FK_Default_inherits_Device" Association="Model.Store.FK_Default_inherits_Device">
       <End Role="Device" EntitySet="DeviceSet" />
@@ -83,6 +88,23 @@
     <Property Name="Data" Type="nvarchar(max)" Nullable="false" />
     <Property Name="AccountId" Type="int" Nullable="false" />
     <Property Name="Validity" Type="time" Nullable="false" />
+    <Property Name="AccountVCardToken_VCardToken_Id" Type="int" Nullable="false" />
+  </EntityType>
+  <EntityType Name="ProdPaymentSet">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="PaymentId" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="State" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="ProductId" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="Price" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="Currency" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="PaymentMethod" Type="nvarchar(max)" Nullable="true" />
+    <Property Name="RedirectURL" Type="nvarchar(max)" Nullable="true" />
+    <Property Name="PaymentData" Type="nvarchar(max)" Nullable="true" />
+    <Property Name="AccountId" Type="int" Nullable="false" />
+    <Property Name="PayerId" Type="nvarchar(max)" Nullable="true" />
   </EntityType>
   <EntityType Name="DeviceSet_Default">
     <Key>
@@ -140,6 +162,18 @@
         <PropertyRef Name="Id" />
       </Principal>
       <Dependent Role="VCardToken">
+        <PropertyRef Name="AccountVCardToken_VCardToken_Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="AccountProdPayments">
+    <End Role="Account" Type="Model.Store.AccountSet" Multiplicity="1" />
+    <End Role="ProdPayments" Type="Model.Store.ProdPaymentSet" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Account">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="ProdPayments">
         <PropertyRef Name="AccountId" />
       </Dependent>
     </ReferentialConstraint>
@@ -198,6 +232,11 @@
             <End Role="Account" EntitySet="AccountSet" />
             <End Role="VCardToken" EntitySet="VCardTokenSet" />
           </AssociationSet>
+          <EntitySet Name="ProdPaymentSet" EntityType="Model.ProdPayment" />
+          <AssociationSet Name="AccountProdPayments" Association="Model.AccountProdPayments">
+            <End Role="Account" EntitySet="AccountSet" />
+            <End Role="ProdPayments" EntitySet="ProdPaymentSet" />
+          </AssociationSet>
           </EntityContainer>
         <EntityType Name="User">
           <Key>
@@ -219,6 +258,7 @@
           <NavigationProperty Name="VCard" Relationship="Model.AccountVCard" FromRole="Account" ToRole="VCard" />
           <Property Name="IsOnline" Type="Boolean" Nullable="false" cg:SetterAccess="Private" />
           <NavigationProperty Name="VCardToken" Relationship="Model.AccountVCardToken" FromRole="Account" ToRole="VCardToken" />
+          <NavigationProperty Name="ProdPayments" Relationship="Model.AccountProdPayments" FromRole="Account" ToRole="ProdPayments" />
         </EntityType>
         <EntityType Name="Device" Abstract="true">
           <Key>
@@ -275,11 +315,31 @@
         <Association Name="AccountVCardToken">
           <End Type="Model.Account" Role="Account" Multiplicity="1" />
           <End Type="Model.VCardToken" Role="VCardToken" Multiplicity="*" />
+        </Association>
+        <EntityType Name="ProdPayment">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="PaymentId" Type="String" Nullable="false" />
+          <Property Name="State" Type="String" Nullable="false" />
+          <Property Name="ProductId" Type="String" Nullable="false" />
+          <Property Name="Price" Type="String" Nullable="false" />
+          <Property Name="Currency" Type="String" Nullable="false" />
+          <Property Name="PaymentMethod" Type="String" Nullable="true" />
+          <Property Name="RedirectURL" Type="String" Nullable="true" />
+          <Property Name="PaymentData" Type="String" Nullable="true" />
+          <Property Name="AccountId" Type="Int32" Nullable="false" />
+          <Property Name="PayerId" Type="String" Nullable="true" />
+        </EntityType>
+        <Association Name="AccountProdPayments">
+          <End Type="Model.Account" Role="Account" Multiplicity="1" />
+          <End Type="Model.ProdPayment" Role="ProdPayments" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="Account">
               <PropertyRef Name="Id" />
             </Principal>
-            <Dependent Role="VCardToken">
+            <Dependent Role="ProdPayments">
               <PropertyRef Name="AccountId" />
             </Dependent>
           </ReferentialConstraint>
@@ -349,6 +409,23 @@
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>
+    <EntitySetMapping Name="ProdPaymentSet">
+      <EntityTypeMapping TypeName="IsTypeOf(Model.ProdPayment)">
+        <MappingFragment StoreEntitySet="ProdPaymentSet">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="PaymentId" ColumnName="PaymentId" />
+          <ScalarProperty Name="State" ColumnName="State" />
+          <ScalarProperty Name="ProductId" ColumnName="ProductId" />
+          <ScalarProperty Name="Price" ColumnName="Price" />
+          <ScalarProperty Name="Currency" ColumnName="Currency" />
+          <ScalarProperty Name="PaymentMethod" ColumnName="PaymentMethod" />
+          <ScalarProperty Name="RedirectURL" ColumnName="RedirectURL" />
+          <ScalarProperty Name="PaymentData" ColumnName="PaymentData" />
+          <ScalarProperty Name="AccountId" ColumnName="AccountId" />
+          <ScalarProperty Name="PayerId" ColumnName="PayerId" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
     <AssociationSetMapping Name="AccountVCard" TypeName="Model.AccountVCard" StoreEntitySet="VCardSet">
       <EndProperty Name="Account">
         <ScalarProperty Name="Id" ColumnName="AccountVCard_VCard_Id" />
@@ -362,6 +439,14 @@
         <ScalarProperty Name="Id" ColumnName="UserAccount_Account_Id" />
       </EndProperty>
       <EndProperty Name="Account">
+        <ScalarProperty Name="Id" ColumnName="Id" />
+      </EndProperty>
+    </AssociationSetMapping>
+    <AssociationSetMapping Name="AccountVCardToken" TypeName="Model.AccountVCardToken" StoreEntitySet="VCardTokenSet">
+      <EndProperty Name="Account">
+        <ScalarProperty Name="Id" ColumnName="AccountVCardToken_VCardToken_Id" />
+      </EndProperty>
+      <EndProperty Name="VCardToken">
         <ScalarProperty Name="Id" ColumnName="Id" />
       </EndProperty>
     </AssociationSetMapping>

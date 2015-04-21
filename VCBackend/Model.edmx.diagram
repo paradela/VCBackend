@@ -5,12 +5,12 @@
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
       <Diagram DiagramId="69930aa420c84948af2a0dea1bd8cbd1" Name="Diagram1" >
-        <EntityTypeShape EntityType="Model.User" Width="1.5" PointX="3.125" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="Model.User" Width="1.5" PointX="6.75" PointY="0.625" IsExpanded="true" />
         <EntityTypeShape EntityType="Model.Account" Width="1.5" PointX="1.125" PointY="3.25" />
-        <EntityTypeShape EntityType="Model.Device" Width="1.5" PointX="6.125" PointY="2.625" />
+        <EntityTypeShape EntityType="Model.Device" Width="1.5" PointX="9.625" PointY="2.625" />
         <EntityTypeShape EntityType="Model.VCard" Width="1.5" PointX="0.5" PointY="6.125" />
-        <EntityTypeShape EntityType="Model.Default" Width="1.5" PointX="5.125" PointY="5.375" />
-        <EntityTypeShape EntityType="Model.Mobile" Width="1.5" PointX="7.375" PointY="5.375" />
+        <EntityTypeShape EntityType="Model.Default" Width="1.5" PointX="8.75" PointY="5.25" />
+        <EntityTypeShape EntityType="Model.Mobile" Width="1.5" PointX="10.75" PointY="5.25" />
         <AssociationConnector Association="Model.UserDevice" />
         <InheritanceConnector EntityType="Model.Default" />
         <InheritanceConnector EntityType="Model.Mobile" />
@@ -18,6 +18,8 @@
         <AssociationConnector Association="Model.UserAccount" />
         <EntityTypeShape EntityType="Model.VCardToken" Width="1.5" PointX="2.5" PointY="6.25" />
         <AssociationConnector Association="Model.AccountVCardToken" />
+        <EntityTypeShape EntityType="Model.ProdPayment" Width="1.5" PointX="4.375" PointY="2.875" />
+        <AssociationConnector Association="Model.AccountProdPayments" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

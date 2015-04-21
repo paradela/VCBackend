@@ -2,7 +2,7 @@
 -- --------------------------------------------------
 -- Entity Designer DDL Script for SQL Server 2005, 2008, 2012 and Azure
 -- --------------------------------------------------
--- Date Created: 04/19/2015 15:04:09
+-- Date Created: 04/21/2015 01:04:43
 -- Generated from EDMX file: C:\Users\Ricardo\Source\Repos\VCBackend\VCBackend\Model.edmx
 -- --------------------------------------------------
 
@@ -29,6 +29,9 @@ GO
 IF OBJECT_ID(N'[dbo].[FK_AccountVCardToken]', 'F') IS NOT NULL
     ALTER TABLE [dbo].[VCardTokenSet] DROP CONSTRAINT [FK_AccountVCardToken];
 GO
+IF OBJECT_ID(N'[dbo].[FK_AccountProdPayments]', 'F') IS NOT NULL
+    ALTER TABLE [dbo].[ProdPaymentsSet] DROP CONSTRAINT [FK_AccountProdPayments];
+GO
 IF OBJECT_ID(N'[dbo].[FK_Default_inherits_Device]', 'F') IS NOT NULL
     ALTER TABLE [dbo].[DeviceSet_Default] DROP CONSTRAINT [FK_Default_inherits_Device];
 GO
@@ -54,6 +57,9 @@ IF OBJECT_ID(N'[dbo].[VCardSet]', 'U') IS NOT NULL
 GO
 IF OBJECT_ID(N'[dbo].[VCardTokenSet]', 'U') IS NOT NULL
     DROP TABLE [dbo].[VCardTokenSet];
+GO
+IF OBJECT_ID(N'[dbo].[ProdPaymentsSet]', 'U') IS NOT NULL
+    DROP TABLE [dbo].[ProdPaymentsSet];
 GO
 IF OBJECT_ID(N'[dbo].[DeviceSet_Default]', 'U') IS NOT NULL
     DROP TABLE [dbo].[DeviceSet_Default];
@@ -108,7 +114,24 @@ CREATE TABLE [dbo].[VCardTokenSet] (
     [Id] int IDENTITY(1,1) NOT NULL,
     [Data] nvarchar(max)  NOT NULL,
     [AccountId] int  NOT NULL,
-    [Validity] time  NOT NULL
+    [Validity] time  NOT NULL,
+    [AccountVCardToken_VCardToken_Id] int  NOT NULL
+);
+GO
+
+-- Creating table 'ProdPaymentSet'
+CREATE TABLE [dbo].[ProdPaymentSet] (
+    [Id] int IDENTITY(1,1) NOT NULL,
+    [PaymentId] nvarchar(max)  NOT NULL,
+    [State] nvarchar(max)  NOT NULL,
+    [ProductId] nvarchar(max)  NOT NULL,
+    [Price] nvarchar(max)  NOT NULL,
+    [Currency] nvarchar(max)  NOT NULL,
+    [PaymentMethod] nvarchar(max)  NULL,
+    [RedirectURL] nvarchar(max)  NULL,
+    [PaymentData] nvarchar(max)  NULL,
+    [AccountId] int  NOT NULL,
+    [PayerId] nvarchar(max)  NULL
 );
 GO
 
@@ -155,6 +178,12 @@ GO
 -- Creating primary key on [Id] in table 'VCardTokenSet'
 ALTER TABLE [dbo].[VCardTokenSet]
 ADD CONSTRAINT [PK_VCardTokenSet]
+    PRIMARY KEY CLUSTERED ([Id] ASC);
+GO
+
+-- Creating primary key on [Id] in table 'ProdPaymentSet'
+ALTER TABLE [dbo].[ProdPaymentSet]
+ADD CONSTRAINT [PK_ProdPaymentSet]
     PRIMARY KEY CLUSTERED ([Id] ASC);
 GO
 
@@ -219,10 +248,10 @@ ON [dbo].[AccountSet]
     ([UserAccount_Account_Id]);
 GO
 
--- Creating foreign key on [AccountId] in table 'VCardTokenSet'
+-- Creating foreign key on [AccountVCardToken_VCardToken_Id] in table 'VCardTokenSet'
 ALTER TABLE [dbo].[VCardTokenSet]
 ADD CONSTRAINT [FK_AccountVCardToken]
-    FOREIGN KEY ([AccountId])
+    FOREIGN KEY ([AccountVCardToken_VCardToken_Id])
     REFERENCES [dbo].[AccountSet]
         ([Id])
     ON DELETE NO ACTION ON UPDATE NO ACTION;
@@ -231,6 +260,21 @@ GO
 -- Creating non-clustered index for FOREIGN KEY 'FK_AccountVCardToken'
 CREATE INDEX [IX_FK_AccountVCardToken]
 ON [dbo].[VCardTokenSet]
+    ([AccountVCardToken_VCardToken_Id]);
+GO
+
+-- Creating foreign key on [AccountId] in table 'ProdPaymentSet'
+ALTER TABLE [dbo].[ProdPaymentSet]
+ADD CONSTRAINT [FK_AccountProdPayments]
+    FOREIGN KEY ([AccountId])
+    REFERENCES [dbo].[AccountSet]
+        ([Id])
+    ON DELETE NO ACTION ON UPDATE NO ACTION;
+GO
+
+-- Creating non-clustered index for FOREIGN KEY 'FK_AccountProdPayments'
+CREATE INDEX [IX_FK_AccountProdPayments]
+ON [dbo].[ProdPaymentSet]
     ([AccountId]);
 GO
 

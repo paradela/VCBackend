@@ -144,8 +144,6 @@
     <Compile Include="Business Rules\Devices\DeviceManager.cs" />
     <Compile Include="Business Rules\Manager.cs" />
     <Compile Include="Business Rules\Payments\PaymentGateway.cs" />
-    <Compile Include="Business Rules\Payments\IPaymentMethod.cs" />
-    <Compile Include="Business Rules\Payments\PaymentRequest.cs" />
     <Compile Include="Business Rules\Payments\PayPal.cs" />
     <Compile Include="Business Rules\Users\InvalidCredentialsException.cs" />
     <Compile Include="Business Rules\Users\MalformedUserDetailsException.cs" />
@@ -193,9 +191,13 @@
     <Compile Include="Models\Dto\TokenDto.cs" />
     <Compile Include="Models\Dto\UserDto.cs" />
     <Compile Include="Models\Mobile.cs" />
+    <Compile Include="Models\ProdPayment.cs" />
     <Compile Include="Models\VCard.cs" />
     <Compile Include="Models\User.cs" />
     <Compile Include="Models\VCardToken.cs" />
+    <Compile Include="ProdPayment.cs">
+      <DependentUpon>Model.tt</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repositories\Repository.cs" />
     <Compile Include="Repositories\UnitOfWork.cs" />
