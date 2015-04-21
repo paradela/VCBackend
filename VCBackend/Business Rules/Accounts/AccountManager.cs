@@ -52,28 +52,12 @@ namespace VCBackend.Business_Rules.Accounts
             return true;
         }
 
-        public void UseOnlineValidation(Account Account)
-        {
-            //Load Card with Account.Balance
-        }
-
-        public void UseTokenValidation(Account Account)
-        {
-            //Convert balance present in the card to Account.Balance
-        }
-
         public String GetAuthToLoadCard(Account Account)
         {
-            if (Account.IsOnline)
+            if (Account.VCard.Id != 0)
                 return AuthToken.GetCardAccessJwt(Account.VCard);
-            else throw new Exception(); // Create Exception
+            else throw new Exception();
         }
 
-        public String GetAuthToCreateToken(Account Account)
-        {
-            if (!Account.IsOnline)
-                return "token Account.Card.Id";
-            else throw new Exception(); // Create Exception
-        }
     }
 }

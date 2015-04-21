@@ -23,7 +23,6 @@ namespace VCBackend
     
         public int Id { get; set; }
         public double Balance { get; set; }
-        public bool IsOnline { get; private set; }
     
         public virtual VCard VCard { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]

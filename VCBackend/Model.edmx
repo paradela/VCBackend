@@ -256,7 +256,6 @@
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="Balance" Type="Double" Nullable="false" />
           <NavigationProperty Name="VCard" Relationship="Model.AccountVCard" FromRole="Account" ToRole="VCard" />
-          <Property Name="IsOnline" Type="Boolean" Nullable="false" cg:SetterAccess="Private" />
           <NavigationProperty Name="VCardToken" Relationship="Model.AccountVCardToken" FromRole="Account" ToRole="VCardToken" />
           <NavigationProperty Name="ProdPayments" Relationship="Model.AccountProdPayments" FromRole="Account" ToRole="ProdPayments" />
         </EntityType>
@@ -365,7 +364,6 @@
         <MappingFragment StoreEntitySet="AccountSet">
           <ScalarProperty Name="Id" ColumnName="Id" />
           <ScalarProperty Name="Balance" ColumnName="Balance" />
-          <ScalarProperty Name="IsOnline" ColumnName="IsOnline" />
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>

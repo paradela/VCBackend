@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using VCBackend.Models;
 using VCBackend.Models.Dto;
 using VCBackend.Business_Rules.Users;
+using VCBackend.Business_Rules.Accounts;
 using VCBackend.Repositories;
 
 namespace VCBackend.Business_Rules
@@ -179,6 +180,14 @@ namespace VCBackend.Business_Rules
             uw.Dispose();
 
             return devDto;
+        }
+
+        public static bool SetAccountValidationMode(int AuthDevice, String Mode)
+        {
+            UnitOfWork uw = new UnitOfWork();
+            AccountManager manager = new AccountManager(uw);
+            
+            return true;
         }
     }
 }

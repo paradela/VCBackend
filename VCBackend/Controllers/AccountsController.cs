@@ -11,11 +11,11 @@ namespace VCBackend.Controllers
     [RoutePrefix("api/account")]
     public class AccountsController : ApiController
     {
-        [Route("{mode}")]
+
+        [Route("/products")]
         [VCAuthenticate]
-        public void PutValidationMode([FromUri] String mode)
+        public void /*List<ProductDto>*/ GetProductsList()
         {
-            //Change validation mode mode = online || mode = token
         }
 
         [Route("payments/list")]
@@ -28,14 +28,22 @@ namespace VCBackend.Controllers
         //https://developer.paypal.com/docs/integration/direct/rest_api_payment_country_currency_support/
         [Route("load/{method}/begin")]
         [VCAuthenticate]
-        public void /*PaypalPaymentDto*/ PostLoadCardBegin([FromUri] String method, [FromUri] String c,[FromUri] String a)
+        public void /*PaypalPaymentDto*/ PostLoadBegin([FromUri] String method, [FromUri] String c, [FromUri] String a = null)
         {
         }
 
         //POST api/account/load/paypal/end?t=asd32&u=PayerID&p=PaymentID
         [Route("load/{method}/end")]
         [VCAuthenticate]
-        public void PostLoadCardEnd([FromUri] String method, [FromUri] String u, [FromUri] String p)
+        public void PostLoadEnd([FromUri] String method, [FromUri] String u, [FromUri] String p)
+        {
+        }
+
+        public void PostLoadProduct([FromUri] String p)
+        {
+        }
+
+        public void GetToken([FromUri] String p)
         {
         }
 
