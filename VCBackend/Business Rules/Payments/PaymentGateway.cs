@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using VCBackend.Business_Rules.Exceptions;
 
 namespace VCBackend.Business_Rules.Payments
 {
@@ -34,9 +35,11 @@ namespace VCBackend.Business_Rules.Payments
         }
     }
 
-    public class PaymentMethodUnknown : Exception
+    public class PaymentMethodUnknown : VCException
     {
-        public PaymentMethodUnknown() { }
-        public PaymentMethodUnknown(String Message) : base(Message) { }
+        public PaymentMethodUnknown(String Message) : base(Message) 
+        {
+            Error = "PaymentMethodUnknown";
+        }
     }
 }

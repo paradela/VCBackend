@@ -5,6 +5,7 @@ using System.Web;
 using System.Configuration;
 using System.Web.Caching;
 using PayPal.Api;
+using VCBackend.Business_Rules.Exceptions;
 
 namespace VCBackend.Business_Rules.Payments
 {
@@ -59,7 +60,7 @@ namespace VCBackend.Business_Rules.Payments
                 request.PaymentId = createdPayment.id;
                 return request;
             }
-            else throw new PayPalPaymentFailed(request, String.Format("PayPal payment {0}.", request.State));
+            else throw new PayPalPaymentFailed(String.Format("PayPal payment creation failed. State: {0}.", request.State));
         }
 
         ProdPayment IPaymentMethod.PaymentEnd(ProdPayment request)
@@ -91,7 +92,7 @@ namespace VCBackend.Business_Rules.Payments
                 }
             }
 
-            throw new PayPalPaymentFailed(request, String.Format("Paypal payment {0}.", request.State));
+            throw new PayPalPaymentFailed(String.Format("Paypal payment is in state: {0}.", request.State));
         }
 
         ProdPayment IPaymentMethod.PaymentCancel(ProdPayment request)
@@ -101,16 +102,5 @@ namespace VCBackend.Business_Rules.Payments
             return request;
         }
 
-    }
-
-    public class PayPalPaymentFailed : Exception
-    {
-        public ProdPayment Payment { get; set; }
-
-        public PayPalPaymentFailed(ProdPayment payment, String message)
-            : base(message)
-        {
-            this.Payment = payment;
-        }
     }
 }

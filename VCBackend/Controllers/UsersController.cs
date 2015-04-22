@@ -10,6 +10,7 @@ using VCBackend.Models;
 using VCBackend.Models.Dto;
 using VCBackend.Business_Rules;
 using VCBackend.Business_Rules.Users;
+using VCBackend.Business_Rules.Exceptions;
 
 namespace VCBackend.Controllers
 {
@@ -25,16 +26,16 @@ namespace VCBackend.Controllers
                 TokenDto token = BRulesApi.CreateUser(n, e, p);
                 return token;
             }
-            catch (MalformedUserDetailsException ex)
+            catch (VCException ex)
             {
                 var resp = new HttpResponseMessage(HttpStatusCode.Forbidden)
                 {
-                    Content = new StringContent(ex.Message),
-                    ReasonPhrase = ex.Message
+                    Content = new StringContent(ex.Description),
+                    ReasonPhrase = ex.Error
                 };
                 throw new HttpResponseException(resp);
             }
-            catch (UserAlreadyExistException ex)
+            catch (Exception ex)
             {
                 var resp = new HttpResponseMessage(HttpStatusCode.Forbidden)
                 {
@@ -54,7 +55,16 @@ namespace VCBackend.Controllers
                 TokenDto token = BRulesApi.Login(u, p, id);
                 return token;
             }
-            catch (InvalidCredentialsException ex)
+            catch (VCException ex)
+            {
+                var resp = new HttpResponseMessage(HttpStatusCode.Forbidden)
+                {
+                    Content = new StringContent(ex.Description),
+                    ReasonPhrase = ex.Error
+                };
+                throw new HttpResponseException(resp);
+            }
+            catch (Exception ex)
             {
                 var resp = new HttpResponseMessage(HttpStatusCode.Forbidden)
                 {
@@ -77,16 +87,16 @@ namespace VCBackend.Controllers
                 UserDto dto = BRulesApi.UpdateUser(authDev, n, e, p);
                 return dto;
             }
-            catch (MalformedUserDetailsException ex)
+            catch (VCException ex)
             {
                 var resp = new HttpResponseMessage(HttpStatusCode.Forbidden)
                 {
-                    Content = new StringContent(ex.Message),
-                    ReasonPhrase = ex.Message
+                    Content = new StringContent(ex.Description),
+                    ReasonPhrase = ex.Error
                 };
                 throw new HttpResponseException(resp);
             }
-            catch (UserAlreadyExistException ex)
+            catch (Exception ex)
             {
                 var resp = new HttpResponseMessage(HttpStatusCode.Forbidden)
                 {
@@ -121,7 +131,16 @@ namespace VCBackend.Controllers
                 TokenDto token = BRulesApi.AddDevice(authDev, n, id);
                 return token;
             }
-            catch (ManagingDeviceException ex)
+            catch (VCException ex)
+            {
+                var resp = new HttpResponseMessage(HttpStatusCode.Forbidden)
+                {
+                    Content = new StringContent(ex.Description),
+                    ReasonPhrase = ex.Error
+                };
+                throw new HttpResponseException(resp);
+            }
+            catch (Exception ex)
             {
                 var resp = new HttpResponseMessage(HttpStatusCode.Forbidden)
                 {
@@ -144,9 +163,23 @@ namespace VCBackend.Controllers
                 BRulesApi.RemoveDevice(authDev, id);
                 return Ok();
             }
-            catch (ManagingDeviceException ex)
+            catch (VCException ex)
             {
-                return BadRequest(ex.Message);
+                var resp = new HttpResponseMessage(HttpStatusCode.Forbidden)
+                {
+                    Content = new StringContent(ex.Description),
+                    ReasonPhrase = ex.Error
+                };
+                throw new HttpResponseException(resp);
+            }
+            catch (Exception ex)
+            {
+                var resp = new HttpResponseMessage(HttpStatusCode.Forbidden)
+                {
+                    Content = new StringContent(ex.Message),
+                    ReasonPhrase = ex.Message
+                };
+                throw new HttpResponseException(resp);
             }
         }
 

@@ -7,9 +7,9 @@ using VCBackend.Models.Dto;
 using VCBackend.Repositories;
 using VCBackend.Utility.Security;
 using System.Text.RegularExpressions;
-
 using VCBackend.Business_Rules.Devices;
 using VCBackend.Business_Rules.Accounts;
+using VCBackend.Business_Rules.Exceptions;
 
 namespace VCBackend.Business_Rules.Users
 {
@@ -98,12 +98,12 @@ namespace VCBackend.Business_Rules.Users
             /*
              * Validate if the new user details are well formed
              */
-            if (!ValidateUserData(Name, Email, Password)) throw new MalformedUserDetailsException("One or more of the details passed have an incorrect format.");
+            if (!ValidateUserData(Name, Email, Password)) throw new InvalidDataFormat("One or more of the details passed have an incorrect format.");
             /*
              * First check wether exists on the Users DB a user with any of the given data.
              */
             if (ExistUserWithEmail(Email))
-                throw new UserAlreadyExistException("Email already in use.");
+                throw new EmailAlreadyRegistered("Given email address is already in use.");
 
             
             // Then if the user doesn't exist, we can create the user
@@ -141,14 +141,14 @@ namespace VCBackend.Business_Rules.Users
             /*
              * Validate if the new user details are well formed
              */
-            if (!ValidateUserData(Name, Email, Password)) throw new MalformedUserDetailsException("One or more of the details passed have an incorrect format.");
+            if (!ValidateUserData(Name, Email, Password)) throw new InvalidDataFormat("One or more of the details passed have an incorrect format.");
 
             if (Name != null)
                 User.Name = Name;
             if (Email != null)
             {
                 if (ExistUserWithEmail(Email))
-                    throw new UserAlreadyExistException("Email already in use.");
+                    throw new EmailAlreadyRegistered("Email already in use.");
                 User.Email = Email;
             }
             if (Password != null)
@@ -202,7 +202,7 @@ namespace VCBackend.Business_Rules.Users
                         q.Token = AuthToken.GetAPIAccessJwt(user, q);
                         token = q.Token;
                     }
-                    else throw new InvalidCredentialsException("Invalid DeviceId");
+                    else throw new DeviceNotFound("Invalid Device identifier!");
                     
                 }
                 else
@@ -215,13 +215,13 @@ namespace VCBackend.Business_Rules.Users
                         q.Token = AuthToken.GetAPIAccessJwt(user, q);
                         token = q.Token;
                     }
-                    else throw new InvalidCredentialsException("Internal error, no devices to authenticate");
+                    else throw new DeviceNotFound("Internal error, no devices to authenticate");
                 }
 
                 UnitOfWork.UserRepository.Update(user);
                 UnitOfWork.Save();
             }
-            else throw new InvalidCredentialsException();
+            else throw new InvalidCredentials("The email and/or password are not correct.");
 
             return token;
 
@@ -241,7 +241,7 @@ namespace VCBackend.Business_Rules.Users
             DeviceManager deviceManager = new DeviceManager(UnitOfWork);
 
             if (!ValidateDeviceData(DevName, DevId))
-                throw new ManagingDeviceException("Invalid device name or Id.");
+                throw new DeviceNotFound(String.Format("Invalid device name: {0} or Id {1}.", DevName, DevId));
 
             //Check if the user already have a Device with id @DevId
             var devCount = (from d in User.Devices
@@ -255,7 +255,7 @@ namespace VCBackend.Business_Rules.Users
                 UnitOfWork.Save();
                 return dev.Token;
             }
-            else throw new ManagingDeviceException("Device Id already registered.");
+            else throw new DeviceAlreadyRegistered(String.Format("This user already has a device with identifier: {0}", DevId));
         }
 
         /// <summary>
@@ -270,13 +270,13 @@ namespace VCBackend.Business_Rules.Users
             DeviceManager devMngr = new DeviceManager(UnitOfWork);
 
             if (!ValidateDeviceData(null, DevId))
-                throw new ManagingDeviceException("Invalid id format");
+                throw new DeviceNotFound("Invalid id format");
 
             var dev = (from d in User.Devices
                       where d.DeviceId == DevId
                       select d).First();
             if (dev == null)
-                throw new ManagingDeviceException("Device with given Id does not exist");
+                throw new DeviceNotFound("Device with given Id does not exist");
 
             devMngr.RemoveDevice(dev.Id);
             
@@ -296,4 +296,6 @@ namespace VCBackend.Business_Rules.Users
             return user.Devices;
         }
     }
+
+    
 }

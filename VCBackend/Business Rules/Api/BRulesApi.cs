@@ -8,6 +8,7 @@ using VCBackend.Models.Dto;
 using VCBackend.Business_Rules.Users;
 using VCBackend.Business_Rules.Accounts;
 using VCBackend.Repositories;
+using VCBackend.Business_Rules.Payments;
 
 namespace VCBackend.Business_Rules
 {
@@ -182,6 +183,14 @@ namespace VCBackend.Business_Rules
             return devDto;
         }
 
+        /// <summary>
+        /// Initiates the loading of the specified amount in the user account.
+        /// </summary>
+        /// <param name="AuthDevice">The authenticated device Id.</param>
+        /// <param name="PayMethod">The payment method choosed.</param>
+        /// <param name="Currency">The client currency</param>
+        /// <param name="Amount">The amount to load in the account.</param>
+        /// <returns>A PaymentDto with the information for the client proceed with the payment.</returns>
         public static PaymentDto PaymentBegin(int AuthDevice, String PayMethod, String Currency, String Amount)
         {
             UnitOfWork uw = new UnitOfWork();
@@ -199,6 +208,15 @@ namespace VCBackend.Business_Rules
             return dto;
         }
 
+        /// <summary>
+        /// Concludes one payment initiated. The client is supposed to call this method after
+        /// authorized the payment.
+        /// </summary>
+        /// <param name="AuthDevice">The authenticated device.</param>
+        /// <param name="PayMethod">The payment method choosed.</param>
+        /// <param name="PayerId">The ID of the client in the payment system.</param>
+        /// <param name="PaymentId">The transaction ID.</param>
+        /// <returns>The new balance after the concluded payment.</returns>
         public static BalanceDto PaymentEnd(int AuthDevice, String PayMethod, String PayerId, String PaymentId)
         {
             UnitOfWork uw = new UnitOfWork();
@@ -216,6 +234,26 @@ namespace VCBackend.Business_Rules
             uw.Dispose();
 
             return dto;
+        }
+
+        /// <summary>
+        /// Lists the available payment methods.
+        /// </summary>
+        /// <returns>List of methods.</returns>
+        public static IList<PaymentMethodDto> GetPaymentMethods()
+        {
+            PaymentGateway gateway = new PaymentGateway();
+
+            IList<PaymentMethodDto> list = new List<PaymentMethodDto>();
+
+            foreach (String s in gateway.PaymentMethods)
+            {
+                PaymentMethodDto dto = new PaymentMethodDto();
+                dto.Serialize(s);
+                list.Add(dto);
+            }
+
+            return list;
         }
     }
 }

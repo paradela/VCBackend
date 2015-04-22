@@ -200,17 +200,13 @@
     <Compile Include="Business Rules\Accounts\AccountManager.cs" />
     <Compile Include="Business Rules\Api\BRulesApi.cs" />
     <Compile Include="Business Rules\Devices\DeviceManager.cs" />
+    <Compile Include="Business Rules\Exceptions\VCException.cs" />
     <Compile Include="Business Rules\Manager.cs" />
     <Compile Include="Business Rules\Payments\IPaymentMethod.cs" />
     <Compile Include="Business Rules\Payments\PaymentGateway.cs" />
     <Compile Include="Business Rules\Payments\PayPal.cs" />
-    <Compile Include="Business Rules\Users\InvalidCredentialsException.cs" />
-    <Compile Include="Business Rules\Users\MalformedUserDetailsException.cs" />
-    <Compile Include="Business Rules\Users\ManagingDeviceException.cs" />
-    <Compile Include="Business Rules\Users\UserAlreadyExistException.cs" />
     <Compile Include="Business Rules\Users\UserManager.cs" />
     <Compile Include="Business Rules\VCards\TSMFakeProxy.cs" />
-    <Compile Include="Business Rules\VCards\VCardException.cs" />
     <Compile Include="Business Rules\VCards\VCardManager.cs" />
     <Compile Include="Controllers\AccountsController.cs" />
     <Compile Include="Controllers\UsersController.cs" />
@@ -249,6 +245,7 @@
     <Compile Include="Models\Dto\DeviceDto.cs" />
     <Compile Include="Models\Dto\IDto.cs" />
     <Compile Include="Models\Dto\PaymentDto.cs" />
+    <Compile Include="Models\Dto\PaymentMethodDto.cs" />
     <Compile Include="Models\Dto\TokenDto.cs" />
     <Compile Include="Models\Dto\UserDto.cs" />
     <Compile Include="Models\Mobile.cs" />

@@ -6,6 +6,7 @@ using VCBackend.Repositories;
 using VCBackend.Models;
 using VCBackend.Business_Rules.Accounts;
 using VCBackend.Utility.Time;
+using VCBackend.Business_Rules.Exceptions;
 
 namespace VCBackend.Business_Rules.VCards
 {
@@ -55,7 +56,7 @@ namespace VCBackend.Business_Rules.VCards
             VCard card = UnitOfWork.VCardRepository.GetByID(CardId);
             if (card == null)
             {
-                throw new VCardException("Card ID unknown.");
+                throw new CardNotFound("Card ID unknown.");
             }
             return card;
         }
@@ -66,7 +67,7 @@ namespace VCBackend.Business_Rules.VCards
             VCard card = UnitOfWork.VCardRepository.GetByID(CardId);
             if (card == null)
             {
-                throw new VCardException("Card ID unknown.");
+                throw new CardNotFound("Card ID unknown.");
             }
             UnitOfWork.VCardRepository.Delete(card);
             UnitOfWork.Save();
@@ -76,8 +77,8 @@ namespace VCBackend.Business_Rules.VCards
         {
             VCard card = UnitOfWork.VCardRepository.GetByID(CardId);
             Account account = UnitOfWork.AccountRepository.GetByID(AccountId);
-            if (card == null) throw new VCardException("Card ID unknown.");
-            if (account == null) throw new VCardException("Account ID unknown");
+            if (card == null) throw new CardNotFound("Card ID unknown.");
+            if (account == null) throw new AccountNotFound("Account ID unknown");
             byte[] cardData = new byte[64];
             byte[] cardHeader = card.Read(0, 10); //Read the card header till the S/N.
             System.Array.Copy(cardHeader, cardData, 10);

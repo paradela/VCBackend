@@ -5,6 +5,9 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using VCBackend.Filters;
+using VCBackend.Business_Rules;
+using VCBackend.Models.Dto;
+using VCBackend.Business_Rules.Exceptions;
 
 namespace VCBackend.Controllers
 {
@@ -23,23 +26,95 @@ namespace VCBackend.Controllers
 
         [Route("payments/list")]
         [VCAuthenticate]
-        public void /*List<PaymentGatewayDto>*/ GetPaymentMethods()
+        public IList<PaymentMethodDto> GetPaymentMethods()
         {
+            try
+            {
+                return BRulesApi.GetPaymentMethods();
+            }
+            catch (VCException ex)
+            {
+                var resp = new HttpResponseMessage(HttpStatusCode.Forbidden)
+                {
+                    Content = new StringContent(ex.Description),
+                    ReasonPhrase = ex.Error
+                };
+                throw new HttpResponseException(resp);
+            }
+            catch (Exception ex)
+            {
+                var resp = new HttpResponseMessage(HttpStatusCode.Forbidden)
+                {
+                    Content = new StringContent(ex.Message),
+                    ReasonPhrase = ex.Message
+                };
+                throw new HttpResponseException(resp);
+            }
         }
 
         //POST api/account/load/paypal/begin?t=asd32&c=EUR&a=10.0
         //https://developer.paypal.com/docs/integration/direct/rest_api_payment_country_currency_support/
         [Route("pay/{method}/begin")]
         [VCAuthenticate]
-        public void /*PaypalPaymentDto*/ PostPaymentBegin([FromUri] String method, [FromUri] String c, [FromUri] String a)
+        public PaymentDto PostPaymentBegin([FromUri] String method, [FromUri] String c, [FromUri] String a)
         {
+            int AuthDev = VCAuthenticate.GetAuthenticatedDevice(ActionContext);
+
+            try
+            {
+                PaymentDto dto = BRulesApi.PaymentBegin(AuthDev, method, c, a);
+                return dto;
+            }
+            catch (VCException ex)
+            {
+                var resp = new HttpResponseMessage(HttpStatusCode.Forbidden)
+                {
+                    Content = new StringContent(ex.Description),
+                    ReasonPhrase = ex.Error
+                };
+                throw new HttpResponseException(resp);
+            }
+            catch (Exception ex)
+            {
+                var resp = new HttpResponseMessage(HttpStatusCode.Forbidden)
+                {
+                    Content = new StringContent(ex.Message),
+                    ReasonPhrase = ex.Message
+                };
+                throw new HttpResponseException(resp);
+            }
         }
 
         //POST api/account/load/paypal/end?t=asd32&u=PayerID&p=PaymentID
         [Route("pay/{method}/end")]
         [VCAuthenticate]
-        public void PostPaymentEnd([FromUri] String method, [FromUri] String u, [FromUri] String p)
+        public BalanceDto PostPaymentEnd([FromUri] String method, [FromUri] String u, [FromUri] String p)
         {
+            int AuthDev = VCAuthenticate.GetAuthenticatedDevice(ActionContext);
+
+            try
+            {
+                BalanceDto dto = BRulesApi.PaymentEnd(AuthDev, method, u, p);
+                return dto;
+            }
+            catch (VCException ex)
+            {
+                var resp = new HttpResponseMessage(HttpStatusCode.Forbidden)
+                {
+                    Content = new StringContent(ex.Description),
+                    ReasonPhrase = ex.Error
+                };
+                throw new HttpResponseException(resp);
+            }
+            catch (Exception ex)
+            {
+                var resp = new HttpResponseMessage(HttpStatusCode.Forbidden)
+                {
+                    Content = new StringContent(ex.Message),
+                    ReasonPhrase = ex.Message
+                };
+                throw new HttpResponseException(resp);
+            }
         }
 
         [Route("pay/{method}/cancel")]
@@ -59,8 +134,6 @@ namespace VCBackend.Controllers
         public void GetToken()
         {
         }
-
-        
 
     }
 }
