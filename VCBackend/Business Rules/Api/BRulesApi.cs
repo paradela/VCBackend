@@ -182,12 +182,40 @@ namespace VCBackend.Business_Rules
             return devDto;
         }
 
-        public static bool SetAccountValidationMode(int AuthDevice, String Mode)
+        public static PaymentDto PaymentBegin(int AuthDevice, String PayMethod, String Currency, String Amount)
         {
             UnitOfWork uw = new UnitOfWork();
-            AccountManager manager = new AccountManager(uw);
-            
-            return true;
+            AccountManager am = new AccountManager(uw);
+
+            Account account = uw.DeviceRepository.GetByID(AuthDevice).Owner.Account;
+
+            ProdPayment payment = am.PaymentBegin(account, PayMethod, Currency, Amount);
+            PaymentDto dto = new PaymentDto();
+
+            dto.Serialize(payment);
+
+            uw.Dispose();
+
+            return dto;
+        }
+
+        public static BalanceDto PaymentEnd(int AuthDevice, String PayMethod, String PayerId, String PaymentId)
+        {
+            UnitOfWork uw = new UnitOfWork();
+            AccountManager am = new AccountManager(uw);
+
+            Account account = uw.DeviceRepository.GetByID(AuthDevice).Owner.Account;
+
+            ProdPayment payment = am.PaymentEnd(account, PayMethod, PayerId, PaymentId);
+
+            Account updatedAccount = uw.AccountRepository.GetByID(account.Id);
+
+            BalanceDto dto = new BalanceDto();
+            dto.Serialize(updatedAccount);
+
+            uw.Dispose();
+
+            return dto;
         }
     }
 }

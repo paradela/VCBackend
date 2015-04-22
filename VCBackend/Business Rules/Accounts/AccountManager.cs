@@ -6,6 +6,7 @@ using VCBackend.Repositories;
 using VCBackend.Models;
 using VCBackend.Business_Rules.VCards;
 using VCBackend.Utility.Security;
+using VCBackend.Business_Rules.Payments;
 
 namespace VCBackend.Business_Rules.Accounts
 {
@@ -57,6 +58,62 @@ namespace VCBackend.Business_Rules.Accounts
             if (Account.VCard.Id != 0)
                 return AuthToken.GetCardAccessJwt(Account.VCard);
             else throw new Exception();
+        }
+
+        public ProdPayment PaymentBegin(Account Account, String Method, String Currency, String Amount)
+        {
+            PaymentGateway gateway = new PaymentGateway();
+            IPaymentMethod payMethod = gateway.GetPaymentMethodByName(Method);
+
+            ProdPayment request = new ProdPayment();
+            request.PaymentMethod = Method;
+            request.Currency = Currency;
+            request.Price = Amount;
+
+            ProdPayment newRequest = payMethod.PaymentBegin(request);
+
+            Account.ProdPayments.Add(newRequest);
+
+            UnitOfWork.AccountRepository.Update(Account);
+            UnitOfWork.Save();
+
+            return newRequest;
+        }
+
+        public ProdPayment PaymentEnd(Account Account, String Method, String PayerId, String PaymentId)
+        {
+            PaymentGateway gateway = new PaymentGateway();
+            IPaymentMethod payMethod = gateway.GetPaymentMethodByName(Method);
+            ProdPayment newRequest = null;
+
+            var request = (from payment in Account.ProdPayments
+                          where (payment.PaymentId == PaymentId && payment.AccountId == Account.Id)
+                          select payment).FirstOrDefault();
+
+            if (request == null) throw new Exception(String.Format("No payment request registered with ID {0}.", PaymentId));
+
+            using (var transactionCtx = UnitOfWork.TransactionBegin())
+            {
+                try
+                {
+                    newRequest = payMethod.PaymentEnd(request);
+                    UnitOfWork.PaymentRepository.Update(newRequest);
+
+                    Account.AddBalance(Int32.Parse(request.Price));
+                    UnitOfWork.AccountRepository.Update(Account);
+
+                    UnitOfWork.Save();
+
+                    transactionCtx.Commit();
+                }
+                catch(Exception ex) {
+                    transactionCtx.Rollback();
+                    throw ex;
+                }
+
+            }
+
+            return newRequest;
         }
 
     }

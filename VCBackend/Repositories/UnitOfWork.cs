@@ -3,17 +3,24 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using VCBackend.Models;
+using System.Data.Entity;
 
 namespace VCBackend.Repositories
 {
     public class UnitOfWork : IDisposable
     {
-        private ModelContainer context = new ModelContainer();
+        private ModelContainer context;
         private Repository<User> userRepository;
         private Repository<Device> deviceRepository;
         private Repository<Account> accountRepository;
         private Repository<VCard> vcardRepository;
         private Repository<VCardToken> tokenRepository;
+        private Repository<ProdPayment> paymentRepository;
+
+        public UnitOfWork()
+        {
+            context = new ModelContainer();
+        }
 
         public Repository<User> UserRepository
         {
@@ -75,6 +82,23 @@ namespace VCBackend.Repositories
                 }
                 return tokenRepository;
             }
+        }
+
+        public Repository<ProdPayment> PaymentRepository
+        {
+            get
+            {
+                if (this.paymentRepository == null)
+                {
+                    this.paymentRepository = new Repository<ProdPayment>(context);
+                }
+                return paymentRepository;
+            }
+        }
+
+        public DbContextTransaction TransactionBegin()
+        {
+            return context.Database.BeginTransaction();
         }
 
         public void Save()

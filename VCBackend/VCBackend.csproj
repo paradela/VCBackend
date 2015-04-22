@@ -201,6 +201,7 @@
     <Compile Include="Business Rules\Api\BRulesApi.cs" />
     <Compile Include="Business Rules\Devices\DeviceManager.cs" />
     <Compile Include="Business Rules\Manager.cs" />
+    <Compile Include="Business Rules\Payments\IPaymentMethod.cs" />
     <Compile Include="Business Rules\Payments\PaymentGateway.cs" />
     <Compile Include="Business Rules\Payments\PayPal.cs" />
     <Compile Include="Business Rules\Users\InvalidCredentialsException.cs" />
@@ -244,8 +245,10 @@
     <Compile Include="Models\Account.cs" />
     <Compile Include="Models\Default.cs" />
     <Compile Include="Models\Device.cs" />
+    <Compile Include="Models\Dto\BalanceDto.cs" />
     <Compile Include="Models\Dto\DeviceDto.cs" />
     <Compile Include="Models\Dto\IDto.cs" />
+    <Compile Include="Models\Dto\PaymentDto.cs" />
     <Compile Include="Models\Dto\TokenDto.cs" />
     <Compile Include="Models\Dto\UserDto.cs" />
     <Compile Include="Models\Mobile.cs" />

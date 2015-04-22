@@ -17,5 +17,11 @@ namespace VCBackend
             return new Account();
         }
 
+        public Double AddBalance(Double NewAmount)
+        {
+            this.Balance += NewAmount;
+            return this.Balance;
+        }
+
     }
 }

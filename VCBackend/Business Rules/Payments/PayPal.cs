@@ -8,7 +8,7 @@ using PayPal.Api;
 
 namespace VCBackend.Business_Rules.Payments
 {
-    public class PayPal
+    public class PayPal : IPaymentMethod
     {
         private String ClientID, ClientSecret;
 
@@ -18,7 +18,7 @@ namespace VCBackend.Business_Rules.Payments
             ClientSecret = ConfigurationManager.AppSettings["PP_ClientSecret"];
         }
 
-        ProdPayment PaymentBegin(ProdPayment request)
+        ProdPayment IPaymentMethod.PaymentBegin(ProdPayment request)
         {   
             OAuthTokenCredential tokenCredential =
                 new OAuthTokenCredential(ClientID, ClientSecret);
@@ -38,8 +38,8 @@ namespace VCBackend.Business_Rules.Payments
             transaction.description = "Payment to load the virtual card.";
 
             var redirect_urls = new RedirectUrls();
-            redirect_urls.return_url = "http://localhost:64390/api/load/paypal/end";
-            redirect_urls.cancel_url = "http://localhost:64390/api/load/paypal/cancel";
+            redirect_urls.return_url = "http://localhost:64390/api/pay/paypal/end";
+            redirect_urls.cancel_url = "http://localhost:64390/api/pay/paypal/cancel";
 
             var payment = new Payment();
             payment.intent = "sale";
@@ -62,7 +62,7 @@ namespace VCBackend.Business_Rules.Payments
             else throw new PayPalPaymentFailed(request, String.Format("PayPal payment {0}.", request.State));
         }
 
-        ProdPayment PaymentEnd(ProdPayment request)
+        ProdPayment IPaymentMethod.PaymentEnd(ProdPayment request)
         {
             OAuthTokenCredential tokenCredential =
                 new OAuthTokenCredential(ClientID, ClientSecret);
@@ -79,7 +79,6 @@ namespace VCBackend.Business_Rules.Payments
 
                 if (request.State == ProdPayment.STATE_APPROVED && request.PayerId != null)
                 {
-                    //payment.Execute(context,
                     PaymentExecution paymentExecution = new PaymentExecution();
                     paymentExecution.payer_id = request.PayerId;
 
@@ -95,12 +94,13 @@ namespace VCBackend.Business_Rules.Payments
             throw new PayPalPaymentFailed(request, String.Format("Paypal payment {0}.", request.State));
         }
 
-        ProdPayment PaymentCancel(ProdPayment request)
+        ProdPayment IPaymentMethod.PaymentCancel(ProdPayment request)
         {
             if (request.State != ProdPayment.STATE_APPROVED)
                 request.State = ProdPayment.STATE_CANCELED;
             return request;
         }
+
     }
 
     public class PayPalPaymentFailed : Exception
