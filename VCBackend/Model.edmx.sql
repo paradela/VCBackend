@@ -2,7 +2,7 @@
 -- --------------------------------------------------
 -- Entity Designer DDL Script for SQL Server 2005, 2008, 2012 and Azure
 -- --------------------------------------------------
--- Date Created: 04/22/2015 00:23:44
+-- Date Created: 04/25/2015 17:54:30
 -- Generated from EDMX file: C:\Users\Ricardo\Source\Repos\VCBackend\VCBackend\Model.edmx
 -- --------------------------------------------------
 
@@ -123,7 +123,7 @@ CREATE TABLE [dbo].[ProdPaymentSet] (
     [Id] int IDENTITY(1,1) NOT NULL,
     [PaymentId] nvarchar(max)  NOT NULL,
     [State] nvarchar(max)  NOT NULL,
-    [ProductId] nvarchar(max)  NOT NULL,
+    [ProductId] nvarchar(max)  NULL,
     [Price] nvarchar(max)  NOT NULL,
     [Currency] nvarchar(max)  NOT NULL,
     [PaymentMethod] nvarchar(max)  NULL,

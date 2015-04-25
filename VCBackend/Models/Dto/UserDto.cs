@@ -12,9 +12,8 @@ namespace VCBackend.Models.Dto
 
         public void Serialize(User entity)
         {
-            User user = (User)entity;
-            Name = user.Name;
-            Email = user.Email;
+            Name = entity.Name;
+            Email = entity.Email;
         }
     }
 }

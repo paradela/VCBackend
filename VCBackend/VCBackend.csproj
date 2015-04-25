@@ -203,10 +203,10 @@
     <Compile Include="Business Rules\Errors\ErrorResponse.cs" />
     <Compile Include="Business Rules\Errors\JsonErrorContent.cs" />
     <Compile Include="Business Rules\Exceptions\VCException.cs" />
-    <Compile Include="Business Rules\Manager.cs" />
+    <Compile Include="Business Rules\IManager.cs" />
     <Compile Include="Business Rules\Payments\IPaymentMethod.cs" />
     <Compile Include="Business Rules\Payments\PaymentGateway.cs" />
-    <Compile Include="Business Rules\Payments\PayPal.cs" />
+    <Compile Include="Business Rules\Payments\PayPalMethod.cs" />
     <Compile Include="Business Rules\Users\UserManager.cs" />
     <Compile Include="Business Rules\VCards\TSMFakeProxy.cs" />
     <Compile Include="Business Rules\VCards\VCardManager.cs" />

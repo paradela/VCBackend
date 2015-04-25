@@ -8,7 +8,7 @@ using VCBackend.Utility.Security;
 
 namespace VCBackend.Business_Rules.Devices
 {
-    public class DeviceManager : Manager
+    public class DeviceManager : IManager
     {
         public DeviceManager(UnitOfWork UnitOfWork)
             : base(UnitOfWork)

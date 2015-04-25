@@ -34,11 +34,11 @@ namespace VCBackend.Controllers
             }
             catch (VCException ex)
             {
-                throw new ErrorResponse(ex);
+                throw new HttpResponseException(new ErrorResponse(ex));
             }
             catch (Exception ex)
             {
-                throw new ErrorResponse(ex);
+                throw new HttpResponseException(new ErrorResponse(ex));
             }
         }
 
@@ -57,11 +57,11 @@ namespace VCBackend.Controllers
             }
             catch (VCException ex)
             {
-                throw new ErrorResponse(ex);
+                throw new HttpResponseException(new ErrorResponse(ex));
             }
             catch (Exception ex)
             {
-                throw new ErrorResponse(ex);
+                throw new HttpResponseException(new ErrorResponse(ex));
             }
         }
 
@@ -79,11 +79,11 @@ namespace VCBackend.Controllers
             }
             catch (VCException ex)
             {
-                throw new ErrorResponse(ex);
+                throw new HttpResponseException(new ErrorResponse(ex));
             }
             catch (Exception ex)
             {
-                throw new ErrorResponse(ex);
+                throw new HttpResponseException(new ErrorResponse(ex));
             }
         }
 
@@ -99,11 +99,11 @@ namespace VCBackend.Controllers
             }
             catch (VCException ex)
             {
-                throw new ErrorResponse(ex);
+                throw new HttpResponseException(new ErrorResponse(ex));
             }
             catch (Exception ex)
             {
-                throw new ErrorResponse(ex);
+                throw new HttpResponseException(new ErrorResponse(ex));
             }
         }
 

@@ -96,7 +96,7 @@
     <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
     <Property Name="PaymentId" Type="nvarchar(max)" Nullable="false" />
     <Property Name="State" Type="nvarchar(max)" Nullable="false" />
-    <Property Name="ProductId" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="ProductId" Type="nvarchar(max)" Nullable="true" />
     <Property Name="Price" Type="nvarchar(max)" Nullable="false" />
     <Property Name="Currency" Type="nvarchar(max)" Nullable="false" />
     <Property Name="PaymentMethod" Type="nvarchar(max)" Nullable="true" />
@@ -321,7 +321,7 @@
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="PaymentId" Type="String" Nullable="false" />
           <Property Name="State" Type="String" Nullable="false" />
-          <Property Name="ProductId" Type="String" Nullable="false" />
+          <Property Name="ProductId" Type="String" Nullable="true" />
           <Property Name="Price" Type="String" Nullable="false" />
           <Property Name="Currency" Type="String" Nullable="false" />
           <Property Name="PaymentMethod" Type="String" Nullable="true" />

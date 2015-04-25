@@ -16,6 +16,9 @@
         <p id="product" />
     </div>-->
     <div>
+        <p id="u_name" />
+        <p id="u_email" />
+        <p id="balance" />
         <p id="token" />
     </div>
     <div>
@@ -29,42 +32,17 @@
         <h2>Login</h2>
         <input type="email" id="username"/>
         <input type="password" id="pwd"/>
-        <input type="button" value="Login" onclick="login()" />
+        <input type="button" value="Login" onclick="authenticate()" />
+    </div>
+    <div>
+        <h2>Add Funds</h2>
+        <input type="text" id="amount"/>
+        <input type="button" value="Pay" onclick="pay()" />
     </div>
 
   <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-2.0.3.min.js"></script>
   <script>
-      var uri = 'api/users';
-
-      $(document).ready(function () {
-          // Send an AJAX request
-          $.getJSON(uri)
-              .done(function (data) {
-                  // On success, 'data' contains a list of products.
-                  $.each(data, function (key, item) {
-                      // Add a list item for the product.
-                      $('<li>', { text: formatItem(item) }).appendTo($('#products'));
-                  });
-              })
-              .fail(function (jqXHR, textStatus, err) {
-                  $('#products').text('Error: ' + err);
-              });
-      });
-
-      function formatItem(item) {
-          return "Number" + ': $' + item;
-      }
-
-      function find() {
-          var id = $('#prodId').val();
-          $.getJSON(uri)
-              .done(function (data) {
-                  $('#product').text(formatItem(data));
-              })
-              .fail(function (jqXHR, textStatus, err) {
-                  $('#product').text('Error: ' + err);
-              });
-      }
+      var uri = 'api/user';
 
       function createUser() {
           var name = $('#name').val();
@@ -77,7 +55,7 @@
           $.post(uri,
               null,
               function (value) {
-                  $('#token').text('Token: ' + value);
+                  $('#token').text('Token: ' + value["AuthToken"]);
                   localStorage.token = value;
               },
               "json"
@@ -93,8 +71,39 @@
           $.post(uri,
               null,
               function (value) {
-                  $('#token').text('Token: ' + value);
-                  localStorage.token = value;
+                  $('#token').text('Token: ' + value['AuthToken']);
+                  localStorage.setItem('token', value['AuthToken']);;
+              },
+              "json"
+              );
+      }
+
+      function getUser() {
+          var uri = "api/user?t=" + localStorage.getItem('token');
+          $.get(uri,
+              null,
+              function (value) {
+                  $('#u_name').text('Name: ' + value["Name"]);
+                  $('#u_email').text('Email: ' + value["Email"]);
+              },
+              "json"
+              );
+      }
+
+      function authenticate() {
+          login();
+          getUser();
+      }
+
+      function pay() {
+          var amount = $('#amount').val();
+          var uri = "api/account/pay/paypal/begin?t=" + localStorage.getItem('token') + 
+              '&c=EUR&a=' + amount;
+          $.post(uri,
+              null,
+              function (value) {
+                  $('#token').text('Token: ' + value['AuthToken']);
+                  localStorage.setItem('token', value['AuthToken']);;
               },
               "json"
               );

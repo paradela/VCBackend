@@ -13,7 +13,7 @@ namespace VCBackend.Business_Rules.Payments
         public PaymentGateway()
         {
             methods = new Dictionary<String, IPaymentMethod>();
-            methods["paypal"] = new PayPal();
+            methods["paypal"] = new PayPalMethod();
         }
 
         public IPaymentMethod GetPaymentMethodByName(String name)

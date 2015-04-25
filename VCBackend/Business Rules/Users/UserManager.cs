@@ -13,7 +13,7 @@ using VCBackend.Business_Rules.Exceptions;
 
 namespace VCBackend.Business_Rules.Users
 {
-    public class UserManager : Manager
+    public class UserManager : IManager
     {
         public UserManager(UnitOfWork UnitOfWork) 
             : base(UnitOfWork)

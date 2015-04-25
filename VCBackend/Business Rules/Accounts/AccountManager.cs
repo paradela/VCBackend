@@ -11,7 +11,7 @@ using VCBackend.Business_Rules.Exceptions;
 
 namespace VCBackend.Business_Rules.Accounts
 {
-    public class AccountManager : Manager
+    public class AccountManager : IManager
     {
         public AccountManager(UnitOfWork UnitOfWork)
             : base(UnitOfWork)
@@ -97,10 +97,11 @@ namespace VCBackend.Business_Rules.Accounts
             {
                 try
                 {
+                    request.PayerId = PayerId;
                     newRequest = payMethod.PaymentEnd(request);
                     UnitOfWork.PaymentRepository.Update(newRequest);
 
-                    Account.AddBalance(Int32.Parse(request.Price));
+                    Account.AddBalance(request.Price);
                     UnitOfWork.AccountRepository.Update(Account);
 
                     UnitOfWork.Save();

@@ -10,7 +10,7 @@ using VCBackend.Business_Rules.Exceptions;
 
 namespace VCBackend.Business_Rules.VCards
 {
-    public class VCardManager : Manager
+    public class VCardManager : IManager
     {
         public VCardManager(UnitOfWork UnitOfWork)
             : base(UnitOfWork)

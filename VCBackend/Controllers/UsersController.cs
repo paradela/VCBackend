@@ -29,11 +29,11 @@ namespace VCBackend.Controllers
             }
             catch (VCException ex)
             {
-                throw new ErrorResponse(ex);
+                throw new HttpResponseException(new ErrorResponse(ex));
             }
             catch (Exception ex)
             {
-                throw new ErrorResponse(ex);
+                throw new HttpResponseException(new ErrorResponse(ex));
             }
         }
 
@@ -48,11 +48,11 @@ namespace VCBackend.Controllers
             }
             catch (VCException ex)
             {
-                throw new ErrorResponse(ex);
+                throw new HttpResponseException(new ErrorResponse(ex));
             }
             catch (Exception ex)
             {
-                throw new ErrorResponse(ex);
+                throw new HttpResponseException(new ErrorResponse(ex));
             }
         }
 
@@ -70,11 +70,11 @@ namespace VCBackend.Controllers
             }
             catch (VCException ex)
             {
-                throw new ErrorResponse(ex);
+                throw new HttpResponseException(new ErrorResponse(ex));
             }
             catch (Exception ex)
             {
-                throw new ErrorResponse(ex);
+                throw new HttpResponseException(new ErrorResponse(ex));
             }
         }
 
@@ -104,11 +104,11 @@ namespace VCBackend.Controllers
             }
             catch (VCException ex)
             {
-                throw new ErrorResponse(ex);
+                throw new HttpResponseException(new ErrorResponse(ex));
             }
             catch (Exception ex)
             {
-                throw new ErrorResponse(ex);
+                throw new HttpResponseException(new ErrorResponse(ex));
             }
         }
 
@@ -126,23 +126,33 @@ namespace VCBackend.Controllers
             }
             catch (VCException ex)
             {
-                throw new ErrorResponse(ex);
+                throw new HttpResponseException(new ErrorResponse(ex));
             }
             catch (Exception ex)
             {
-                throw new ErrorResponse(ex);
+                throw new HttpResponseException(new ErrorResponse(ex));
             }
         }
 
         //GET api/user/device?t=123token
         [Route("device")]
         [VCAuthenticate]
-        public IHttpActionResult GetAllDevices() 
+        public ICollection<DeviceDto> GetAllDevices() 
         {
             int authDev = VCAuthenticate.GetAuthenticatedDevice(ActionContext);
-
-            ICollection<DeviceDto> devices = BRulesApi.GetAllDevices(authDev);
-            return Ok(devices);
+            try
+            {
+                ICollection<DeviceDto> devices = BRulesApi.GetAllDevices(authDev);
+                return devices;
+            }
+            catch (VCException ex)
+            {
+                throw new HttpResponseException(new ErrorResponse(ex));
+            }
+            catch (Exception ex)
+            {
+                throw new HttpResponseException(new ErrorResponse(ex));
+            }
         }
 
     }
