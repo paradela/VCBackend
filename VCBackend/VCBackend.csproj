@@ -200,6 +200,8 @@
     <Compile Include="Business Rules\Accounts\AccountManager.cs" />
     <Compile Include="Business Rules\Api\BRulesApi.cs" />
     <Compile Include="Business Rules\Devices\DeviceManager.cs" />
+    <Compile Include="Business Rules\Errors\ErrorResponse.cs" />
+    <Compile Include="Business Rules\Errors\JsonErrorContent.cs" />
     <Compile Include="Business Rules\Exceptions\VCException.cs" />
     <Compile Include="Business Rules\Manager.cs" />
     <Compile Include="Business Rules\Payments\IPaymentMethod.cs" />

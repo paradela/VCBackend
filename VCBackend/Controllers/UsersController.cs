@@ -11,6 +11,7 @@ using VCBackend.Models.Dto;
 using VCBackend.Business_Rules;
 using VCBackend.Business_Rules.Users;
 using VCBackend.Business_Rules.Exceptions;
+using VCBackend.Business_Rules.Errors;
 
 namespace VCBackend.Controllers
 {
@@ -28,21 +29,11 @@ namespace VCBackend.Controllers
             }
             catch (VCException ex)
             {
-                var resp = new HttpResponseMessage(HttpStatusCode.Forbidden)
-                {
-                    Content = new StringContent(ex.Description),
-                    ReasonPhrase = ex.Error
-                };
-                throw new HttpResponseException(resp);
+                throw new ErrorResponse(ex);
             }
             catch (Exception ex)
             {
-                var resp = new HttpResponseMessage(HttpStatusCode.Forbidden)
-                {
-                    Content = new StringContent(ex.Message),
-                    ReasonPhrase = ex.Message
-                };
-                throw new HttpResponseException(resp);
+                throw new ErrorResponse(ex);
             }
         }
 
@@ -57,21 +48,11 @@ namespace VCBackend.Controllers
             }
             catch (VCException ex)
             {
-                var resp = new HttpResponseMessage(HttpStatusCode.Forbidden)
-                {
-                    Content = new StringContent(ex.Description),
-                    ReasonPhrase = ex.Error
-                };
-                throw new HttpResponseException(resp);
+                throw new ErrorResponse(ex);
             }
             catch (Exception ex)
             {
-                var resp = new HttpResponseMessage(HttpStatusCode.Forbidden)
-                {
-                    Content = new StringContent(ex.Message),
-                    ReasonPhrase = ex.Message
-                };
-                throw new HttpResponseException(resp);
+                throw new ErrorResponse(ex);
             }
         }
 
@@ -89,21 +70,11 @@ namespace VCBackend.Controllers
             }
             catch (VCException ex)
             {
-                var resp = new HttpResponseMessage(HttpStatusCode.Forbidden)
-                {
-                    Content = new StringContent(ex.Description),
-                    ReasonPhrase = ex.Error
-                };
-                throw new HttpResponseException(resp);
+                throw new ErrorResponse(ex);
             }
             catch (Exception ex)
             {
-                var resp = new HttpResponseMessage(HttpStatusCode.Forbidden)
-                {
-                    Content = new StringContent(ex.Message),
-                    ReasonPhrase = ex.Message
-                };
-                throw new HttpResponseException(resp);
+                throw new ErrorResponse(ex);
             }
         }
 
@@ -133,21 +104,11 @@ namespace VCBackend.Controllers
             }
             catch (VCException ex)
             {
-                var resp = new HttpResponseMessage(HttpStatusCode.Forbidden)
-                {
-                    Content = new StringContent(ex.Description),
-                    ReasonPhrase = ex.Error
-                };
-                throw new HttpResponseException(resp);
+                throw new ErrorResponse(ex);
             }
             catch (Exception ex)
             {
-                var resp = new HttpResponseMessage(HttpStatusCode.Forbidden)
-                {
-                    Content = new StringContent(ex.Message),
-                    ReasonPhrase = ex.Message
-                };
-                throw new HttpResponseException(resp);
+                throw new ErrorResponse(ex);
             }
         }
 
@@ -165,21 +126,11 @@ namespace VCBackend.Controllers
             }
             catch (VCException ex)
             {
-                var resp = new HttpResponseMessage(HttpStatusCode.Forbidden)
-                {
-                    Content = new StringContent(ex.Description),
-                    ReasonPhrase = ex.Error
-                };
-                throw new HttpResponseException(resp);
+                throw new ErrorResponse(ex);
             }
             catch (Exception ex)
             {
-                var resp = new HttpResponseMessage(HttpStatusCode.Forbidden)
-                {
-                    Content = new StringContent(ex.Message),
-                    ReasonPhrase = ex.Message
-                };
-                throw new HttpResponseException(resp);
+                throw new ErrorResponse(ex);
             }
         }
 

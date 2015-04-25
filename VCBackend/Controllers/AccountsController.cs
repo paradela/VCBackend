@@ -8,6 +8,7 @@ using VCBackend.Filters;
 using VCBackend.Business_Rules;
 using VCBackend.Models.Dto;
 using VCBackend.Business_Rules.Exceptions;
+using VCBackend.Business_Rules.Errors;
 
 namespace VCBackend.Controllers
 {
@@ -19,7 +20,6 @@ namespace VCBackend.Controllers
     {
 
         [Route("products")]
-        [VCAuthenticate]
         public void /*List<ProductDto>*/ GetProductsList()
         {
         }
@@ -34,21 +34,11 @@ namespace VCBackend.Controllers
             }
             catch (VCException ex)
             {
-                var resp = new HttpResponseMessage(HttpStatusCode.Forbidden)
-                {
-                    Content = new StringContent(ex.Description),
-                    ReasonPhrase = ex.Error
-                };
-                throw new HttpResponseException(resp);
+                throw new ErrorResponse(ex);
             }
             catch (Exception ex)
             {
-                var resp = new HttpResponseMessage(HttpStatusCode.Forbidden)
-                {
-                    Content = new StringContent(ex.Message),
-                    ReasonPhrase = ex.Message
-                };
-                throw new HttpResponseException(resp);
+                throw new ErrorResponse(ex);
             }
         }
 
@@ -67,21 +57,11 @@ namespace VCBackend.Controllers
             }
             catch (VCException ex)
             {
-                var resp = new HttpResponseMessage(HttpStatusCode.Forbidden)
-                {
-                    Content = new StringContent(ex.Description),
-                    ReasonPhrase = ex.Error
-                };
-                throw new HttpResponseException(resp);
+                throw new ErrorResponse(ex);
             }
             catch (Exception ex)
             {
-                var resp = new HttpResponseMessage(HttpStatusCode.Forbidden)
-                {
-                    Content = new StringContent(ex.Message),
-                    ReasonPhrase = ex.Message
-                };
-                throw new HttpResponseException(resp);
+                throw new ErrorResponse(ex);
             }
         }
 
@@ -99,28 +79,32 @@ namespace VCBackend.Controllers
             }
             catch (VCException ex)
             {
-                var resp = new HttpResponseMessage(HttpStatusCode.Forbidden)
-                {
-                    Content = new StringContent(ex.Description),
-                    ReasonPhrase = ex.Error
-                };
-                throw new HttpResponseException(resp);
+                throw new ErrorResponse(ex);
             }
             catch (Exception ex)
             {
-                var resp = new HttpResponseMessage(HttpStatusCode.Forbidden)
-                {
-                    Content = new StringContent(ex.Message),
-                    ReasonPhrase = ex.Message
-                };
-                throw new HttpResponseException(resp);
+                throw new ErrorResponse(ex);
             }
         }
 
         [Route("pay/{method}/cancel")]
         [VCAuthenticate]
-        public void DeleteLoadCard()
+        public void DeletePaymentRequest([FromUri] String AuthDevice, [FromUri] String method, [FromUri] String p)
         {
+            int AuthDev = VCAuthenticate.GetAuthenticatedDevice(ActionContext);
+
+            try
+            {
+                BRulesApi.PaymentCancel(AuthDev, method, p);
+            }
+            catch (VCException ex)
+            {
+                throw new ErrorResponse(ex);
+            }
+            catch (Exception ex)
+            {
+                throw new ErrorResponse(ex);
+            }
         }
 
         [Route("vcard/load/{product}")]

@@ -34,13 +34,22 @@ namespace VCBackend.Business_Rules
         public static TokenDto CreateUser (String Name, String Email, String Password) 
         {
             UnitOfWork uw = new UnitOfWork();
-            UserManager um = new UserManager(uw);
+            TokenDto dto;
 
-            String token = um.CreateUser(Name, Email, Password);
+            try
+            {
+               
+                UserManager um = new UserManager(uw);
 
-            TokenDto dto = new TokenDto(token);
+                String token = um.CreateUser(Name, Email, Password);
 
-            uw.Dispose();
+                dto = new TokenDto(token);
+
+            }
+            finally
+            {
+                uw.Dispose();
+            }
 
             //returns a token for authentication!
             //It returns the First device, because the account was just created and it only has one device that is the default one!
@@ -60,13 +69,21 @@ namespace VCBackend.Business_Rules
         public static UserDto UpdateUser (int AuthDevice, String Name, String Email, String Password)
         {
             UnitOfWork uw = new UnitOfWork();
-            UserManager um = new UserManager(uw);
+            UserDto dto;
 
-            User User = uw.DeviceRepository.GetByID(AuthDevice).Owner;
+            try
+            {
+                UserManager um = new UserManager(uw);
 
-            UserDto dto = um.UpdateUser(User, Name, Email, Password);
+                User User = uw.DeviceRepository.GetByID(AuthDevice).Owner;
 
-            uw.Dispose();
+                dto = um.UpdateUser(User, Name, Email, Password);
+            }
+            finally
+            {
+
+                uw.Dispose();
+            }
 
             return dto;
         }
@@ -79,12 +96,19 @@ namespace VCBackend.Business_Rules
         public static UserDto GetUser(int AuthDevice)
         {
             UnitOfWork uw = new UnitOfWork();
-            UserManager um = new UserManager(uw);
-            User User = uw.DeviceRepository.GetByID(AuthDevice).Owner;
+            UserDto dto;
 
-            UserDto dto = um.GetUser(User);
+            try
+            {
+                UserManager um = new UserManager(uw);
+                User User = uw.DeviceRepository.GetByID(AuthDevice).Owner;
 
-            uw.Dispose();
+                dto = um.GetUser(User);
+            }
+            finally
+            {
+                uw.Dispose();
+            }
 
             return dto;
         }
@@ -104,12 +128,19 @@ namespace VCBackend.Business_Rules
         public static TokenDto Login(String Username, String Password, String DeviceId)
         {
             UnitOfWork uw = new UnitOfWork();
-            UserManager um = new UserManager(uw);
+            TokenDto dto;
 
-            String token = um.UserLogin(Username, Password, DeviceId);
-            TokenDto dto = new TokenDto(token);
+            try
+            {
+                UserManager um = new UserManager(uw);
 
-            uw.Dispose();
+                String token = um.UserLogin(Username, Password, DeviceId);
+                dto = new TokenDto(token);
+            }
+            finally
+            {
+                uw.Dispose();
+            }
 
             return dto;
         }
@@ -129,13 +160,20 @@ namespace VCBackend.Business_Rules
         public static TokenDto AddDevice(int AuthDevice, String DeviceName, String DeviceId)
         {
             UnitOfWork uw = new UnitOfWork();
-            UserManager um = new UserManager(uw);
-            User user = uw.DeviceRepository.GetByID(AuthDevice).Owner;
+            TokenDto dto;
 
-            String token = um.AddDeviceToUser(user, DeviceName, DeviceId);
-            TokenDto dto = new TokenDto(token);
+            try
+            {
+                UserManager um = new UserManager(uw);
+                User user = uw.DeviceRepository.GetByID(AuthDevice).Owner;
 
-            uw.Dispose();
+                String token = um.AddDeviceToUser(user, DeviceName, DeviceId);
+                dto = new TokenDto(token);
+            }
+            finally
+            {
+                uw.Dispose();
+            }
 
             return dto;
         }
@@ -150,12 +188,17 @@ namespace VCBackend.Business_Rules
         public static void RemoveDevice(int AuthDevice, String DeviceId)
         {
             UnitOfWork uw = new UnitOfWork();
-            UserManager um = new UserManager(uw);
-            User user = uw.DeviceRepository.GetByID(AuthDevice).Owner;
+            try
+            {
+                UserManager um = new UserManager(uw);
+                User user = uw.DeviceRepository.GetByID(AuthDevice).Owner;
 
-            um.RemoveDeviceFromUser(user, DeviceId);
-
-            uw.Dispose();
+                um.RemoveDeviceFromUser(user, DeviceId);
+            }
+            finally
+            {
+                uw.Dispose();
+            }
         }
 
         /// <summary>
@@ -166,19 +209,27 @@ namespace VCBackend.Business_Rules
         public static ICollection<DeviceDto> GetAllDevices(int AuthDevice)
         {
             UnitOfWork uw = new UnitOfWork();
-            UserManager um = new UserManager(uw);
-            User user = uw.DeviceRepository.GetByID(AuthDevice).Owner;
+            ICollection<DeviceDto> devDto;
 
-            ICollection<Device> devices = um.GetUserDevices(user);
-            ICollection<DeviceDto> devDto = new List<DeviceDto>();
-            foreach (Device d in devices)
+            try
             {
-                DeviceDto dto = new DeviceDto();
-                dto.Serialize(d);
-                devDto.Add(dto);
-            }
+                UserManager um = new UserManager(uw);
+                User user = uw.DeviceRepository.GetByID(AuthDevice).Owner;
 
-            uw.Dispose();
+                ICollection<Device> devices = um.GetUserDevices(user);
+                devDto = new List<DeviceDto>();
+                foreach (Device d in devices)
+                {
+                    DeviceDto dto = new DeviceDto();
+                    dto.Serialize(d);
+                    devDto.Add(dto);
+                }
+
+            }
+            finally
+            {
+                uw.Dispose();
+            }
 
             return devDto;
         }
@@ -194,16 +245,23 @@ namespace VCBackend.Business_Rules
         public static PaymentDto PaymentBegin(int AuthDevice, String PayMethod, String Currency, String Amount)
         {
             UnitOfWork uw = new UnitOfWork();
-            AccountManager am = new AccountManager(uw);
+            PaymentDto dto;
 
-            Account account = uw.DeviceRepository.GetByID(AuthDevice).Owner.Account;
+            try
+            {
+                AccountManager am = new AccountManager(uw);
 
-            ProdPayment payment = am.PaymentBegin(account, PayMethod, Currency, Amount);
-            PaymentDto dto = new PaymentDto();
+                Account account = uw.DeviceRepository.GetByID(AuthDevice).Owner.Account;
 
-            dto.Serialize(payment);
+                ProdPayment payment = am.PaymentBegin(account, PayMethod, Currency, Amount);
+                dto = new PaymentDto();
 
-            uw.Dispose();
+                dto.Serialize(payment);
+            }
+            finally
+            {
+                uw.Dispose();
+            }
 
             return dto;
         }
@@ -220,20 +278,45 @@ namespace VCBackend.Business_Rules
         public static BalanceDto PaymentEnd(int AuthDevice, String PayMethod, String PayerId, String PaymentId)
         {
             UnitOfWork uw = new UnitOfWork();
-            AccountManager am = new AccountManager(uw);
+            BalanceDto dto;
 
-            Account account = uw.DeviceRepository.GetByID(AuthDevice).Owner.Account;
+            try
+            {
+                AccountManager am = new AccountManager(uw);
 
-            ProdPayment payment = am.PaymentEnd(account, PayMethod, PayerId, PaymentId);
+                Account account = uw.DeviceRepository.GetByID(AuthDevice).Owner.Account;
 
-            Account updatedAccount = uw.AccountRepository.GetByID(account.Id);
+                ProdPayment payment = am.PaymentEnd(account, PayMethod, PayerId, PaymentId);
 
-            BalanceDto dto = new BalanceDto();
-            dto.Serialize(updatedAccount);
+                Account updatedAccount = uw.AccountRepository.GetByID(account.Id);
 
-            uw.Dispose();
+                dto = new BalanceDto();
+                dto.Serialize(updatedAccount);
+            }
+            finally
+            {
+                uw.Dispose();
+            }
 
             return dto;
+        }
+
+        public static void PaymentCancel(int AuthDevice, String PayMethod, String PaymentId)
+        {
+            UnitOfWork uw = new UnitOfWork();
+            try
+            {
+                AccountManager am = new AccountManager(uw);
+
+                Account account = uw.DeviceRepository.GetByID(AuthDevice).Owner.Account;
+
+                am.PaymentCancel(account, PayMethod, PaymentId);
+            }
+            finally
+            {
+                uw.Dispose();
+            }
+
         }
 
         /// <summary>

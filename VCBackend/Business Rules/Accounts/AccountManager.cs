@@ -7,6 +7,7 @@ using VCBackend.Models;
 using VCBackend.Business_Rules.VCards;
 using VCBackend.Utility.Security;
 using VCBackend.Business_Rules.Payments;
+using VCBackend.Business_Rules.Exceptions;
 
 namespace VCBackend.Business_Rules.Accounts
 {
@@ -57,7 +58,7 @@ namespace VCBackend.Business_Rules.Accounts
         {
             if (Account.VCard.Id != 0)
                 return AuthToken.GetCardAccessJwt(Account.VCard);
-            else throw new Exception();
+            else throw new CardNotFound(String.Format("The card isn't created."));
         }
 
         public ProdPayment PaymentBegin(Account Account, String Method, String Currency, String Amount)
@@ -90,7 +91,7 @@ namespace VCBackend.Business_Rules.Accounts
                           where (payment.PaymentId == PaymentId && payment.AccountId == Account.Id)
                           select payment).FirstOrDefault();
 
-            if (request == null) throw new Exception(String.Format("No payment request registered with ID {0}.", PaymentId));
+            if (request == null) throw new PaymentNotFound(String.Format("No payment request registered with ID {0}.", PaymentId));
 
             using (var transactionCtx = UnitOfWork.TransactionBegin())
             {
@@ -114,6 +115,21 @@ namespace VCBackend.Business_Rules.Accounts
             }
 
             return newRequest;
+        }
+
+        public void PaymentCancel(Account Account, String Method, String PaymentId)
+        {
+            ProdPayment payment = UnitOfWork.PaymentRepository.Get(filter: q => (q.PaymentMethod == Method && q.PaymentId == PaymentId)).FirstOrDefault();
+
+            if (payment != null)
+            {
+                if (payment.State != ProdPayment.STATE_APPROVED)
+                {
+                    UnitOfWork.PaymentRepository.Delete(payment);
+                }
+                else throw new DeletePaymentError(String.Format("Cannot delete aproved payment!"));
+            }
+            else throw new PaymentNotFound(String.Format("Payment ID: {0} unknown.", PaymentId));
         }
 
     }

@@ -11,6 +11,8 @@ using System.Threading.Tasks;
 using VCBackend.Models;
 using VCBackend.Repositories;
 using System.Web.Http.Controllers;
+using VCBackend.Business_Rules.Exceptions;
+using VCBackend.Business_Rules.Errors;
 
 namespace VCBackend.Filters
 {
@@ -26,34 +28,38 @@ namespace VCBackend.Filters
         public System.Threading.Tasks.Task AuthenticateAsync(HttpAuthenticationContext context, System.Threading.CancellationToken cancellationToken)
         {
             UnitOfWork uw = new UnitOfWork();
+            try
+            {
+                //1. Get query key/value map to get the authentication data
+                var query = context.ActionContext.Request.RequestUri.Query;
+                var queryStringCollection = System.Web.HttpUtility.ParseQueryString(query);
 
-            //1. Get query key/value map to get the authentication data
-            var query = context.ActionContext.Request.RequestUri.Query;
-            var queryStringCollection = System.Web.HttpUtility.ParseQueryString(query);
-
-            var token = queryStringCollection["t"];
+                var token = queryStringCollection["t"];
 
 
-            //2. If the token is not available, nothing to do
-            if (token == null || token == String.Empty)
-                return null;
+                //2. If the token is not available, nothing to do
+                if (token == null || token == String.Empty)
+                    throw new ErrorResponse(new InvalidAuthToken("Missing authentication token."));
 
-            var payload = AuthToken.ValidateToken(token);
-            //3. Validate the token
-            if (payload == null)
-                return null;
+                var payload = AuthToken.ValidateToken(token);
+                //3. Validate the token
+                if (payload == null)
+                    throw new ErrorResponse(new InvalidAuthToken("The suplied token is not valid."));
 
-            var uid = payload["user_id"];
-            var did = payload["device_id"];
+                var uid = payload["user_id"];
+                var did = payload["device_id"];
 
-            Device dev = uw.DeviceRepository.GetByID((int)did);
-            
-            if (dev == null || dev.Owner.Id != (int)uid || dev.Token != token)
-                return null;
+                Device dev = uw.DeviceRepository.GetByID((int)did);
 
-            context.Request.Properties.Add(AUTH_DEVICE, did);
+                if (dev == null || dev.Owner.Id != (int)uid || dev.Token != token)
+                    throw new ErrorResponse(new InvalidAuthToken("The suplied token is no longer valid."));
 
-            uw.Dispose();
+                context.Request.Properties.Add(AUTH_DEVICE, did);
+            }
+            finally
+            {
+                uw.Dispose();
+            }
 
             return Task.FromResult(0);
         }

@@ -45,6 +45,15 @@ namespace VCBackend.Business_Rules.Exceptions
         }
     }
 
+    public class PaymentNotFound : VCException
+    {
+        public PaymentNotFound(String Message)
+            : base(Message)
+        {
+            Error = "PaymentNotFound";
+        }
+    }
+
     public class EmailAlreadyRegistered : VCException
     {
         public EmailAlreadyRegistered(String Message)
@@ -88,6 +97,24 @@ namespace VCBackend.Business_Rules.Exceptions
             : base(message)
         {
             Error = "PayPalPaymentFailed";
+        }
+    }
+
+    public class DeletePaymentError : VCException
+    {
+        public DeletePaymentError(String Message)
+            : base(Message)
+        {
+            Error = "DeletePaymentError";
+        }
+    }
+
+    public class InvalidAuthToken : VCException
+    {
+        public InvalidAuthToken(String Message)
+            : base(Message)
+        {
+            Error = "InvalidAuthToken";
         }
     }
 }
