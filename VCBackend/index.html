@@ -4,22 +4,12 @@
   <title>Virtual Card</title>
 </head>
 <body>
-
-    <!--<div>
-        <h2>All Products</h2>
-        <ul id="products" />
-    </div>
-    <div>
-        <h2>Search by ID</h2>
-        <input type="text" id="prodId" size="5" />
-        <input type="button" value="Search" onclick="find();" />
-        <p id="product" />
-    </div>-->
     <div>
         <p id="u_name" />
         <p id="u_email" />
         <p id="balance" />
         <p id="token" />
+        <p id="payment_url" />
     </div>
     <div>
         <h2>Create User</h2>
@@ -38,6 +28,12 @@
         <h2>Add Funds</h2>
         <input type="text" id="amount"/>
         <input type="button" value="Pay" onclick="pay()" />
+    </div>
+    <div>
+        <h2>Finish Payment</h2>
+        <input type="text" value="PayerId" id="payerid" />
+        <input type="text" value="PaymentId" id="paymentid" />
+        <input type="button" value="Conclude" onclick="finishPayment()" />
     </div>
 
   <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-2.0.3.min.js"></script>
@@ -102,8 +98,27 @@
           $.post(uri,
               null,
               function (value) {
-                  $('#token').text('Token: ' + value['AuthToken']);
-                  localStorage.setItem('token', value['AuthToken']);;
+                  var mydiv = document.getElementById('payment_url');
+                  var aTag = document.createElement('a');
+                  aTag.setAttribute('href', value['PaymentURL']);
+                  aTag.innerHTML = "Pay here!";
+                  mydiv.appendChild(aTag);
+              },
+              "json"
+              );
+      }
+
+      function finishPayment() {
+          var payerId = $('#payerid').val();
+          var paymentId = $('#paymentid').val();
+          var uri = 'api/account/pay/paypal/end?t=' +
+              localStorage.getItem('token') +
+              '&u=' + payerId +
+              '&p=' + paymentId;
+          $.post(uri,
+              null,
+              function (value) {
+                  $('#balance').text('Balance: ' + value['Balance']);
               },
               "json"
               );
