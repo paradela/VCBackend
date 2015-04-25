@@ -23,7 +23,8 @@ namespace VCBackend
         {
             // TODO: set rules to indicate which entity sets and service operations are visible, updatable, etc.
             // Examples:
-            config.SetEntitySetAccessRule("Cards", EntitySetRights.All);
+            config.SetEntitySetAccessRule("VCardSet", EntitySetRights.All);
+            config.SetEntitySetAccessRule("VCardTokenSet", EntitySetRights.All);
             // config.SetServiceOperationAccessRule("MyServiceOperation", ServiceOperationRights.All);
             config.DataServiceBehavior.MaxProtocolVersion = DataServiceProtocolVersion.V3;
         }

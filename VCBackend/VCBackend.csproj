@@ -250,6 +250,7 @@
     <Compile Include="Models\Dto\PaymentMethodDto.cs" />
     <Compile Include="Models\Dto\TokenDto.cs" />
     <Compile Include="Models\Dto\UserDto.cs" />
+    <Compile Include="Models\Dto\VCardTokenDto.cs" />
     <Compile Include="Models\Mobile.cs" />
     <Compile Include="Models\ProdPayment.cs" />
     <Compile Include="Models\VCard.cs" />

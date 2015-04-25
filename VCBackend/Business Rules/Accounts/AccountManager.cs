@@ -54,11 +54,18 @@ namespace VCBackend.Business_Rules.Accounts
             return true;
         }
 
-        public String GetAuthToLoadCard(Account Account)
+        public String GetAuthToLoadCard(VCard VCard)
         {
-            if (Account.VCard.Id != 0)
-                return AuthToken.GetCardAccessJwt(Account.VCard);
+            if (VCard.Id != 0)
+                return AuthToken.GetCardAccessJwt(VCard);
             else throw new CardNotFound(String.Format("The card isn't created."));
+        }
+
+        public String GetAuthToLoadCard(VCardToken VCard)
+        {
+            if (VCard.Id != 0)
+                return AuthToken.GetCardTokenAccessJwt(VCard);
+            else throw new CardNotFound(String.Format("The token isn't created."));
         }
 
         public ProdPayment PaymentBegin(Account Account, String Method, String Currency, String Amount)
@@ -133,5 +140,19 @@ namespace VCBackend.Business_Rules.Accounts
             else throw new PaymentNotFound(String.Format("Payment ID: {0} unknown.", PaymentId));
         }
 
+        public String GetNewToken(Account Account)
+        {
+            VCardManager CardManager = new VCardManager(UnitOfWork);
+
+            VCardToken token = CardManager.CreateTokenFromCard(Account.VCard.Id, Account.Id);
+
+            String accessToken = GetAuthToLoadCard(token);
+
+            //Call TKServer to load the token
+
+
+
+            return "";
+        }
     }
 }
