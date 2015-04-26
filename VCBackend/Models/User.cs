@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.ComponentModel.DataAnnotations;
+using VCBackend.Utility.Security;
+using VCBackend.Exceptions;
 
 namespace VCBackend
 {
@@ -20,8 +21,44 @@ namespace VCBackend
         public void AddDevice(Device device)
         {
             device.Owner = this;
-
             Devices.Add(device);
+        }
+
+        public Device CreateDevice(String Name = null, String DeviceId = null)
+        {
+            Device device;
+
+            if (DeviceId == null)
+                device = new Default();
+            else device = new Mobile(DeviceId, Name);
+
+            //Generates a token that should be used next to register a device.
+            device.Token = AuthToken.GetAPIAccessJwt(this, device);
+
+            AddDevice(device);
+
+            return device;
+        }
+
+        public Device RemoveDevice(String DeviceId)
+        {
+            var dev = (from d in Devices
+                      where d.DeviceId == DeviceId &&
+                      !d.IsDefault()
+                      select d).FirstOrDefault();
+
+            if (dev == null)
+                throw new DeviceNotFound("Device identifier is unknown.");
+
+            Devices.Remove(dev);
+
+            return dev;
+        }
+
+        public Account CreateAccount()
+        {
+            Account account = new Account(0.0);
+            return account;
         }
 
     }

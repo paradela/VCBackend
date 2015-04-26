@@ -5,7 +5,7 @@ using System.Web;
 using System.Net.Http;
 using System.Net.Http.Formatting;
 
-namespace VCBackend.Business_Rules.Exceptions
+namespace VCBackend.Errors
 {
     public class JsonErrorContent : ObjectContent<object>
     {

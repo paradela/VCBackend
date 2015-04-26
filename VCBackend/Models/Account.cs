@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
-using VCBackend.Business_Rules.Exceptions;
+using VCBackend.Exceptions;
 using VCBackend.Utility.Security;
+using VCBackend.ExternalServices.TSM;
 
 namespace VCBackend
 {
@@ -14,6 +15,26 @@ namespace VCBackend
         public Account(Double Balance)
         {
             this.Balance = Balance;
+        }
+
+        public bool InitializeAccount()
+        {
+            TSMFakeProxy proxy = new TSMFakeProxy();
+
+            int card = proxy.InstallCard(Id);
+
+            if (card != TSMFakeProxy.ERROR)
+            {
+                return proxy.InitCard(card);
+            }
+            else return false;
+        }
+
+        public VCard CreateCard(byte[] EmptyCard)
+        {
+            VCard card = new VCard(EmptyCard);
+            this.VCard = card;
+            return card;
         }
 
         public Double AddFunds(String NewAmount)

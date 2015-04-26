@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using VCBackend.Utility.Time;
 
 namespace VCBackend
 {
@@ -15,14 +16,22 @@ namespace VCBackend
 
         public byte[] Read(uint Offset, uint Length)
         {
-            return null;
+            byte[] card = System.Convert.FromBase64String(this.Data);
+
+            if ((Offset + Length) <= card.Length && Length > 0)
+            {
+                byte[] dataRead = new byte[Length];
+                System.Array.Copy(card, Offset, dataRead, 0, Length);
+            }
+            return new byte[0];
         }
 
         public bool Write(uint OffSet, byte[] Data, uint Length)
         {
-            if ((OffSet + Length) <= this.Data.Length || Data.Length >= Length)
+            byte[] card = System.Convert.FromBase64String(this.Data);
+
+            if ((OffSet + Length) <= card.Length)
             {
-                byte[] card = System.Convert.FromBase64String(this.Data);
                 System.Array.Copy(Data, 0, card, OffSet, Length);
                 this.Data = System.Convert.ToBase64String(card);
                 return true;
@@ -35,6 +44,25 @@ namespace VCBackend
             if (this.Data == null) return new byte[0];
             byte[] card = System.Convert.FromBase64String(this.Data);
             return card;
+        }
+
+        public bool InitCard(byte[] SerialNumber)
+        {
+            if (SerialNumber.Length == 4)
+                return Write(6, SerialNumber, (uint)SerialNumber.Length);
+            else return false;
+        }
+
+        public VCardToken CreateVCardToken(Account account)
+        {
+            byte[] cardData = new byte[64];
+            byte[] cardHeader = Read(0, 10); //Read the card header till the S/N.
+            System.Array.Copy(cardHeader, cardData, 10);
+            VCardToken token = new VCardToken(cardData);
+            token.AccountId = account.Id;
+            token.Validity = Time.ValidityInHours(24);
+            account.VCardToken.Add(token);
+            return token;
         }
     }
 }

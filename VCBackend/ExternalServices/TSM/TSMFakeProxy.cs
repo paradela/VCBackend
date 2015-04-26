@@ -5,7 +5,7 @@ using System.Web;
 using VCBackend.Models;
 using VCBackend.Repositories;
 
-namespace VCBackend.Business_Rules.VCards
+namespace VCBackend.ExternalServices.TSM
 {
     public class TSMFakeProxy
     {
@@ -18,13 +18,11 @@ namespace VCBackend.Business_Rules.VCards
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
         };
 
-        private VCardManager CardManager;
         private UnitOfWork UnitOfWork;
 
         public TSMFakeProxy()
         {
             UnitOfWork = new UnitOfWork();
-            CardManager = new VCardManager(UnitOfWork);
         }
 
         private byte[] INT2LE(int data)
@@ -39,7 +37,8 @@ namespace VCBackend.Business_Rules.VCards
 
         public int InstallCard(int AccountId)
         {
-            VCard card = CardManager.CreateCard(AccountId, emptyCard);
+            Account Account = UnitOfWork.AccountRepository.GetByID(AccountId);
+            VCard card = Account.CreateCard(emptyCard);
             if (card != null)
                 return card.Id;
             else return ERROR;
@@ -47,8 +46,10 @@ namespace VCBackend.Business_Rules.VCards
 
         public bool InitCard(int CardId)
         {
-            if (CardId != 0)
-                return CardManager.InitCard(CardId, INT2LE(CardId));
+            VCard card = UnitOfWork.VCardRepository.GetByID(CardId);
+
+            if (card != null) 
+                return card.InitCard(INT2LE(CardId));
             else return false;
         }
     }

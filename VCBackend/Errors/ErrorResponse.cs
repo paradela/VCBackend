@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
-using VCBackend.Business_Rules.Exceptions;
+using VCBackend.Exceptions;
 using System.Net.Http;
 using System.Net;
 
-namespace VCBackend.Business_Rules.Errors
+namespace VCBackend.Errors
 {
     public class ErrorResponse : HttpResponseMessage
     {

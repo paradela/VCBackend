@@ -7,7 +7,7 @@ using VCBackend.Models;
 using VCBackend.Business_Rules.VCards;
 using VCBackend.Utility.Security;
 using VCBackend.Business_Rules.Payments;
-using VCBackend.Business_Rules.Exceptions;
+using VCBackend.Exceptions;
 
 namespace VCBackend.Business_Rules.Accounts
 {
@@ -18,29 +18,9 @@ namespace VCBackend.Business_Rules.Accounts
         {
         }
 
-        public Account CreateAccount()
-        {
-            Account account = new Account(0.0);
-            UnitOfWork.AccountRepository.Add(account);
-            return account;
-        }
+        
 
-        public bool InitializeAccount(int AccountId)
-        {
-            Account Account = UnitOfWork.AccountRepository.GetByID(AccountId);
-
-            if (Account == null) return false;
-
-            TSMFakeProxy proxy = new TSMFakeProxy();
-
-            int card = proxy.InstallCard(Account.Id);
-
-            if (card != TSMFakeProxy.ERROR)
-            {
-                return proxy.InitCard(card);
-            }
-            else return false;
-        }
+        
 
         public bool SetCardToAccount(int AccountId, VCard NewCard)
         {
