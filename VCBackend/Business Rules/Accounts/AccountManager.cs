@@ -144,15 +144,22 @@ namespace VCBackend.Business_Rules.Accounts
         {
             VCardManager CardManager = new VCardManager(UnitOfWork);
 
+            User u = UnitOfWork.UserRepository.Get(filter: q => (q.Account.Id == Account.Id)).FirstOrDefault();
+            if (u == null) throw new AccountNotFound("Invalid Account identifier.");
+
             VCardToken token = CardManager.CreateTokenFromCard(Account.VCard.Id, Account.Id);
 
             String accessToken = GetAuthToLoadCard(token);
 
             //Call TKServer to load the token
 
+            VCardSecurity secure = new VCardSecurity(u);
 
+            token = UnitOfWork.VCardTokenRepository.GetByID(token.Id);
 
-            return "";
+            String secureToken = secure.RijndaelEncrypt(token);
+
+            return secureToken;
         }
     }
 }

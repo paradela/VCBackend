@@ -8,6 +8,7 @@ namespace VCBackend.Models.Dto
     public class VCardTokenDto : IDto<VCardToken>
     {
         String EncryptedToken { get; set; }
+        String Data { get; set; }
 
         public VCardTokenDto() { }
 
