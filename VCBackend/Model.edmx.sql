@@ -2,7 +2,7 @@
 -- --------------------------------------------------
 -- Entity Designer DDL Script for SQL Server 2005, 2008, 2012 and Azure
 -- --------------------------------------------------
--- Date Created: 04/25/2015 17:54:30
+-- Date Created: 04/26/2015 21:06:51
 -- Generated from EDMX file: C:\Users\Ricardo\Source\Repos\VCBackend\VCBackend\Model.edmx
 -- --------------------------------------------------
 
@@ -29,8 +29,11 @@ GO
 IF OBJECT_ID(N'[dbo].[FK_AccountVCardToken]', 'F') IS NOT NULL
     ALTER TABLE [dbo].[VCardTokenSet] DROP CONSTRAINT [FK_AccountVCardToken];
 GO
-IF OBJECT_ID(N'[dbo].[FK_AccountProdPayments]', 'F') IS NOT NULL
-    ALTER TABLE [dbo].[ProdPaymentSet] DROP CONSTRAINT [FK_AccountProdPayments];
+IF OBJECT_ID(N'[dbo].[FK_AccountLoadRequest]', 'F') IS NOT NULL
+    ALTER TABLE [dbo].[LoadRequestSet] DROP CONSTRAINT [FK_AccountLoadRequest];
+GO
+IF OBJECT_ID(N'[dbo].[FK_AccountPaymentRequest]', 'F') IS NOT NULL
+    ALTER TABLE [dbo].[PaymentRequestSet] DROP CONSTRAINT [FK_AccountPaymentRequest];
 GO
 IF OBJECT_ID(N'[dbo].[FK_Default_inherits_Device]', 'F') IS NOT NULL
     ALTER TABLE [dbo].[DeviceSet_Default] DROP CONSTRAINT [FK_Default_inherits_Device];
@@ -58,8 +61,11 @@ GO
 IF OBJECT_ID(N'[dbo].[VCardTokenSet]', 'U') IS NOT NULL
     DROP TABLE [dbo].[VCardTokenSet];
 GO
-IF OBJECT_ID(N'[dbo].[ProdPaymentSet]', 'U') IS NOT NULL
-    DROP TABLE [dbo].[ProdPaymentSet];
+IF OBJECT_ID(N'[dbo].[PaymentRequestSet]', 'U') IS NOT NULL
+    DROP TABLE [dbo].[PaymentRequestSet];
+GO
+IF OBJECT_ID(N'[dbo].[LoadRequestSet]', 'U') IS NOT NULL
+    DROP TABLE [dbo].[LoadRequestSet];
 GO
 IF OBJECT_ID(N'[dbo].[DeviceSet_Default]', 'U') IS NOT NULL
     DROP TABLE [dbo].[DeviceSet_Default];
@@ -118,8 +124,8 @@ CREATE TABLE [dbo].[VCardTokenSet] (
 );
 GO
 
--- Creating table 'ProdPaymentSet'
-CREATE TABLE [dbo].[ProdPaymentSet] (
+-- Creating table 'PaymentRequestSet'
+CREATE TABLE [dbo].[PaymentRequestSet] (
     [Id] int IDENTITY(1,1) NOT NULL,
     [PaymentId] nvarchar(max)  NOT NULL,
     [State] nvarchar(max)  NOT NULL,
@@ -129,8 +135,20 @@ CREATE TABLE [dbo].[ProdPaymentSet] (
     [PaymentMethod] nvarchar(max)  NULL,
     [RedirectURL] nvarchar(max)  NULL,
     [PaymentData] nvarchar(max)  NULL,
+    [PayerId] nvarchar(max)  NULL,
+    [AccountId] int  NOT NULL
+);
+GO
+
+-- Creating table 'LoadRequestSet'
+CREATE TABLE [dbo].[LoadRequestSet] (
+    [Id] int IDENTITY(1,1) NOT NULL,
     [AccountId] int  NOT NULL,
-    [PayerId] nvarchar(max)  NULL
+    [ProdId] nvarchar(max)  NOT NULL,
+    [Quantity] int  NOT NULL,
+    [Price] float  NOT NULL,
+    [DateInitial] datetime  NULL,
+    [CardAuth] nvarchar(max)  NOT NULL
 );
 GO
 
@@ -180,9 +198,15 @@ ADD CONSTRAINT [PK_VCardTokenSet]
     PRIMARY KEY CLUSTERED ([Id] ASC);
 GO
 
--- Creating primary key on [Id] in table 'ProdPaymentSet'
-ALTER TABLE [dbo].[ProdPaymentSet]
-ADD CONSTRAINT [PK_ProdPaymentSet]
+-- Creating primary key on [Id] in table 'PaymentRequestSet'
+ALTER TABLE [dbo].[PaymentRequestSet]
+ADD CONSTRAINT [PK_PaymentRequestSet]
+    PRIMARY KEY CLUSTERED ([Id] ASC);
+GO
+
+-- Creating primary key on [Id] in table 'LoadRequestSet'
+ALTER TABLE [dbo].[LoadRequestSet]
+ADD CONSTRAINT [PK_LoadRequestSet]
     PRIMARY KEY CLUSTERED ([Id] ASC);
 GO
 
@@ -262,18 +286,33 @@ ON [dbo].[VCardTokenSet]
     ([AccountVCardToken_VCardToken_Id]);
 GO
 
--- Creating foreign key on [AccountId] in table 'ProdPaymentSet'
-ALTER TABLE [dbo].[ProdPaymentSet]
-ADD CONSTRAINT [FK_AccountProdPayments]
+-- Creating foreign key on [AccountId] in table 'LoadRequestSet'
+ALTER TABLE [dbo].[LoadRequestSet]
+ADD CONSTRAINT [FK_AccountLoadRequest]
     FOREIGN KEY ([AccountId])
     REFERENCES [dbo].[AccountSet]
         ([Id])
     ON DELETE NO ACTION ON UPDATE NO ACTION;
 GO
 
--- Creating non-clustered index for FOREIGN KEY 'FK_AccountProdPayments'
-CREATE INDEX [IX_FK_AccountProdPayments]
-ON [dbo].[ProdPaymentSet]
+-- Creating non-clustered index for FOREIGN KEY 'FK_AccountLoadRequest'
+CREATE INDEX [IX_FK_AccountLoadRequest]
+ON [dbo].[LoadRequestSet]
+    ([AccountId]);
+GO
+
+-- Creating foreign key on [AccountId] in table 'PaymentRequestSet'
+ALTER TABLE [dbo].[PaymentRequestSet]
+ADD CONSTRAINT [FK_AccountPaymentRequest]
+    FOREIGN KEY ([AccountId])
+    REFERENCES [dbo].[AccountSet]
+        ([Id])
+    ON DELETE NO ACTION ON UPDATE NO ACTION;
+GO
+
+-- Creating non-clustered index for FOREIGN KEY 'FK_AccountPaymentRequest'
+CREATE INDEX [IX_FK_AccountPaymentRequest]
+ON [dbo].[PaymentRequestSet]
     ([AccountId]);
 GO
 

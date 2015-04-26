@@ -253,7 +253,7 @@ namespace VCBackend.Business_Rules
 
                 Account account = uw.DeviceRepository.GetByID(AuthDevice).Owner.Account;
 
-                ProdPayment payment = am.PaymentBegin(account, PayMethod, Currency, Amount);
+                PaymentRequest payment = am.PaymentBegin(account, PayMethod, Currency, Amount);
                 dto = new PaymentDto();
 
                 dto.Serialize(payment);
@@ -286,7 +286,7 @@ namespace VCBackend.Business_Rules
 
                 Account account = uw.DeviceRepository.GetByID(AuthDevice).Owner.Account;
 
-                ProdPayment payment = am.PaymentEnd(account, PayMethod, PayerId, PaymentId);
+                PaymentRequest payment = am.PaymentEnd(account, PayMethod, PayerId, PaymentId);
 
                 Account updatedAccount = uw.AccountRepository.GetByID(account.Id);
 

@@ -54,6 +54,15 @@ namespace VCBackend.Business_Rules.Exceptions
         }
     }
 
+    public class InvalidAmountException : VCException
+    {
+        public InvalidAmountException(String Message)
+            : base(Message)
+        {
+            Error = "InvalidAmountException";
+        }
+    }
+
     public class EmailAlreadyRegistered : VCException
     {
         public EmailAlreadyRegistered(String Message)

@@ -20,8 +20,7 @@ namespace VCBackend.Business_Rules.Accounts
 
         public Account CreateAccount()
         {
-            Account account = new Account();
-            account.Balance = 0.0;
+            Account account = new Account(0.0);
             UnitOfWork.AccountRepository.Add(account);
             return account;
         }
@@ -54,33 +53,21 @@ namespace VCBackend.Business_Rules.Accounts
             return true;
         }
 
-        public String GetAuthToLoadCard(VCard VCard)
-        {
-            if (VCard.Id != 0)
-                return AuthToken.GetCardAccessJwt(VCard);
-            else throw new CardNotFound(String.Format("The card isn't created."));
-        }
+        
 
-        public String GetAuthToLoadCard(VCardToken VCard)
-        {
-            if (VCard.Id != 0)
-                return AuthToken.GetCardTokenAccessJwt(VCard);
-            else throw new CardNotFound(String.Format("The token isn't created."));
-        }
-
-        public ProdPayment PaymentBegin(Account Account, String Method, String Currency, String Amount)
+        public PaymentRequest PaymentBegin(Account Account, String Method, String Currency, String Amount)
         {
             PaymentGateway gateway = new PaymentGateway();
             IPaymentMethod payMethod = gateway.GetPaymentMethodByName(Method);
 
-            ProdPayment request = new ProdPayment();
+            PaymentRequest request = new PaymentRequest();
             request.PaymentMethod = Method;
             request.Currency = Currency;
             request.Price = Amount;
 
-            ProdPayment newRequest = payMethod.PaymentBegin(request);
+            PaymentRequest newRequest = payMethod.PaymentBegin(request);
 
-            Account.ProdPayments.Add(newRequest);
+            Account.PaymentRequest.Add(newRequest);
 
             UnitOfWork.AccountRepository.Update(Account);
             UnitOfWork.Save();
@@ -88,13 +75,13 @@ namespace VCBackend.Business_Rules.Accounts
             return newRequest;
         }
 
-        public ProdPayment PaymentEnd(Account Account, String Method, String PayerId, String PaymentId)
+        public PaymentRequest PaymentEnd(Account Account, String Method, String PayerId, String PaymentId)
         {
             PaymentGateway gateway = new PaymentGateway();
             IPaymentMethod payMethod = gateway.GetPaymentMethodByName(Method);
-            ProdPayment newRequest = null;
+            PaymentRequest newRequest = null;
 
-            var request = (from payment in Account.ProdPayments
+            var request = (from payment in Account.PaymentRequest
                           where (payment.PaymentId == PaymentId && payment.AccountId == Account.Id)
                           select payment).FirstOrDefault();
 
@@ -108,7 +95,7 @@ namespace VCBackend.Business_Rules.Accounts
                     newRequest = payMethod.PaymentEnd(request);
                     UnitOfWork.PaymentRepository.Update(newRequest);
 
-                    Account.AddBalance(request.Price);
+                    Account.AddFunds(request.Price);
                     UnitOfWork.AccountRepository.Update(Account);
 
                     UnitOfWork.Save();
@@ -127,11 +114,11 @@ namespace VCBackend.Business_Rules.Accounts
 
         public void PaymentCancel(Account Account, String Method, String PaymentId)
         {
-            ProdPayment payment = UnitOfWork.PaymentRepository.Get(filter: q => (q.PaymentMethod == Method && q.PaymentId == PaymentId)).FirstOrDefault();
+            PaymentRequest payment = UnitOfWork.PaymentRepository.Get(filter: q => (q.PaymentMethod == Method && q.PaymentId == PaymentId)).FirstOrDefault();
 
             if (payment != null)
             {
-                if (payment.State != ProdPayment.STATE_APPROVED)
+                if (payment.State != PaymentRequest.STATE_APPROVED)
                 {
                     UnitOfWork.PaymentRepository.Delete(payment);
                 }
@@ -140,24 +127,42 @@ namespace VCBackend.Business_Rules.Accounts
             else throw new PaymentNotFound(String.Format("Payment ID: {0} unknown.", PaymentId));
         }
 
-        public String GetNewToken(Account Account)
+        public String GetNewToken(Account Account, String ProductId, DateTime DateInitial)
         {
             VCardManager CardManager = new VCardManager(UnitOfWork);
+            ProductManager ProdManager = new ProductManager(UnitOfWork);
 
             User u = UnitOfWork.UserRepository.Get(filter: q => (q.Account.Id == Account.Id)).FirstOrDefault();
-            if (u == null) throw new AccountNotFound("Invalid Account identifier.");
 
-            VCardToken token = CardManager.CreateTokenFromCard(Account.VCard.Id, Account.Id);
+            if (u == null) 
+                throw new AccountNotFound("Invalid Account identifier.");
+            if (ProductId == null || ProductId == String.Empty)
+                throw new VCException("Invalid Product Identifier.");
+            if (DateInitial == null || DateInitial < DateTime.Now)
+                throw new VCException("Invalid initial date.");
 
-            String accessToken = GetAuthToLoadCard(token);
+            VCardToken token;
 
-            //Call TKServer to load the token
+            using (var transaction = UnitOfWork.TransactionBegin())
+            {
+                token = CardManager.CreateTokenFromCard(Account.VCard.Id, Account.Id);
+
+                LoadRequest req = new LoadRequest();
+                req.CardAuth = GetAuthToLoadCard(token);
+                req.DateInitial = DateInitial;
+                req.ProdId = ProductId;
+                req.Quantity = 1;
+                //ProdManager
+
+                
+            }
 
             VCardSecurity secure = new VCardSecurity(u);
 
             token = UnitOfWork.VCardTokenRepository.GetByID(token.Id);
 
             String secureToken = secure.RijndaelEncrypt(token);
+
 
             return secureToken;
         }

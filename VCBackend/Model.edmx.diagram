@@ -18,8 +18,10 @@
         <AssociationConnector Association="Model.UserAccount" />
         <EntityTypeShape EntityType="Model.VCardToken" Width="1.5" PointX="2.5" PointY="6.25" />
         <AssociationConnector Association="Model.AccountVCardToken" />
-        <EntityTypeShape EntityType="Model.ProdPayment" Width="1.5" PointX="4.375" PointY="2.875" />
-        <AssociationConnector Association="Model.AccountProdPayments" />
+        <EntityTypeShape EntityType="Model.PaymentRequest" Width="1.5" PointX="6.625" PointY="3.125" />
+        <EntityTypeShape EntityType="Model.LoadRequest" PointX="4.625" PointY="5.25" Width="1.5" />
+        <AssociationConnector Association="Model.AccountLoadRequest" />
+        <AssociationConnector Association="Model.AccountPaymentRequest" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

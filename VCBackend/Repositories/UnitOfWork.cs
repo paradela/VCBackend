@@ -15,7 +15,7 @@ namespace VCBackend.Repositories
         private Repository<Account> accountRepository;
         private Repository<VCard> vcardRepository;
         private Repository<VCardToken> tokenRepository;
-        private Repository<ProdPayment> paymentRepository;
+        private Repository<PaymentRequest> paymentRepository;
 
         public UnitOfWork()
         {
@@ -84,13 +84,13 @@ namespace VCBackend.Repositories
             }
         }
 
-        public Repository<ProdPayment> PaymentRepository
+        public Repository<PaymentRequest> PaymentRepository
         {
             get
             {
                 if (this.paymentRepository == null)
                 {
-                    this.paymentRepository = new Repository<ProdPayment>(context);
+                    this.paymentRepository = new Repository<PaymentRequest>(context);
                 }
                 return paymentRepository;
             }

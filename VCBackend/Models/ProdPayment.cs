@@ -5,7 +5,7 @@ using System.Web;
 
 namespace VCBackend
 {
-    public partial class ProdPayment
+    public partial class PaymentRequest
     {
         public static string STATE_CREATED = "created";
         public static string STATE_APPROVED = "approved";

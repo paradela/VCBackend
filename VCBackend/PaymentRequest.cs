@@ -12,7 +12,7 @@ namespace VCBackend
     using System;
     using System.Collections.Generic;
     
-    public partial class ProdPayment
+    public partial class PaymentRequest
     {
         public int Id { get; set; }
         public string PaymentId { get; set; }
@@ -23,7 +23,7 @@ namespace VCBackend
         public string PaymentMethod { get; set; }
         public string RedirectURL { get; set; }
         public string PaymentData { get; set; }
-        public int AccountId { get; set; }
         public string PayerId { get; set; }
+        public int AccountId { get; set; }
     }
 }

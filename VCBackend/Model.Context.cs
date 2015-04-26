@@ -30,6 +30,7 @@ namespace VCBackend
         public virtual DbSet<Device> DeviceSet { get; set; }
         public virtual DbSet<VCard> VCardSet { get; set; }
         public virtual DbSet<VCardToken> VCardTokenSet { get; set; }
-        public virtual DbSet<ProdPayment> ProdPaymentSet { get; set; }
+        public virtual DbSet<PaymentRequest> PaymentRequestSet { get; set; }
+        public virtual DbSet<LoadRequest> LoadRequestSet { get; set; }
     }
 }

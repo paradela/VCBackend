@@ -11,7 +11,8 @@
     <EntitySet Name="DeviceSet" EntityType="Model.Store.DeviceSet" store:Type="Tables" Schema="dbo" />
     <EntitySet Name="VCardSet" EntityType="Model.Store.VCardSet" store:Type="Tables" Schema="dbo" />
     <EntitySet Name="VCardTokenSet" EntityType="Model.Store.VCardTokenSet" store:Type="Tables" Schema="dbo" />
-    <EntitySet Name="ProdPaymentSet" EntityType="Model.Store.ProdPaymentSet" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="PaymentRequestSet" EntityType="Model.Store.PaymentRequestSet" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="LoadRequestSet" EntityType="Model.Store.LoadRequestSet" store:Type="Tables" Schema="dbo" />
     <EntitySet Name="DeviceSet_Default" EntityType="Model.Store.DeviceSet_Default" store:Type="Tables" Schema="dbo" />
     <EntitySet Name="DeviceSet_Mobile" EntityType="Model.Store.DeviceSet_Mobile" store:Type="Tables" Schema="dbo" />
     <AssociationSet Name="UserDevice" Association="Model.Store.UserDevice">
@@ -30,9 +31,13 @@
       <End Role="Account" EntitySet="AccountSet" />
       <End Role="VCardToken" EntitySet="VCardTokenSet" />
     </AssociationSet>
-    <AssociationSet Name="AccountProdPayments" Association="Model.Store.AccountProdPayments">
+    <AssociationSet Name="AccountLoadRequest" Association="Model.Store.AccountLoadRequest">
       <End Role="Account" EntitySet="AccountSet" />
-      <End Role="ProdPayments" EntitySet="ProdPaymentSet" />
+      <End Role="LoadRequest" EntitySet="LoadRequestSet" />
+    </AssociationSet>
+    <AssociationSet Name="AccountPaymentRequest" Association="Model.Store.AccountPaymentRequest">
+      <End Role="Account" EntitySet="AccountSet" />
+      <End Role="PaymentRequest" EntitySet="PaymentRequestSet" />
     </AssociationSet>
     <AssociationSet Name="FK_Default_inherits_Device" Association="Model.Store.FK_Default_inherits_Device">
       <End Role="Device" EntitySet="DeviceSet" />
@@ -89,7 +94,7 @@
     <Property Name="Validity" Type="time" Nullable="false" />
     <Property Name="AccountVCardToken_VCardToken_Id" Type="int" Nullable="false" />
   </EntityType>
-  <EntityType Name="ProdPaymentSet">
+  <EntityType Name="PaymentRequestSet">
     <Key>
       <PropertyRef Name="Id" />
     </Key>
@@ -102,8 +107,20 @@
     <Property Name="PaymentMethod" Type="nvarchar(max)" Nullable="true" />
     <Property Name="RedirectURL" Type="nvarchar(max)" Nullable="true" />
     <Property Name="PaymentData" Type="nvarchar(max)" Nullable="true" />
-    <Property Name="AccountId" Type="int" Nullable="false" />
     <Property Name="PayerId" Type="nvarchar(max)" Nullable="true" />
+    <Property Name="AccountId" Type="int" Nullable="false" />
+  </EntityType>
+  <EntityType Name="LoadRequestSet">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="AccountId" Type="int" Nullable="false" />
+    <Property Name="ProdId" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="Quantity" Type="int" Nullable="false" />
+    <Property Name="Price" Type="float" Nullable="false" />
+    <Property Name="DateInitial" Type="datetime" Nullable="true" />
+    <Property Name="CardAuth" Type="nvarchar(max)" Nullable="false" />
   </EntityType>
   <EntityType Name="DeviceSet_Default">
     <Key>
@@ -165,14 +182,26 @@
       </Dependent>
     </ReferentialConstraint>
   </Association>
-  <Association Name="AccountProdPayments">
+  <Association Name="AccountLoadRequest">
     <End Role="Account" Type="Model.Store.AccountSet" Multiplicity="1" />
-    <End Role="ProdPayments" Type="Model.Store.ProdPaymentSet" Multiplicity="*" />
+    <End Role="LoadRequest" Type="Model.Store.LoadRequestSet" Multiplicity="*" />
     <ReferentialConstraint>
       <Principal Role="Account">
         <PropertyRef Name="Id" />
       </Principal>
-      <Dependent Role="ProdPayments">
+      <Dependent Role="LoadRequest">
+        <PropertyRef Name="AccountId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="AccountPaymentRequest">
+    <End Role="Account" Type="Model.Store.AccountSet" Multiplicity="1" />
+    <End Role="PaymentRequest" Type="Model.Store.PaymentRequestSet" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Account">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="PaymentRequest">
         <PropertyRef Name="AccountId" />
       </Dependent>
     </ReferentialConstraint>
@@ -231,10 +260,15 @@
             <End Role="Account" EntitySet="AccountSet" />
             <End Role="VCardToken" EntitySet="VCardTokenSet" />
           </AssociationSet>
-          <EntitySet Name="ProdPaymentSet" EntityType="Model.ProdPayment" />
-          <AssociationSet Name="AccountProdPayments" Association="Model.AccountProdPayments">
+          <EntitySet Name="PaymentRequestSet" EntityType="Model.PaymentRequest" />
+          <EntitySet Name="LoadRequestSet" EntityType="Model.LoadRequest" />
+          <AssociationSet Name="AccountLoadRequest" Association="Model.AccountLoadRequest">
+            <End EntitySet="AccountSet" Role="Account" />
+            <End EntitySet="LoadRequestSet" Role="LoadRequest" />
+          </AssociationSet>
+          <AssociationSet Name="AccountPaymentRequest" Association="Model.AccountPaymentRequest">
             <End Role="Account" EntitySet="AccountSet" />
-            <End Role="ProdPayments" EntitySet="ProdPaymentSet" />
+            <End Role="PaymentRequest" EntitySet="PaymentRequestSet" />
           </AssociationSet>
           </EntityContainer>
         <EntityType Name="User">
@@ -256,7 +290,8 @@
           <Property Name="Balance" Type="Double" Nullable="false" />
           <NavigationProperty Name="VCard" Relationship="Model.AccountVCard" FromRole="Account" ToRole="VCard" />
           <NavigationProperty Name="VCardToken" Relationship="Model.AccountVCardToken" FromRole="Account" ToRole="VCardToken" />
-          <NavigationProperty Name="ProdPayments" Relationship="Model.AccountProdPayments" FromRole="Account" ToRole="ProdPayments" />
+          <NavigationProperty Name="LoadRequest" Relationship="Model.AccountLoadRequest" FromRole="Account" ToRole="LoadRequest" />
+          <NavigationProperty Name="PaymentRequest" Relationship="Model.AccountPaymentRequest" FromRole="Account" ToRole="PaymentRequest" />
         </EntityType>
         <EntityType Name="Device" Abstract="true">
           <Key>
@@ -314,7 +349,7 @@
           <End Type="Model.Account" Role="Account" Multiplicity="1" />
           <End Type="Model.VCardToken" Role="VCardToken" Multiplicity="*" />
         </Association>
-        <EntityType Name="ProdPayment">
+        <EntityType Name="PaymentRequest">
           <Key>
             <PropertyRef Name="Id" />
           </Key>
@@ -327,17 +362,41 @@
           <Property Name="PaymentMethod" Type="String" Nullable="true" />
           <Property Name="RedirectURL" Type="String" Nullable="true" />
           <Property Name="PaymentData" Type="String" Nullable="true" />
-          <Property Name="AccountId" Type="Int32" Nullable="false" />
           <Property Name="PayerId" Type="String" Nullable="true" />
+          <Property Name="AccountId" Type="Int32" Nullable="false" />
         </EntityType>
-        <Association Name="AccountProdPayments">
-          <End Type="Model.Account" Role="Account" Multiplicity="1" />
-          <End Type="Model.ProdPayment" Role="ProdPayments" Multiplicity="*" />
+        <EntityType Name="LoadRequest">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" Type="Int32" />
+          <Property Name="AccountId" Nullable="false" Type="Int32" />
+          <Property Name="ProdId" Nullable="false" Type="String" />
+          <Property Name="Quantity" Type="Int32" Nullable="false" />
+          <Property Name="Price" Type="Double" Nullable="false" />
+          <Property Name="DateInitial" Nullable="true" Type="DateTime" />
+          <Property Name="CardAuth" Type="String" Nullable="false" />
+        </EntityType>
+        <Association Name="AccountLoadRequest">
+          <End Type="Model.Account" Multiplicity="1" Role="Account" />
+          <End Type="Model.LoadRequest" Multiplicity="*" Role="LoadRequest" />
           <ReferentialConstraint>
             <Principal Role="Account">
               <PropertyRef Name="Id" />
             </Principal>
-            <Dependent Role="ProdPayments">
+            <Dependent Role="LoadRequest">
+              <PropertyRef Name="AccountId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="AccountPaymentRequest">
+          <End Type="Model.Account" Role="Account" Multiplicity="1" />
+          <End Type="Model.PaymentRequest" Role="PaymentRequest" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Account">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="PaymentRequest">
               <PropertyRef Name="AccountId" />
             </Dependent>
           </ReferentialConstraint>
@@ -406,9 +465,9 @@
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>
-    <EntitySetMapping Name="ProdPaymentSet">
-      <EntityTypeMapping TypeName="IsTypeOf(Model.ProdPayment)">
-        <MappingFragment StoreEntitySet="ProdPaymentSet">
+    <EntitySetMapping Name="PaymentRequestSet">
+      <EntityTypeMapping TypeName="IsTypeOf(Model.PaymentRequest)">
+        <MappingFragment StoreEntitySet="PaymentRequestSet">
           <ScalarProperty Name="Id" ColumnName="Id" />
           <ScalarProperty Name="PaymentId" ColumnName="PaymentId" />
           <ScalarProperty Name="State" ColumnName="State" />
@@ -418,8 +477,21 @@
           <ScalarProperty Name="PaymentMethod" ColumnName="PaymentMethod" />
           <ScalarProperty Name="RedirectURL" ColumnName="RedirectURL" />
           <ScalarProperty Name="PaymentData" ColumnName="PaymentData" />
-          <ScalarProperty Name="AccountId" ColumnName="AccountId" />
           <ScalarProperty Name="PayerId" ColumnName="PayerId" />
+          <ScalarProperty Name="AccountId" ColumnName="AccountId" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="LoadRequestSet">
+      <EntityTypeMapping TypeName="IsTypeOf(Model.LoadRequest)">
+        <MappingFragment StoreEntitySet="LoadRequestSet">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="AccountId" ColumnName="AccountId" />
+          <ScalarProperty Name="ProdId" ColumnName="ProdId" />
+          <ScalarProperty Name="Quantity" ColumnName="Quantity" />
+          <ScalarProperty Name="Price" ColumnName="Price" />
+          <ScalarProperty Name="DateInitial" ColumnName="DateInitial" />
+          <ScalarProperty Name="CardAuth" ColumnName="CardAuth" />
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>

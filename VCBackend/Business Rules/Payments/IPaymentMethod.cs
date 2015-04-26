@@ -7,8 +7,8 @@ namespace VCBackend.Business_Rules.Payments
 {
     public interface IPaymentMethod
     {
-        ProdPayment PaymentBegin(ProdPayment request);
-        ProdPayment PaymentEnd(ProdPayment request);
-        ProdPayment PaymentCancel(ProdPayment request);
+        PaymentRequest PaymentBegin(PaymentRequest request);
+        PaymentRequest PaymentEnd(PaymentRequest request);
+        PaymentRequest PaymentCancel(PaymentRequest request);
     }
 }

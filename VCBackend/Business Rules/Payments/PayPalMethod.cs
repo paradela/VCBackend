@@ -20,7 +20,7 @@ namespace VCBackend.Business_Rules.Payments
             ClientSecret = ConfigurationManager.AppSettings["PP_ClientSecret"];
         }
 
-        ProdPayment IPaymentMethod.PaymentBegin(ProdPayment request)
+        PaymentRequest IPaymentMethod.PaymentBegin(PaymentRequest request)
         {
             OAuthTokenCredential tokenCredential = null;
 
@@ -63,7 +63,7 @@ namespace VCBackend.Business_Rules.Payments
                 request.PaymentMethod = "paypal";
                 request.State = createdPayment.state;
 
-                if (createdPayment.state == ProdPayment.STATE_CREATED)
+                if (createdPayment.state == PaymentRequest.STATE_CREATED)
                 {
                     request.RedirectURL = createdPayment.GetApprovalUrl();
                     request.PaymentId = createdPayment.id;
@@ -75,13 +75,13 @@ namespace VCBackend.Business_Rules.Payments
             {
                 throw ex;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 throw new PayPalPaymentFailed(String.Format("Error calling PayPal."));
             }
         }
 
-        ProdPayment IPaymentMethod.PaymentEnd(ProdPayment request)
+        PaymentRequest IPaymentMethod.PaymentEnd(PaymentRequest request)
         {
             OAuthTokenCredential tokenCredential =
                 new OAuthTokenCredential(ClientID, ClientSecret);
@@ -90,13 +90,13 @@ namespace VCBackend.Business_Rules.Payments
 
             APIContext context = new APIContext(accessToken);
 
-            if (request.State == ProdPayment.STATE_CREATED)
+            if (request.State == PaymentRequest.STATE_CREATED)
             {
                 Payment payment = Payment.Get(context, request.PaymentId);
                 
                 request.State = payment.state;
 
-                if (request.State == ProdPayment.STATE_CREATED && request.PayerId != null)
+                if (request.State == PaymentRequest.STATE_CREATED && request.PayerId != null)
                 {
                     PaymentExecution paymentExecution = new PaymentExecution();
                     paymentExecution.payer_id = request.PayerId;
@@ -105,7 +105,7 @@ namespace VCBackend.Business_Rules.Payments
 
                     request.State = executedPayment.state;
 
-                    if (request.State == ProdPayment.STATE_APPROVED)
+                    if (request.State == PaymentRequest.STATE_APPROVED)
                         return request;
                 }
             }
@@ -113,14 +113,14 @@ namespace VCBackend.Business_Rules.Payments
             throw new PayPalPaymentFailed(String.Format("Paypal payment is in state: {0}.", request.State));
         }
 
-        ProdPayment IPaymentMethod.PaymentCancel(ProdPayment request)
+        PaymentRequest IPaymentMethod.PaymentCancel(PaymentRequest request)
         {
-            if (request.State != ProdPayment.STATE_APPROVED)
-                request.State = ProdPayment.STATE_CANCELED;
+            if (request.State != PaymentRequest.STATE_APPROVED)
+                request.State = PaymentRequest.STATE_CANCELED;
             return request;
         }
 
-        private bool ValidatePaymentRequest(ProdPayment request)
+        private bool ValidatePaymentRequest(PaymentRequest request)
         {
             //Validate the request fields. Actually I'm just verifying currency and ammount.
             Regex priceRgx = new Regex(@"[0-9]{1,7}\.[0-9]{2}");
