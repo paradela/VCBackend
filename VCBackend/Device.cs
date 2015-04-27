@@ -12,13 +12,13 @@ namespace VCBackend
     using System;
     using System.Collections.Generic;
     
-    public abstract partial class Device
+    public partial class Device
     {
         public int Id { get; set; }
         public int UserId { get; set; }
         public string Name { get; set; }
         public string Token { get; set; }
-        public string DeviceId { get; internal set; }
+        public string DeviceId { get; private set; }
     
         public virtual User Owner { get; set; }
     }

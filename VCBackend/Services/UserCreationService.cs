@@ -24,7 +24,7 @@ namespace VCBackend.Services
         public UserCreationService(UnitOfWork UnitOfWork)
             : base(UnitOfWork) { }
 
-        public override bool Execute()
+        public override bool ExecuteService()
         {
             if (name == null || email == null || password == null)
                 return false;
@@ -51,9 +51,7 @@ namespace VCBackend.Services
 
             Account account = newUser.CreateAccount();
 
-            newUser.Account = account;
-
-            UnitOfWork.UserRepository.Update(newUser);
+            UnitOfWork.UserRepository.Add(newUser);
             UnitOfWork.Save();
 
             account.InitializeAccount();

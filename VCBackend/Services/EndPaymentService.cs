@@ -50,7 +50,7 @@ namespace VCBackend.Services
         public EndPaymentService(UnitOfWork UnitOfWork, Device AuthDevice)
             : base(UnitOfWork, AuthDevice) { }
 
-        public override bool Execute()
+        public override bool ExecuteService()
         {
             if (method == null || payerid == null || paymentid == null)
                 return false;

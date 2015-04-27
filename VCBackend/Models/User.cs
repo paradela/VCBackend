@@ -29,8 +29,8 @@ namespace VCBackend
             Device device;
 
             if (DeviceId == null)
-                device = new Default();
-            else device = new Mobile(DeviceId, Name);
+                device = new Device();
+            else device = new Device(DeviceId, Name);
 
             //Generates a token that should be used next to register a device.
             device.Token = AuthToken.GetAPIAccessJwt(this, device);
@@ -44,7 +44,7 @@ namespace VCBackend
         {
             var dev = (from d in Devices
                       where d.DeviceId == DeviceId &&
-                      !d.IsDefault()
+                      d.DeviceId != null
                       select d).FirstOrDefault();
 
             if (dev == null)
@@ -58,6 +58,7 @@ namespace VCBackend
         public Account CreateAccount()
         {
             Account account = new Account(0.0);
+            Account = account;
             return account;
         }
 

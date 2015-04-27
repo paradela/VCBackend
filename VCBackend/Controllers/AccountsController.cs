@@ -60,7 +60,7 @@ namespace VCBackend.Controllers
                 BeginPaymentService service = new BeginPaymentService(uw, dev);
                 service.Amount = a;
                 service.Method = method;
-                if (service.Execute())
+                if (service.ExecuteService())
                 {
                     return service.PaymentDto;
                 }
@@ -90,7 +90,7 @@ namespace VCBackend.Controllers
                 service.Method = method;
                 service.PayerId = u;
                 service.PaymentId = p;
-                if (service.Execute())
+                if (service.ExecuteService())
                 {
                     return service.BalanceDto;
                 }
@@ -118,7 +118,7 @@ namespace VCBackend.Controllers
                 CancelPaymentService service = new CancelPaymentService(uw, dev);
                 service.Method = method;
                 service.PaymentId = p;
-                service.Execute();
+                service.ExecuteService();
             }
             catch (VCException ex)
             {

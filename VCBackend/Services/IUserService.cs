@@ -75,7 +75,8 @@ namespace VCBackend.Services
             Regex emailRgx = new Regex(@"^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$");
             bool validName = (Name != null) ? nameRgx.IsMatch(Name) : true;
             bool validEmail = (Email != null) ? emailRgx.IsMatch(Email) : true;
-            return validName && validEmail && (Password != null) ? ValidatePassword(Password) : true;
+            bool validPwd = (Password != null) ? ValidatePassword(Password) : true;
+            return validName && validEmail && validPwd;
         }
 
         protected bool ExistUserWithEmail(String Email)

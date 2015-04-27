@@ -25,7 +25,7 @@ namespace VCBackend.Services
         public UserLoginService(UnitOfWork UnitOfWork)
             : base(UnitOfWork) { }
 
-        public override bool Execute()
+        public override bool ExecuteService()
         {
             String token = null;
 
@@ -59,7 +59,7 @@ namespace VCBackend.Services
                 }
                 else
                 {
-                    var q = UnitOfWork.DeviceRepository.Get(filter: d => (d.Owner.Id == user.Id && d.IsDefault())).FirstOrDefault();
+                    var q = UnitOfWork.DeviceRepository.Get(filter: d => (d.Owner.Id == user.Id && d.DeviceId == null)).FirstOrDefault();
                     if (q != null)
                     {
                         q.Token = AuthToken.GetAPIAccessJwt(user, q);

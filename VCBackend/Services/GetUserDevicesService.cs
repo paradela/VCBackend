@@ -26,7 +26,7 @@ namespace VCBackend.Services
             dtoList = new List<DeviceDto>();
         }
 
-        public override bool Execute()
+        public override bool ExecuteService()
         {
             User user = AuthDevice.Owner;
 

@@ -1,9 +1,9 @@
 
 -- --------------------------------------------------
--- Entity Designer DDL Script for SQL Server 2005, 2008, and Azure
+-- Entity Designer DDL Script for SQL Server 2005, 2008, 2012 and Azure
 -- --------------------------------------------------
--- Date Created: 04/27/2015 20:00:16
--- Generated from EDMX file: C:\Users\Card4b\Source\Repos\VCBackend\VCBackend\Model.edmx
+-- Date Created: 04/27/2015 23:26:01
+-- Generated from EDMX file: C:\Users\Ricardo\Source\Repos\VCBackend\VCBackend\Model.edmx
 -- --------------------------------------------------
 
 SET QUOTED_IDENTIFIER OFF;
@@ -233,6 +233,7 @@ ADD CONSTRAINT [FK_UserDevice]
     REFERENCES [dbo].[UserSet]
         ([Id])
     ON DELETE NO ACTION ON UPDATE NO ACTION;
+GO
 
 -- Creating non-clustered index for FOREIGN KEY 'FK_UserDevice'
 CREATE INDEX [IX_FK_UserDevice]
@@ -247,6 +248,7 @@ ADD CONSTRAINT [FK_AccountVCard]
     REFERENCES [dbo].[AccountSet]
         ([Id])
     ON DELETE NO ACTION ON UPDATE NO ACTION;
+GO
 
 -- Creating non-clustered index for FOREIGN KEY 'FK_AccountVCard'
 CREATE INDEX [IX_FK_AccountVCard]
@@ -261,6 +263,7 @@ ADD CONSTRAINT [FK_UserAccount]
     REFERENCES [dbo].[UserSet]
         ([Id])
     ON DELETE NO ACTION ON UPDATE NO ACTION;
+GO
 
 -- Creating non-clustered index for FOREIGN KEY 'FK_UserAccount'
 CREATE INDEX [IX_FK_UserAccount]
@@ -275,6 +278,7 @@ ADD CONSTRAINT [FK_AccountVCardToken]
     REFERENCES [dbo].[AccountSet]
         ([Id])
     ON DELETE NO ACTION ON UPDATE NO ACTION;
+GO
 
 -- Creating non-clustered index for FOREIGN KEY 'FK_AccountVCardToken'
 CREATE INDEX [IX_FK_AccountVCardToken]
@@ -289,6 +293,7 @@ ADD CONSTRAINT [FK_AccountLoadRequest]
     REFERENCES [dbo].[AccountSet]
         ([Id])
     ON DELETE NO ACTION ON UPDATE NO ACTION;
+GO
 
 -- Creating non-clustered index for FOREIGN KEY 'FK_AccountLoadRequest'
 CREATE INDEX [IX_FK_AccountLoadRequest]
@@ -303,6 +308,7 @@ ADD CONSTRAINT [FK_AccountPaymentRequest]
     REFERENCES [dbo].[AccountSet]
         ([Id])
     ON DELETE NO ACTION ON UPDATE NO ACTION;
+GO
 
 -- Creating non-clustered index for FOREIGN KEY 'FK_AccountPaymentRequest'
 CREATE INDEX [IX_FK_AccountPaymentRequest]

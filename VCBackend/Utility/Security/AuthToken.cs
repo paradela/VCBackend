@@ -26,7 +26,7 @@ namespace VCBackend.Utility.Security
             };
 
             
-            if (Device.IsDefault())
+            if (Device.DeviceId == null)
             {
                 payload["exp"] = now + API_KEY_VALIDITY;
             }

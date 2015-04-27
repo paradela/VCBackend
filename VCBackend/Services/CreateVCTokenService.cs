@@ -42,7 +42,7 @@ namespace VCBackend.Services
         public CreateVCTokenService(UnitOfWork UnitOfWork, Device AuthDevice)
             : base(UnitOfWork, AuthDevice) { }
 
-        public override bool Execute()
+        public override bool ExecuteService()
         {
             if (productid == null || productid == String.Empty)
                 return false;

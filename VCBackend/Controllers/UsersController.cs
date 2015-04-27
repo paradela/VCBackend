@@ -29,7 +29,7 @@ namespace VCBackend.Controllers
                 service.Name = n;
                 service.Email = e;
                 service.Password = p;
-                if (service.Execute())
+                if (service.ExecuteService())
                     return service.Token;
                 else return null;
             }
@@ -54,7 +54,7 @@ namespace VCBackend.Controllers
                 service.Email = u;
                 service.Password = p;
                 service.DeviceId = id;
-                if (service.Execute())
+                if (service.ExecuteService())
                     return service.TokenDto;
                 else return null;
             }
@@ -82,7 +82,7 @@ namespace VCBackend.Controllers
                 service.Name = n;
                 service.Email = e;
                 service.Password = p;
-                if (service.Execute())
+                if (service.ExecuteService())
                     return service.UserDto;
                 return null;
             }
@@ -105,7 +105,7 @@ namespace VCBackend.Controllers
             int authDev = VCAuthenticate.GetAuthenticatedDevice(ActionContext);
             Device dev = uw.DeviceRepository.GetByID(authDev);
             GetUserService service = new GetUserService(uw, dev);
-            if (service.Execute())
+            if (service.ExecuteService())
                 return service.UserDto;
             else return null;
         }
@@ -123,7 +123,7 @@ namespace VCBackend.Controllers
                 AddDeviceService service = new AddDeviceService(uw, dev);
                 service.DeviceName = n;
                 service.DeviceId = id;
-                if (service.Execute())
+                if (service.ExecuteService())
                     return service.TokenDto;
                 else return null;
             }
@@ -149,7 +149,7 @@ namespace VCBackend.Controllers
                 Device dev = uw.DeviceRepository.GetByID(authDev);
                 RemoveDeviceService service = new RemoveDeviceService(uw, dev);
                 service.DeviceId = id;
-                service.Execute();
+                service.ExecuteService();
             }
             catch (VCException ex)
             {
@@ -172,7 +172,7 @@ namespace VCBackend.Controllers
                 int authDev = VCAuthenticate.GetAuthenticatedDevice(ActionContext);
                 Device dev = uw.DeviceRepository.GetByID(authDev);
                 GetUserDevicesService service = new GetUserDevicesService(uw, dev);
-                if (service.Execute())
+                if (service.ExecuteService())
                     return service.DeviceDtoList;
                 return null;
             }

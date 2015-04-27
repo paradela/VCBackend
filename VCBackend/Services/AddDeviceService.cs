@@ -33,7 +33,7 @@ namespace VCBackend.Services
         public AddDeviceService(UnitOfWork UnitOfWork, Device AuthDevice = null)
             : base(UnitOfWork, AuthDevice) { }
 
-        public override bool Execute()
+        public override bool ExecuteService()
         {
             User user = AuthDevice.Owner;
 

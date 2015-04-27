@@ -31,7 +31,7 @@ namespace VCBackend.Services
         public CancelPaymentService(UnitOfWork UnitOfWork, Device AuthDevice)
             : base(UnitOfWork, AuthDevice) { }
 
-        public override bool Execute()
+        public override bool ExecuteService()
         {
             if (method == null || paymentid == null)
                 return false;

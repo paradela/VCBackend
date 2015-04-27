@@ -21,7 +21,7 @@ namespace VCBackend.Models.Dto
             Device dev = (Device)entity;
 
             Name = dev.Name;
-            Type = (dev.IsDefault()) ?
+            Type = (dev.DeviceId == null) ?
                 DeviceTypeDto.DTO_DEFAULT_DEVICE : DeviceTypeDto.DTO_MOBILE_DEVICE;
         }
     }

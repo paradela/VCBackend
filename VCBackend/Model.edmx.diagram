@@ -9,11 +9,7 @@
         <EntityTypeShape EntityType="Model.Account" Width="1.5" PointX="1.125" PointY="3.25" />
         <EntityTypeShape EntityType="Model.Device" Width="1.5" PointX="9.625" PointY="2.625" />
         <EntityTypeShape EntityType="Model.VCard" Width="1.5" PointX="0.5" PointY="6.125" />
-        <EntityTypeShape EntityType="Model.Default" Width="1.5" PointX="8.75" PointY="5.25" />
-        <EntityTypeShape EntityType="Model.Mobile" Width="1.5" PointX="10.75" PointY="5.25" />
         <AssociationConnector Association="Model.UserDevice" />
-        <InheritanceConnector EntityType="Model.Default" />
-        <InheritanceConnector EntityType="Model.Mobile" />
         <AssociationConnector Association="Model.AccountVCard" />
         <AssociationConnector Association="Model.UserAccount" />
         <EntityTypeShape EntityType="Model.VCardToken" Width="1.5" PointX="2.5" PointY="6.25" />

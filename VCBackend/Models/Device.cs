@@ -9,6 +9,16 @@ namespace VCBackend
 {
     public partial class Device
     {
-        abstract public bool IsDefault();
+        public Device()
+        {
+            this.Name = "Default";
+            this.DeviceId = null;
+        }
+
+        public Device(String Name, String DeviceId)
+        {
+            this.Name = Name;
+            this.DeviceId = DeviceId;
+        }
     }
 }

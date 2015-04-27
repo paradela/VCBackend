@@ -22,7 +22,7 @@
         <h2>Login</h2>
         <input type="email" id="username"/>
         <input type="password" id="pwd"/>
-        <input type="button" value="Login" onclick="authenticate()" />
+        <input type="button" value="Login" onclick="login()" />
     </div>
     <div>
         <h2>Add Funds</h2>
@@ -68,7 +68,8 @@
               null,
               function (value) {
                   $('#token').text('Token: ' + value['AuthToken']);
-                  localStorage.setItem('token', value['AuthToken']);;
+                  localStorage.setItem('token', value['AuthToken']);
+                  getUser();
               },
               "json"
               );
@@ -84,11 +85,6 @@
               },
               "json"
               );
-      }
-
-      function authenticate() {
-          login();
-          getUser();
       }
 
       function pay() {

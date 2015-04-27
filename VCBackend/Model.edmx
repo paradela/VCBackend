@@ -4,7 +4,7 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-    <Schema Namespace="Model.Store" Alias="Self" Provider="System.Data.SqlClient" ProviderManifestToken="2008" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+    <Schema Namespace="Model.Store" Alias="Self" Provider="System.Data.SqlClient" ProviderManifestToken="2012" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
   <EntityContainer Name="ModelStoreContainer">
     <EntitySet Name="UserSet" EntityType="Model.Store.UserSet" store:Type="Tables" Schema="dbo" />
     <EntitySet Name="AccountSet" EntityType="Model.Store.AccountSet" store:Type="Tables" Schema="dbo" />
@@ -13,8 +13,6 @@
     <EntitySet Name="VCardTokenSet" EntityType="Model.Store.VCardTokenSet" store:Type="Tables" Schema="dbo" />
     <EntitySet Name="PaymentRequestSet" EntityType="Model.Store.PaymentRequestSet" store:Type="Tables" Schema="dbo" />
     <EntitySet Name="LoadRequestSet" EntityType="Model.Store.LoadRequestSet" store:Type="Tables" Schema="dbo" />
-    <EntitySet Name="DeviceSet_Default" EntityType="Model.Store.DeviceSet_Default" store:Type="Tables" Schema="dbo" />
-    <EntitySet Name="DeviceSet_Mobile" EntityType="Model.Store.DeviceSet_Mobile" store:Type="Tables" Schema="dbo" />
     <AssociationSet Name="UserDevice" Association="Model.Store.UserDevice">
       <End Role="User" EntitySet="UserSet" />
       <End Role="Device" EntitySet="DeviceSet" />
@@ -38,14 +36,6 @@
     <AssociationSet Name="AccountPaymentRequest" Association="Model.Store.AccountPaymentRequest">
       <End Role="Account" EntitySet="AccountSet" />
       <End Role="PaymentRequest" EntitySet="PaymentRequestSet" />
-    </AssociationSet>
-    <AssociationSet Name="FK_Default_inherits_Device" Association="Model.Store.FK_Default_inherits_Device">
-      <End Role="Device" EntitySet="DeviceSet" />
-      <End Role="Default" EntitySet="DeviceSet_Default" />
-    </AssociationSet>
-    <AssociationSet Name="FK_Mobile_inherits_Device" Association="Model.Store.FK_Mobile_inherits_Device">
-      <End Role="Device" EntitySet="DeviceSet" />
-      <End Role="Mobile" EntitySet="DeviceSet_Mobile" />
     </AssociationSet>
   </EntityContainer>
   <EntityType Name="UserSet">
@@ -122,18 +112,6 @@
     <Property Name="DateInitial" Type="datetime" Nullable="true" />
     <Property Name="CardAuth" Type="nvarchar(max)" Nullable="false" />
   </EntityType>
-  <EntityType Name="DeviceSet_Default">
-    <Key>
-      <PropertyRef Name="Id" />
-    </Key>
-    <Property Name="Id" Type="int" Nullable="false" />
-  </EntityType>
-  <EntityType Name="DeviceSet_Mobile">
-    <Key>
-      <PropertyRef Name="Id" />
-    </Key>
-    <Property Name="Id" Type="int" Nullable="false" />
-  </EntityType>
   <Association Name="UserDevice">
     <End Role="User" Type="Model.Store.UserSet" Multiplicity="1" />
     <End Role="Device" Type="Model.Store.DeviceSet" Multiplicity="*" />
@@ -206,34 +184,6 @@
       </Dependent>
     </ReferentialConstraint>
   </Association>
-  <Association Name="FK_Default_inherits_Device">
-    <End Role="Device" Type="Model.Store.DeviceSet" Multiplicity="1">
-      <OnDelete Action="Cascade" />
-    </End>
-    <End Role="Default" Type="Model.Store.DeviceSet_Default" Multiplicity="0..1" />
-    <ReferentialConstraint>
-      <Principal Role="Device">
-        <PropertyRef Name="Id" />
-      </Principal>
-      <Dependent Role="Default">
-        <PropertyRef Name="Id" />
-      </Dependent>
-    </ReferentialConstraint>
-  </Association>
-  <Association Name="FK_Mobile_inherits_Device">
-    <End Role="Device" Type="Model.Store.DeviceSet" Multiplicity="1">
-      <OnDelete Action="Cascade" />
-    </End>
-    <End Role="Mobile" Type="Model.Store.DeviceSet_Mobile" Multiplicity="0..1" />
-    <ReferentialConstraint>
-      <Principal Role="Device">
-        <PropertyRef Name="Id" />
-      </Principal>
-      <Dependent Role="Mobile">
-        <PropertyRef Name="Id" />
-      </Dependent>
-    </ReferentialConstraint>
-  </Association>
 </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
@@ -293,7 +243,7 @@
           <NavigationProperty Name="LoadRequest" Relationship="Model.AccountLoadRequest" FromRole="Account" ToRole="LoadRequest" />
           <NavigationProperty Name="PaymentRequest" Relationship="Model.AccountPaymentRequest" FromRole="Account" ToRole="PaymentRequest" />
         </EntityType>
-        <EntityType Name="Device" Abstract="true">
+        <EntityType Name="Device" Abstract="false">
           <Key>
             <PropertyRef Name="Id" />
           </Key>
@@ -302,7 +252,7 @@
           <Property Name="UserId" Type="Int32" Nullable="false" />
           <Property Name="Name" Type="String" Nullable="false" MaxLength="Max" Unicode="true" FixedLength="false" />
           <Property Name="Token" Type="String" Nullable="false" MaxLength="Max" Unicode="true" FixedLength="false" />
-          <Property Name="DeviceId" Type="String" Nullable="true" cg:SetterAccess="Internal" MaxLength="Max" Unicode="true" FixedLength="false" />
+          <Property Name="DeviceId" Type="String" Nullable="true" cg:SetterAccess="Private" MaxLength="Max" Unicode="true" FixedLength="false" />
         </EntityType>
         <EntityType Name="VCard">
           <Key>
@@ -311,10 +261,6 @@
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="Data" Type="String" Nullable="false" MaxLength="Max" Unicode="true" FixedLength="false" />
           <Property Name="AccountId" Type="Int32" Nullable="false" />
-        </EntityType>
-        <EntityType Name="Default" BaseType="Model.Device">
-        </EntityType>
-        <EntityType Name="Mobile" BaseType="Model.Device">
         </EntityType>
         <Association Name="UserDevice">
           <End Type="Model.User" Role="User" Multiplicity="1" />
@@ -435,16 +381,6 @@
           <ScalarProperty Name="DeviceId" ColumnName="DeviceId" />
         </MappingFragment>
       </EntityTypeMapping>
-      <EntityTypeMapping TypeName="IsTypeOf(Model.Default)">
-        <MappingFragment StoreEntitySet="DeviceSet_Default">
-          <ScalarProperty Name="Id" ColumnName="Id" />
-        </MappingFragment>
-      </EntityTypeMapping>
-      <EntityTypeMapping TypeName="IsTypeOf(Model.Mobile)">
-        <MappingFragment StoreEntitySet="DeviceSet_Mobile">
-          <ScalarProperty Name="Id" ColumnName="Id" />
-        </MappingFragment>
-      </EntityTypeMapping>
     </EntitySetMapping>
     <EntitySetMapping Name="VCardSet">
       <EntityTypeMapping TypeName="IsTypeOf(Model.VCard)">
@@ -519,7 +455,7 @@
         <ScalarProperty Name="Id" ColumnName="Id" />
       </EndProperty>
     </AssociationSetMapping>
-  </EntityContainerMapping>
+          </EntityContainerMapping>
 </Mapping></edmx:Mappings>
   </edmx:Runtime>
   <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
