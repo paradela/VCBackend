@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using VCBackend.Models.Dto;
 using VCBackend.Repositories;
-using VCBackend.Models.Dto;
 
 namespace VCBackend.Services
 {
@@ -22,19 +17,11 @@ namespace VCBackend.Services
 
         public GetUserService(UnitOfWork UnitOfWork, Device AuthDevice) : base(UnitOfWork, AuthDevice) { }
 
-        public bool Execute()
+        public override bool Execute()
         {
-            if (AuthDevice == null)
-            {
-                dto = null;
-                return false;
-            }
-            else
-            {
-                dto = new UserDto();
-                dto.Serialize(AuthDevice.Owner);
-                return true;
-            }
+            dto = new UserDto();
+            dto.Serialize(AuthDevice.Owner);
+            return true;
         }
     }
 }

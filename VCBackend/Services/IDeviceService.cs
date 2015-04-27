@@ -10,7 +10,7 @@ namespace VCBackend.Services
 {
     public abstract class IDeviceService : IService
     {
-        internal String deviceid;
+        protected String deviceid;
 
         public String DeviceId
         {
@@ -22,7 +22,7 @@ namespace VCBackend.Services
 
         public IDeviceService(UnitOfWork UnitOfWork, Device AuthDevice = null) : base(UnitOfWork, AuthDevice) { }
 
-        internal bool ValidateDeviceData(String Name = null, String DevId = null)
+        protected bool ValidateDeviceData(String Name = null, String DevId = null)
         {
             Regex nameRgx = new Regex(@"[A-zÀ-ú-]{2}[A-zÀ-ú-\s]*");
             Regex idRgx = new Regex(@"[A-z1-9]{4}[A-z1-9]*");

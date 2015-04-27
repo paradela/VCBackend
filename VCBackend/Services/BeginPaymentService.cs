@@ -43,7 +43,7 @@ namespace VCBackend.Services
         public BeginPaymentService(UnitOfWork UnitOfWork, Device AuthDevice)
             : base(UnitOfWork, AuthDevice) { }
 
-        public bool Execute()
+        public override bool Execute()
         {
             if (amount == null || method == null)
                 return false;

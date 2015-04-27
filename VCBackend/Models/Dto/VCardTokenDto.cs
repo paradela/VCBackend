@@ -5,17 +5,13 @@ using System.Web;
 
 namespace VCBackend.Models.Dto
 {
-    public class VCardTokenDto : IDto<VCardToken>
+    public class VCardTokenDto
     {
         String EncryptedToken { get; set; }
-        String Data { get; set; }
 
-        public VCardTokenDto() { }
-
-
-        public void Serialize(VCardToken entity)
+        public VCardTokenDto(String CardData)
         {
-            EncryptedToken = entity.Data;
+            EncryptedToken = CardData;
         }
     }
 }

@@ -9,9 +9,9 @@ namespace VCBackend.Services
 {
     public abstract class IUserService : IDeviceService
     {
-        internal String name;
-        internal String email;
-        internal String password;
+        protected String name;
+        protected String email;
+        protected String password;
 
         public IUserService(UnitOfWork UnitOfWork, Device AuthDevice = null)
             : base(UnitOfWork, AuthDevice)
@@ -40,7 +40,7 @@ namespace VCBackend.Services
         }
 
         //http://stackoverflow.com/questions/5859632/regular-expression-for-password-validation
-        internal bool ValidatePassword(string password)
+        protected bool ValidatePassword(string password)
         {
             const int MIN_LENGTH = 6;
             const int MAX_LENGTH = 40;
@@ -68,8 +68,8 @@ namespace VCBackend.Services
         
          //This method validates if the attributes are wel formed.
          //It will not look for those that are @null!!
-         
-        internal bool ValidateUserData(String Name = null, String Email = null, String Password = null)
+
+        protected bool ValidateUserData(String Name = null, String Email = null, String Password = null)
         {
             Regex nameRgx = new Regex(@"[A-zÀ-ú-]{2}[A-zÀ-ú-\s]*");
             Regex emailRgx = new Regex(@"^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$");
@@ -78,7 +78,7 @@ namespace VCBackend.Services
             return validName && validEmail && (Password != null) ? ValidatePassword(Password) : true;
         }
 
-        internal bool ExistUserWithEmail(String Email)
+        protected bool ExistUserWithEmail(String Email)
         {
             IEnumerable<User> users = UnitOfWork.UserRepository.Get(filter: u => (u.Email == Email));
 

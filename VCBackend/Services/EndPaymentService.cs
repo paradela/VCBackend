@@ -13,7 +13,7 @@ namespace VCBackend.Services
     public class EndPaymentService : IService
     {
         private String method, payerid, paymentid;
-        private PaymentDto dto;
+        private BalanceDto dto;
 
         public String Method
         {
@@ -31,7 +31,7 @@ namespace VCBackend.Services
             }
         }
 
-        public String PayementId
+        public String PaymentId
         {
             set
             {
@@ -39,7 +39,7 @@ namespace VCBackend.Services
             }
         }
 
-        public PaymentDto PaymentDto
+        public BalanceDto BalanceDto
         {
             get
             {
@@ -50,7 +50,7 @@ namespace VCBackend.Services
         public EndPaymentService(UnitOfWork UnitOfWork, Device AuthDevice)
             : base(UnitOfWork, AuthDevice) { }
 
-        public bool Execute()
+        public override bool Execute()
         {
             if (method == null || payerid == null || paymentid == null)
                 return false;
@@ -87,8 +87,8 @@ namespace VCBackend.Services
                 }
 
             }
-            dto = new PaymentDto();
-            dto.Serialize(newRequest);
+            dto = new BalanceDto();
+            dto.Serialize(Account);
             return true;
         }
     }

@@ -5,13 +5,13 @@ using System.Web;
 using System.Security.Cryptography;
 using System.IO;
 
-namespace VCBackend.Business_Rules.VCards
+namespace VCBackend.Utility.Security
 {
-    public class VCardSecurity
+    public class VCardEncryptor
     {
         private readonly byte[] key;
 
-        public VCardSecurity(User User)
+        public VCardEncryptor(User User)
         {
             key = System.Convert.FromBase64String(User.Password);
         }

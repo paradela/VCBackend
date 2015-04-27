@@ -24,7 +24,7 @@ namespace VCBackend.Services
         public UserCreationService(UnitOfWork UnitOfWork)
             : base(UnitOfWork) { }
 
-        public bool Execute()
+        public override bool Execute()
         {
             if (name == null || email == null || password == null)
                 return false;

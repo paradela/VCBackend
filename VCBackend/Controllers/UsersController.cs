@@ -8,10 +8,10 @@ using System.Web.Http;
 using VCBackend.Filters;
 using VCBackend.Models;
 using VCBackend.Models.Dto;
-using VCBackend.Business_Rules;
-using VCBackend.Business_Rules.Users;
-using VCBackend.Business_Rules.Exceptions;
-using VCBackend.Business_Rules.Errors;
+using VCBackend.Exceptions;
+using VCBackend.Errors;
+using VCBackend.Repositories;
+using VCBackend.Services;
 
 namespace VCBackend.Controllers
 {
@@ -24,8 +24,14 @@ namespace VCBackend.Controllers
         {
             try
             {
-                TokenDto token = BRulesApi.CreateUser(n, e, p);
-                return token;
+                UnitOfWork uw = new UnitOfWork();
+                UserCreationService service = new UserCreationService(uw);
+                service.Name = n;
+                service.Email = e;
+                service.Password = p;
+                if (service.Execute())
+                    return service.Token;
+                else return null;
             }
             catch (VCException ex)
             {
@@ -43,8 +49,14 @@ namespace VCBackend.Controllers
         {
             try
             {
-                TokenDto token = BRulesApi.Login(u, p, id);
-                return token;
+                UnitOfWork uw = new UnitOfWork();
+                UserLoginService service = new UserLoginService(uw);
+                service.Email = u;
+                service.Password = p;
+                service.DeviceId = id;
+                if (service.Execute())
+                    return service.TokenDto;
+                else return null;
             }
             catch (VCException ex)
             {
@@ -61,12 +73,18 @@ namespace VCBackend.Controllers
         [VCAuthenticate]
         public UserDto PostUpdateUser([FromUri] String n = null, [FromUri] String e = null, [FromUri] String p = null)
         {
-            int authDev = VCAuthenticate.GetAuthenticatedDevice(ActionContext);
-
             try
             {
-                UserDto dto = BRulesApi.UpdateUser(authDev, n, e, p);
-                return dto;
+                UnitOfWork uw = new UnitOfWork();
+                int authDev = VCAuthenticate.GetAuthenticatedDevice(ActionContext);
+                Device dev = uw.DeviceRepository.GetByID(authDev);
+                UserUpdateService service = new UserUpdateService(uw, dev);
+                service.Name = n;
+                service.Email = e;
+                service.Password = p;
+                if (service.Execute())
+                    return service.UserDto;
+                return null;
             }
             catch (VCException ex)
             {
@@ -83,11 +101,13 @@ namespace VCBackend.Controllers
         [VCAuthenticate]
         public UserDto GetUser()
         {
+            UnitOfWork uw = new UnitOfWork();
             int authDev = VCAuthenticate.GetAuthenticatedDevice(ActionContext);
-
-            UserDto dto = BRulesApi.GetUser(authDev);
-
-            return dto;
+            Device dev = uw.DeviceRepository.GetByID(authDev);
+            GetUserService service = new GetUserService(uw, dev);
+            if (service.Execute())
+                return service.UserDto;
+            else return null;
         }
 
         //POST api/user/device?t=123token
@@ -95,12 +115,17 @@ namespace VCBackend.Controllers
         [VCAuthenticate]
         public TokenDto PostAddDevice([FromUri] String n, [FromUri] String id)
         {
-            int authDev = VCAuthenticate.GetAuthenticatedDevice(ActionContext);
-
             try
             {
-                TokenDto token = BRulesApi.AddDevice(authDev, n, id);
-                return token;
+                UnitOfWork uw = new UnitOfWork();
+                int authDev = VCAuthenticate.GetAuthenticatedDevice(ActionContext);
+                Device dev = uw.DeviceRepository.GetByID(authDev);
+                AddDeviceService service = new AddDeviceService(uw, dev);
+                service.DeviceName = n;
+                service.DeviceId = id;
+                if (service.Execute())
+                    return service.TokenDto;
+                else return null;
             }
             catch (VCException ex)
             {
@@ -115,14 +140,16 @@ namespace VCBackend.Controllers
         //DELETE api/user/device/id?t=123token
         [Route("device/{id}")]
         [VCAuthenticate]
-        public IHttpActionResult DeleteDevice([FromUri] String id)
+        public void DeleteDevice([FromUri] String id)
         {
-            int authDev = VCAuthenticate.GetAuthenticatedDevice(ActionContext);
-
             try
             {
-                BRulesApi.RemoveDevice(authDev, id);
-                return Ok();
+                UnitOfWork uw = new UnitOfWork();
+                int authDev = VCAuthenticate.GetAuthenticatedDevice(ActionContext);
+                Device dev = uw.DeviceRepository.GetByID(authDev);
+                RemoveDeviceService service = new RemoveDeviceService(uw, dev);
+                service.DeviceId = id;
+                service.Execute();
             }
             catch (VCException ex)
             {
@@ -139,11 +166,15 @@ namespace VCBackend.Controllers
         [VCAuthenticate]
         public ICollection<DeviceDto> GetAllDevices() 
         {
-            int authDev = VCAuthenticate.GetAuthenticatedDevice(ActionContext);
             try
             {
-                ICollection<DeviceDto> devices = BRulesApi.GetAllDevices(authDev);
-                return devices;
+                UnitOfWork uw = new UnitOfWork();
+                int authDev = VCAuthenticate.GetAuthenticatedDevice(ActionContext);
+                Device dev = uw.DeviceRepository.GetByID(authDev);
+                GetUserDevicesService service = new GetUserDevicesService(uw, dev);
+                if (service.Execute())
+                    return service.DeviceDtoList;
+                return null;
             }
             catch (VCException ex)
             {

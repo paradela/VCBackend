@@ -33,6 +33,6 @@ namespace VCBackend.Services
             this.authDevice = AuthDevice;
         }
 
-        bool Execute();
+        public abstract bool Execute();
     }
 }

@@ -13,7 +13,7 @@ namespace VCBackend.Services
         public RemoveDeviceService(UnitOfWork UnitOfWork, Device AuthDevice)
             : base(UnitOfWork, AuthDevice) { }
 
-        public bool Execute()
+        public override bool Execute()
         {
             if (deviceid == null)
                 return false;

@@ -12,8 +12,8 @@ using System.Threading.Tasks;
 using VCBackend.Models;
 using VCBackend.Repositories;
 using System.Web.Http.Controllers;
-using VCBackend.Business_Rules.Exceptions;
-using VCBackend.Business_Rules.Errors;
+using VCBackend.Exceptions;
+using VCBackend.Errors;
 
 namespace VCBackend.Filters
 {
