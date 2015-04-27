@@ -7,14 +7,14 @@ using System.Text.RegularExpressions;
 
 namespace VCBackend.Services
 {
-    public abstract class IUserService : IService
+    public abstract class IUserService : IDeviceService
     {
         internal String name;
         internal String email;
         internal String password;
 
-        public IUserService(UnitOfWork UnitOfWork)
-            : base(UnitOfWork)
+        public IUserService(UnitOfWork UnitOfWork, Device AuthDevice = null)
+            : base(UnitOfWork, AuthDevice)
         { }
 
         public String Name
@@ -69,22 +69,13 @@ namespace VCBackend.Services
          //This method validates if the attributes are wel formed.
          //It will not look for those that are @null!!
          
-        internal bool ValidateUserData(String Name, String Email, String Password)
+        internal bool ValidateUserData(String Name = null, String Email = null, String Password = null)
         {
             Regex nameRgx = new Regex(@"[A-zÀ-ú-]{2}[A-zÀ-ú-\s]*");
             Regex emailRgx = new Regex(@"^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$");
             bool validName = (Name != null) ? nameRgx.IsMatch(Name) : true;
             bool validEmail = (Email != null) ? emailRgx.IsMatch(Email) : true;
             return validName && validEmail && (Password != null) ? ValidatePassword(Password) : true;
-        }
-
-        internal bool ValidateDeviceData(String Name, String DevId)
-        {
-            Regex nameRgx = new Regex(@"[A-zÀ-ú-]{2}[A-zÀ-ú-\s]*");
-            Regex idRgx = new Regex(@"[A-z1-9]{4}[A-z1-9]*");
-            bool validName = (Name != null) ? nameRgx.IsMatch(Name) : true;
-            bool validId = (DevId != null) ? idRgx.IsMatch(DevId) : true;
-            return validName && validId;
         }
 
         internal bool ExistUserWithEmail(String Email)

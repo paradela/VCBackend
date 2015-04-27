@@ -24,8 +24,11 @@ namespace VCBackend.Services
         public UserCreationService(UnitOfWork UnitOfWork)
             : base(UnitOfWork) { }
 
-        public void doExecute()
+        public bool Execute()
         {
+            if (name == null || email == null || password == null)
+                return false;
+
             if (!ValidateUserData(name, email, password)) 
                 throw new InvalidDataFormat("One or more of the details passed have an incorrect format.");
 
@@ -56,6 +59,8 @@ namespace VCBackend.Services
             account.InitializeAccount();
 
             this.token = new TokenDto(token);
+
+            return true;
         }
     }
 }

@@ -8,7 +8,8 @@ namespace VCBackend.Services
 {
     public abstract class IService
     {
-        internal readonly UnitOfWork unitofwork;
+        private readonly UnitOfWork unitofwork;
+        private readonly Device authDevice;
 
         public UnitOfWork UnitOfWork
         {
@@ -18,11 +19,20 @@ namespace VCBackend.Services
             }
         }
 
-        public IService(UnitOfWork UnitOfWork)
+        public Device AuthDevice
         {
-            this.unitofwork = UnitOfWork;
+            get
+            {
+                return authDevice;
+            }
         }
 
-        void doExecute();
+        public IService(UnitOfWork UnitOfWork, Device AuthDevice = null)
+        {
+            this.unitofwork = UnitOfWork;
+            this.authDevice = AuthDevice;
+        }
+
+        bool Execute();
     }
 }

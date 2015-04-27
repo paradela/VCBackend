@@ -11,16 +11,7 @@ namespace VCBackend.Services
 {
     public class UserUpdateService : IUserService
     {
-        private User user;
         private UserDto dto;
-
-        public User User
-        {
-            set
-            {
-                user = value;
-            }
-        }
 
         public UserDto UserDto
         {
@@ -30,13 +21,15 @@ namespace VCBackend.Services
             }
         }
 
-        public UserUpdateService(UnitOfWork UnitOfWork)
-            : base(UnitOfWork) { }
+        public UserUpdateService(UnitOfWork UnitOfWork, Device AuthDevice)
+            : base(UnitOfWork, AuthDevice) { }
 
-        public void doExecute()
+        public bool Execute()
         {
-            if (user == null)
-                throw new VCException("Invalid User");
+            if (name == null || email == null || password == null)
+                return false;
+
+            User user = AuthDevice.Owner;
             /*
              * Validate if the new user details are well formed
              */
@@ -58,6 +51,8 @@ namespace VCBackend.Services
 
             this.dto = new UserDto();
             this.dto.Serialize(user);
+
+            return true;
         }
     }
 }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
-namespace VCBackend.Business_Rules.Payments
+namespace VCBackend.ExternalServices.Payments
 {
     public interface IPaymentMethod
     {

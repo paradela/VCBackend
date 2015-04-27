@@ -126,4 +126,5 @@ namespace VCBackend.Exceptions
             Error = "InvalidAuthToken";
         }
     }
+
 }

@@ -5,10 +5,10 @@ using System.Web;
 using System.Configuration;
 using System.Web.Caching;
 using PayPal.Api;
-using VCBackend.Business_Rules.Exceptions;
+using VCBackend.Exceptions;
 using System.Text.RegularExpressions;
 
-namespace VCBackend.Business_Rules.Payments
+namespace VCBackend.ExternalServices.Payments
 {
     public class PayPalMethod : IPaymentMethod
     {

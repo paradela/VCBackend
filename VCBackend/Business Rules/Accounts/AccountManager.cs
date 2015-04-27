@@ -35,25 +35,7 @@ namespace VCBackend.Business_Rules.Accounts
 
         
 
-        public PaymentRequest PaymentBegin(Account Account, String Method, String Currency, String Amount)
-        {
-            PaymentGateway gateway = new PaymentGateway();
-            IPaymentMethod payMethod = gateway.GetPaymentMethodByName(Method);
-
-            PaymentRequest request = new PaymentRequest();
-            request.PaymentMethod = Method;
-            request.Currency = Currency;
-            request.Price = Amount;
-
-            PaymentRequest newRequest = payMethod.PaymentBegin(request);
-
-            Account.PaymentRequest.Add(newRequest);
-
-            UnitOfWork.AccountRepository.Update(Account);
-            UnitOfWork.Save();
-
-            return newRequest;
-        }
+        
 
         public PaymentRequest PaymentEnd(Account Account, String Method, String PayerId, String PaymentId)
         {

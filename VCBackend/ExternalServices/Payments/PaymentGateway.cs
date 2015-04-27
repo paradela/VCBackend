@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
-using VCBackend.Business_Rules.Exceptions;
+using VCBackend.Exceptions;
 
-namespace VCBackend.Business_Rules.Payments
+namespace VCBackend.ExternalServices.Payments
 {
     public class PaymentGateway
     {
