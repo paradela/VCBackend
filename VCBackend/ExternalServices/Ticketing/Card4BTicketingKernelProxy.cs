@@ -27,16 +27,31 @@ namespace VCBackend.ExternalServices.Ticketing
             LoadProductEx(ProdId, Token: Token);
         }
 
-        private void LoadProductEx(String ProdId, VCard Card = null, VCardToken Token = null)
+        private async void LoadProductEx(String ProdId, VCard Card = null, VCardToken Token = null)
         {
-            var response = Client.GetAsync(ServerUri).Result;
-            string obj = response.Content.ReadAsStringAsync().Result;
-            var json = JObject.Parse(obj);
-            string tkUri = json["URL"].ToString();
+            //Call WS to get a server to load the card
+            var callTask = Client.GetAsync(ServerUri);
 
-            response = Client.PostAsync(tkUri, new StringContent("")).Result;
-            obj = response.Content.ReadAsStringAsync().Result;
-            json = JObject.Parse(obj);
+            string card;
+
+            if (Card != null)
+                card = Card.Data;
+            else if (Token != null)
+                card = Token.Data;
+            else return;
+
+            await callTask; //wait for call to be finnished
+
+            string strRsp = callTask.Result.Content.ReadAsStringAsync().Result;
+            var jsonRsp = JObject.Parse(strRsp);
+            string tkUri = jsonRsp["URL"].ToString();
+
+            var jsonReq = new JObject();
+            jsonReq["tkmsg"] = "<tkmsg><product>" + ProdId + "</product></tkmsg>";
+            jsonReq["card"] = card;
+            var response = Client.PostAsJsonAsync(tkUri, jsonReq).Result;
+            strRsp = response.Content.ReadAsStringAsync().Result;
+            jsonRsp = JObject.Parse(strRsp);
         }
     }
 }
