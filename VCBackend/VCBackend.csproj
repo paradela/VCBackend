@@ -16,7 +16,7 @@
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
-    <UseIISExpress>false</UseIISExpress>
+    <UseIISExpress>true</UseIISExpress>
     <IISExpressSSLPort>44300</IISExpressSSLPort>
     <IISExpressAnonymousAuthentication />
     <IISExpressWindowsAuthentication />
@@ -206,6 +206,7 @@
     <Compile Include="ExternalServices\Payments\IPaymentMethod.cs" />
     <Compile Include="ExternalServices\Payments\PaymentGateway.cs" />
     <Compile Include="ExternalServices\Payments\PayPalMethod.cs" />
+    <Compile Include="ExternalServices\Ticketing\Card4BTicketingKernelProxy.cs" />
     <Compile Include="ExternalServices\TSM\TSMFakeProxy.cs" />
     <Compile Include="LoadRequest.cs">
       <DependentUpon>Model.tt</DependentUpon>
@@ -341,7 +342,7 @@
     <VisualStudio>
       <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
         <WebProjectProperties>
-          <UseIIS>True</UseIIS>
+          <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>64390</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
