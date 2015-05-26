@@ -32,12 +32,18 @@ namespace VCBackend.ExternalServices.Ticketing
             //Call WS to get a server to load the card
             var callTask = Client.GetAsync(ServerUri);
 
-            string card;
+            var card = new JObject();
 
-            if (Card != null)
-                card = Card.Data;
+            if (Card == null)
+            {
+                card["type"] = "CTS512B";
+                card["data"] = "carddadatasdasda";//Card.Data;
+            }
             else if (Token != null)
-                card = Token.Data;
+            {
+                card["type"] = "CTS512B";
+                card["data"] = Token.Data;
+            }
             else return;
 
             await callTask; //wait for call to be finnished
