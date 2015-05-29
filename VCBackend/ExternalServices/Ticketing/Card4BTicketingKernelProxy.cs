@@ -37,6 +37,7 @@ namespace VCBackend.ExternalServices.Ticketing
 
         public bool LoadToken(VCardToken Token, uint LoadId)
         {
+             //HH:mm
             string tkmsg =
                 "<tkmsg><load>" +
                 "<product card_value=\"2065209\"><attribs>" +
@@ -44,7 +45,7 @@ namespace VCBackend.ExternalServices.Ticketing
                 "<attrib type=\"sale_device\">42</attrib>" +
                 "<attrib type=\"sale_date\">" + DateTime.Today.ToString("yyyy-MM-dd") + "</attrib>" +
                 "<attrib type=\"sale_number_daily\">" + LoadId + "</attrib>" +
-                "<attrib type=\"date_initial\">" + DateTime.Today.ToString("yyyy-MM-dd HH:mm") + "</attrib>" +
+                "<attrib type=\"date_initial\">" + DateTime.Now.ToString("yyyy-MM-dd") + "</attrib>" +
                 "</attribs></product></load></tkmsg>";
             return LoadProductEx(tkmsg, Token: Token).Result;
         }
