@@ -220,6 +220,14 @@
             <End Role="Account" EntitySet="AccountSet" />
             <End Role="PaymentRequest" EntitySet="PaymentRequestSet" />
           </AssociationSet>
+          <AssociationSet Name="LoadTokenVCardToken" Association="Model.LoadTokenVCardToken">
+            <End Role="LoadToken" EntitySet="LoadRequestSet" />
+            <End Role="VCardToken" EntitySet="VCardTokenSet" />
+          </AssociationSet>
+          <AssociationSet Name="LoadCardVCard" Association="Model.LoadCardVCard">
+            <End Role="LoadCard" EntitySet="LoadRequestSet" />
+            <End Role="VCard" EntitySet="VCardSet" />
+          </AssociationSet>
           </EntityContainer>
         <EntityType Name="User">
           <Key>
@@ -289,7 +297,8 @@
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="Data" Type="String" Nullable="false" />
           <Property Name="AccountId" Type="Int32" Nullable="false" />
-          <Property Name="Validity" Type="Time" Nullable="false" />
+          <Property Name="DateInitial" Type="DateTime" Nullable="false" />
+          <Property Name="DateFinal" Type="DateTime" Nullable="false" />
         </EntityType>
         <Association Name="AccountVCardToken">
           <End Type="Model.Account" Role="Account" Multiplicity="1" />
@@ -311,17 +320,17 @@
           <Property Name="PayerId" Type="String" Nullable="true" />
           <Property Name="AccountId" Type="Int32" Nullable="false" />
         </EntityType>
-        <EntityType Name="LoadRequest">
+        <EntityType Name="LoadRequest" Abstract="true">
           <Key>
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" Type="Int32" />
           <Property Name="AccountId" Nullable="false" Type="Int32" />
           <Property Name="ProdId" Nullable="false" Type="String" />
-          <Property Name="Quantity" Type="Int32" Nullable="false" />
           <Property Name="Price" Type="Double" Nullable="false" />
-          <Property Name="DateInitial" Nullable="true" Type="DateTime" />
-          <Property Name="CardAuth" Type="String" Nullable="false" />
+          <Property Name="SaleDate" Type="DateTime" Nullable="false" />
+          <Property Name="State" Type="String" Nullable="false" cg:SetterAccess="Private" />
+          <Property Name="LoadResult" Type="Int32" Nullable="false" cg:SetterAccess="Private" />
         </EntityType>
         <Association Name="AccountLoadRequest">
           <End Type="Model.Account" Multiplicity="1" Role="Account" />
@@ -346,6 +355,20 @@
               <PropertyRef Name="AccountId" />
             </Dependent>
           </ReferentialConstraint>
+        </Association>
+        <EntityType Name="LoadToken" BaseType="Model.LoadRequest" >
+          <NavigationProperty Name="VCardToken" Relationship="Model.LoadTokenVCardToken" FromRole="LoadToken" ToRole="VCardToken" cg:SetterAccess="Private" />
+        </EntityType>
+        <EntityType Name="LoadCard" BaseType="Model.LoadRequest" >
+          <NavigationProperty Name="VCard" Relationship="Model.LoadCardVCard" FromRole="LoadCard" ToRole="VCard" cg:SetterAccess="Private" />
+        </EntityType>
+        <Association Name="LoadTokenVCardToken">
+          <End Type="Model.LoadToken" Role="LoadToken" Multiplicity="1" />
+          <End Type="Model.VCardToken" Role="VCardToken" Multiplicity="1" />
+        </Association>
+        <Association Name="LoadCardVCard">
+          <End Type="Model.LoadCard" Role="LoadCard" Multiplicity="1" />
+          <End Type="Model.VCard" Role="VCard" Multiplicity="1" />
         </Association>
       </Schema>
     </edmx:ConceptualModels>
@@ -397,7 +420,7 @@
           <ScalarProperty Name="Id" ColumnName="Id" />
           <ScalarProperty Name="Data" ColumnName="Data" />
           <ScalarProperty Name="AccountId" ColumnName="AccountId" />
-          <ScalarProperty Name="Validity" ColumnName="Validity" />
+          <ScalarProperty Name="DateInitial" ColumnName="Validity" />
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>
@@ -424,10 +447,7 @@
           <ScalarProperty Name="Id" ColumnName="Id" />
           <ScalarProperty Name="AccountId" ColumnName="AccountId" />
           <ScalarProperty Name="ProdId" ColumnName="ProdId" />
-          <ScalarProperty Name="Quantity" ColumnName="Quantity" />
           <ScalarProperty Name="Price" ColumnName="Price" />
-          <ScalarProperty Name="DateInitial" ColumnName="DateInitial" />
-          <ScalarProperty Name="CardAuth" ColumnName="CardAuth" />
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>

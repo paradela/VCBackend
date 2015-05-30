@@ -25,7 +25,7 @@ namespace VCBackend.Tests
             };
             VCardToken token = new VCardToken(emptyCard);
 
-            tk.LoadToken(token, 1);
+            //tk.LoadToken(token, 1);
         }
         //[TestMethod]
         //public void TestUserCreation()

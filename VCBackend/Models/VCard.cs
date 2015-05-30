@@ -60,7 +60,6 @@ namespace VCBackend
             System.Array.Copy(cardHeader, cardData, 10);
             VCardToken token = new VCardToken(cardData);
             token.AccountId = account.Id;
-            token.Validity = Time.ValidityInHours(24);
             account.VCardToken.Add(token);
             return token;
         }

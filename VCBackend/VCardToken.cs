@@ -17,6 +17,7 @@ namespace VCBackend
         public int Id { get; set; }
         public string Data { get; set; }
         public int AccountId { get; set; }
-        public System.TimeSpan Validity { get; set; }
+        public System.DateTime DateInitial { get; set; }
+        public System.DateTime DateFinal { get; set; }
     }
 }

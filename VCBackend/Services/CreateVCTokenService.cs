@@ -7,6 +7,7 @@ using VCBackend.Repositories;
 using VCBackend.Exceptions;
 using VCBackend.Models.Dto;
 using VCBackend.Utility.Security;
+using VCBackend.ExternalServices.Ticketing;
 
 namespace VCBackend.Services
 {
@@ -61,17 +62,17 @@ namespace VCBackend.Services
             using (var transaction = UnitOfWork.TransactionBegin())
             {
                 VCard card = u.Account.VCard;
+                Card4BTicketingKernelProxy tk = new Card4BTicketingKernelProxy();
 
                 token = card.CreateVCardToken(u.Account);
 
-                LoadRequest req = new LoadRequest();
-                req.CardAuth = u.Account.GetAuthToLoadCard(token.Id);
-                req.DateInitial = date;
-                req.ProdId = productid;
-                req.Quantity = 1;
-                //ProdManager
+                var load = new LoadToken(token);
 
+                UnitOfWork.Save(); // just to guarantee that loadToken has an ID.
 
+                
+
+                transaction.Commit();
             }
 
             VCardEncryptor secure = new VCardEncryptor(u);

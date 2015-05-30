@@ -12,12 +12,19 @@
         <AssociationConnector Association="Model.UserDevice" />
         <AssociationConnector Association="Model.AccountVCard" />
         <AssociationConnector Association="Model.UserAccount" />
-        <EntityTypeShape EntityType="Model.VCardToken" Width="1.5" PointX="2.5" PointY="6.25" />
+        <EntityTypeShape EntityType="Model.VCardToken" Width="1.5" PointX="2.5" PointY="6.125" />
         <AssociationConnector Association="Model.AccountVCardToken" />
         <EntityTypeShape EntityType="Model.PaymentRequest" Width="1.5" PointX="6.625" PointY="3.125" />
-        <EntityTypeShape EntityType="Model.LoadRequest" PointX="4.625" PointY="5.25" Width="1.5" />
+        <EntityTypeShape EntityType="Model.LoadRequest" PointX="4.625" PointY="5.875" Width="1.5" />
         <AssociationConnector Association="Model.AccountLoadRequest" />
         <AssociationConnector Association="Model.AccountPaymentRequest" />
+        <EntityTypeShape EntityType="Model.LoadToken" Width="1.5" PointX="3.375" PointY="8.875" />
+        <InheritanceConnector EntityType="Model.LoadToken" ManuallyRouted="false" >
+        </InheritanceConnector>
+        <EntityTypeShape EntityType="Model.LoadCard" Width="1.5" PointX="0.75" PointY="8.875" />
+        <InheritanceConnector EntityType="Model.LoadCard" />
+        <AssociationConnector Association="Model.LoadTokenVCardToken" />
+        <AssociationConnector Association="Model.LoadCardVCard" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

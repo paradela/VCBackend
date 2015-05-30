@@ -12,14 +12,14 @@ namespace VCBackend
     using System;
     using System.Collections.Generic;
     
-    public partial class LoadRequest
+    public abstract partial class LoadRequest
     {
         public int Id { get; set; }
         public int AccountId { get; set; }
         public string ProdId { get; set; }
-        public int Quantity { get; set; }
         public double Price { get; set; }
-        public Nullable<System.DateTime> DateInitial { get; set; }
-        public string CardAuth { get; set; }
+        public System.DateTime SaleDate { get; set; }
+        public string State { get; private set; }
+        public int LoadResult { get; private set; }
     }
 }
