@@ -81,7 +81,37 @@ namespace VCBackend.ExternalServices.Ticketing
             var response = Client.PostAsJsonAsync(tkUri, jsonReq).Result;
             strRsp = response.Content.ReadAsStringAsync().Result;
             jsonRsp = JObject.Parse(strRsp);
+            var rslt = jsonRsp.ToObject<Result>();
             return true;
+        }
+    }
+
+    public class VCardWriteOperation
+    {
+        public int Address { get; set; }
+        public int Len { get; set; }
+        public String Data { get; set; }
+
+        public VCardWriteOperation(int address, int len, string data)
+        {
+            Address = address;
+            Len = len;
+            Data = data;
+        }
+
+        public VCardWriteOperation() { }
+    }
+
+    public class Result
+    {
+        public uint status { get; set; }
+        public uint result { get; set; }
+        public string msg { get; set; }
+        public IList<VCardWriteOperation> card_messages { get; set; }
+
+        public Result()
+        {
+            card_messages = new List<VCardWriteOperation>();
         }
     }
 }
