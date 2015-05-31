@@ -101,6 +101,7 @@
     <Property Name="AccountId" Type="int" Nullable="false" />
     <Property Name="DateInitial" Type="datetime" Nullable="false" />
     <Property Name="DateFinal" Type="datetime" Nullable="false" />
+    <Property Name="Ammount" Type="float" Nullable="true" />
     <Property Name="AccountVCardToken_VCardToken_Id" Type="int" Nullable="false" />
   </EntityType>
   <EntityType Name="PaymentRequestSet">
@@ -135,6 +136,8 @@
     <Key>
       <PropertyRef Name="Id" />
     </Key>
+    <Property Name="DateInitial" Type="datetime" Nullable="true" />
+    <Property Name="DateFinal" Type="datetime" Nullable="true" />
     <Property Name="Id" Type="int" Nullable="false" />
     <Property Name="VCardToken_Id" Type="int" Nullable="false" />
   </EntityType>
@@ -142,6 +145,7 @@
     <Key>
       <PropertyRef Name="Id" />
     </Key>
+    <Property Name="ResultantBalance" Type="float" Nullable="true" />
     <Property Name="Id" Type="int" Nullable="false" />
     <Property Name="VCard_Id" Type="int" Nullable="false" />
   </EntityType>
@@ -384,6 +388,7 @@
           <Property Name="AccountId" Type="Int32" Nullable="false" />
           <Property Name="DateInitial" Type="DateTime" Nullable="false" />
           <Property Name="DateFinal" Type="DateTime" Nullable="false" />
+          <Property Name="Ammount" Type="Double" Nullable="true" />
         </EntityType>
         <Association Name="AccountVCardToken">
           <End Type="Model.Account" Role="Account" Multiplicity="1" />
@@ -416,7 +421,6 @@
           <Property Name="SaleDate" Type="DateTime" Nullable="false" />
           <Property Name="State" Type="String" Nullable="false" cg:SetterAccess="Private" />
           <Property Name="LoadResult" Type="Int32" Nullable="false" cg:SetterAccess="Private" />
-          <Property Name="DateInitial" Type="DateTime" Nullable="true" />
         </EntityType>
         <Association Name="AccountLoadRequest">
           <End Type="Model.Account" Multiplicity="1" Role="Account" />
@@ -444,9 +448,12 @@
         </Association>
         <EntityType Name="LoadToken" BaseType="Model.LoadRequest" >
           <NavigationProperty Name="VCardToken" Relationship="Model.LoadTokenVCardToken" FromRole="LoadToken" ToRole="VCardToken" cg:SetterAccess="Private" />
+          <Property Name="DateInitial" Type="DateTime" Nullable="true" />
+          <Property Name="DateFinal" Type="DateTime" Nullable="true" />
         </EntityType>
         <EntityType Name="LoadCard" BaseType="Model.LoadRequest" >
           <NavigationProperty Name="VCard" Relationship="Model.LoadCardVCard" FromRole="LoadCard" ToRole="VCard" cg:SetterAccess="Private" />
+          <Property Name="ResultantBalance" Type="Double" Nullable="true" />
         </EntityType>
         <Association Name="LoadTokenVCardToken">
           <End Type="Model.LoadToken" Role="LoadToken" Multiplicity="1" />
@@ -508,6 +515,7 @@
           <ScalarProperty Name="AccountId" ColumnName="AccountId" />
           <ScalarProperty Name="DateInitial" ColumnName="DateInitial" />
           <ScalarProperty Name="DateFinal" ColumnName="DateFinal" />
+          <ScalarProperty Name="Ammount" ColumnName="Ammount" />
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>
@@ -543,11 +551,14 @@
       <EntityTypeMapping TypeName="IsTypeOf(Model.LoadToken)">
         <MappingFragment StoreEntitySet="LoadRequestSet_LoadToken">
           <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="DateInitial" ColumnName="DateInitial" />
+          <ScalarProperty Name="DateFinal" ColumnName="DateFinal" />
         </MappingFragment>
       </EntityTypeMapping>
       <EntityTypeMapping TypeName="IsTypeOf(Model.LoadCard)">
         <MappingFragment StoreEntitySet="LoadRequestSet_LoadCard">
           <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="ResultantBalance" ColumnName="ResultantBalance" />
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>

@@ -13,36 +13,19 @@ namespace VCBackend.Services
 {
     public class GetVCTokenService : IService
     {
-        private String productid, dateinitial;
-        private VCardTokenDto dto;
+        public String DateInitial { private get; set; }
 
-        public String DateInitial
-        {
-            set
-            {
-                dateinitial = value;
-            }
-        }
-
-        public VCardTokenDto VCardTokenDto
-        {
-            get
-            {
-                return dto;
-            }
-        }
+        public VCardTokenDto VCardTokenDto { get; private set; }
 
         public GetVCTokenService(UnitOfWork UnitOfWork, Device AuthDevice)
             : base(UnitOfWork, AuthDevice) { }
 
         public override bool ExecuteService()
         {
-            if (productid == null || productid == String.Empty)
-                return false;
-            if (dateinitial == null)
+            if (DateInitial == null)
                 return false;
 
-            DateTime date = DateTime.ParseExact(dateinitial, "yyyy-MM-dd HH:mm",
+            DateTime date = DateTime.ParseExact(DateInitial, "yyyy-MM-dd HH:mm",
                                        System.Globalization.CultureInfo.InvariantCulture);
 
             User u = AuthDevice.Owner;
@@ -61,29 +44,28 @@ namespace VCBackend.Services
                 load.AccountId = u.Account.Id;
                 load.DateInitial = date;
 
-                if (!tk.ApproveLoadTokenRequest(load))
-                {
-                    transaction.Rollback();
-                    throw new InvalidLoadRequest("Initial date needs to be set for today!");
-                }
-
                 try
                 {
+                    if (!tk.ApproveLoadTokenRequest(load))
+                    {
+                        transaction.Rollback();
+                        throw new InvalidLoadRequest("Request to load no valid.");
+                    }
+
                     u.Account.Withdraw(load.Price);
+
+                    UnitOfWork.Save(); // just to guarantee that loadToken has an ID.
+
+                    if (!tk.LoadToken(load))
+                    {
+                        transaction.Rollback();
+                        throw new InvalidLoadRequest(String.Format("The token loading request failed with result: {0}", load.LoadResult));
+                    }
                 }
                 catch (VCException ex)
                 {
                     transaction.Rollback();
                     throw ex;
-                }
-
-
-                UnitOfWork.Save(); // just to guarantee that loadToken has an ID.
-
-                if (!tk.LoadToken(load))
-                {
-                    transaction.Rollback();
-                    throw new InvalidLoadRequest("The token loading request failed!");
                 }
 
                 transaction.Commit();
@@ -95,7 +77,8 @@ namespace VCBackend.Services
 
             String secureToken = secure.RijndaelEncrypt(token);
 
-            dto = new VCardTokenDto(secureToken);
+            VCardTokenDto = new VCardTokenDto(secureToken);
+            VCardTokenDto.Serialize(token);
 
             return true;
         }

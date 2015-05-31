@@ -226,6 +226,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\Dto\CardBalanceDto.cs" />
     <Compile Include="Models\LoadCard.cs" />
     <Compile Include="Models\LoadRequest.cs" />
     <Compile Include="Models\LoadToken.cs" />
@@ -237,6 +238,7 @@
     <Compile Include="Services\EndPaymentService.cs" />
     <Compile Include="Services\BeginPaymentService.cs" />
     <Compile Include="Services\GetUserDevicesService.cs" />
+    <Compile Include="Services\LoadVCardService.cs" />
     <Compile Include="User.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>

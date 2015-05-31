@@ -21,6 +21,5 @@ namespace VCBackend
         public System.DateTime SaleDate { get; set; }
         public string State { get; private set; }
         public int LoadResult { get; private set; }
-        public Nullable<System.DateTime> DateInitial { get; set; }
     }
 }

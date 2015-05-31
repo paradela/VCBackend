@@ -2,7 +2,7 @@
 -- --------------------------------------------------
 -- Entity Designer DDL Script for SQL Server 2005, 2008, 2012 and Azure
 -- --------------------------------------------------
--- Date Created: 05/30/2015 23:50:31
+-- Date Created: 05/31/2015 18:16:13
 -- Generated from EDMX file: C:\Users\Ricardo\Source\Repos\VCBackend\VCBackend\Model.edmx
 -- --------------------------------------------------
 
@@ -127,6 +127,7 @@ CREATE TABLE [dbo].[VCardTokenSet] (
     [AccountId] int  NOT NULL,
     [DateInitial] datetime  NOT NULL,
     [DateFinal] datetime  NOT NULL,
+    [Ammount] float  NULL,
     [AccountVCardToken_VCardToken_Id] int  NOT NULL
 );
 GO
@@ -161,6 +162,8 @@ GO
 
 -- Creating table 'LoadRequestSet_LoadToken'
 CREATE TABLE [dbo].[LoadRequestSet_LoadToken] (
+    [DateInitial] datetime  NULL,
+    [DateFinal] datetime  NULL,
     [Id] int  NOT NULL,
     [VCardToken_Id] int  NOT NULL
 );
@@ -168,6 +171,7 @@ GO
 
 -- Creating table 'LoadRequestSet_LoadCard'
 CREATE TABLE [dbo].[LoadRequestSet_LoadCard] (
+    [ResultantBalance] float  NULL,
     [Id] int  NOT NULL,
     [VCard_Id] int  NOT NULL
 );

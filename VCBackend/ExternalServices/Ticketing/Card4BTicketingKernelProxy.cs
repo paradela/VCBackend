@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Text.RegularExpressions;
 using System.Xml;
 using System.IO;
+using VCBackend.Exceptions;
 
 namespace VCBackend.ExternalServices.Ticketing
 {
@@ -26,18 +27,12 @@ namespace VCBackend.ExternalServices.Ticketing
         {
             if (Request != null)
             {
-                if (
-                    Request.Price > 0 &&
-                    Request.SaleDate.Year == DateTime.Now.Year &&
-                    Request.SaleDate.DayOfYear == DateTime.Now.DayOfYear &&
-                    Request.State == LoadRequest.STATE_CREATED
-                    )
-                {
-
-                    Request.ProdId = "2065208";
-                    Request.ApproveLoad();
-                    return true;
-                }
+                if (Request.Price <= 0) throw new InvalidLoadRequest(String.Format("Ammount of {0} is not valid.", Request.Price));
+                if (Request.SaleDate.Date != DateTime.Today.Date) throw new InvalidLoadRequest("Internal error: sale date must be today");
+                if (Request.State != LoadRequest.STATE_CREATED) throw new InvalidLoadRequest("Internal error: request not valid!");
+                Request.ProdId = "2065208";
+                Request.ApproveLoad();
+                return true;
             }
             return false;
         }
@@ -46,24 +41,23 @@ namespace VCBackend.ExternalServices.Ticketing
         {
             if (Request != null)
             {
-                if (
-                    Request.SaleDate.Year == DateTime.Now.Year &&
-                    Request.SaleDate.DayOfYear == DateTime.Now.DayOfYear &&
-                    Request.State == LoadRequest.STATE_CREATED &&
-                    Request.DateInitial.HasValue &&
-                    Request.DateInitial.Value.AddMinutes(10) >= DateTime.Now &&
-                    Request.DateInitial.Value.Year == DateTime.Now.Year &&
-                    Request.DateInitial.Value.DayOfYear == DateTime.Now.DayOfYear
-                    )
-                {
+                 if (Request.SaleDate.Date != DateTime.Today.Date) throw new InvalidLoadRequest("Internal error: sale date must be today");
+                 if (Request.State != LoadRequest.STATE_CREATED) throw new InvalidLoadRequest("Internal error: request not valid!");
+                 if (!Request.DateInitial.HasValue || Request.DateInitial.Value.AddMinutes(10).Date < DateTime.Today.Date) 
+                     throw new InvalidLoadRequest("Initial token date is not valid!");
 
-                    Request.ProdId = "2065209";
-                    Request.Price = 100.0;
-                    Request.ApproveLoad();
-                    return true;
-                }
+                Request.ProdId = "2065209";
+                Request.Price = 100.0;
+                Request.ApproveLoad();
+                return true;
             }
             return false;
+        }
+
+        public bool ReadCard(VCard Card)
+        {
+            //TODO
+            return true;
         }
 
         public bool LoadCard(LoadCard Request)
@@ -79,12 +73,22 @@ namespace VCBackend.ExternalServices.Ticketing
                     "<attrib type=\"sale_date\">" + Request.SaleDate.ToString("yyyy-MM-dd") + "</attrib>" +
                     "<attrib type=\"sale_number_daily\">" + Request.Id + "</attrib>" +
                     "</attribs></product></load></tkmsg>";
-                LoadResult result = LoadProductEx(tkmsg, Request, Request.VCard.Data).Result;
-                if (Request.State == LoadRequest.STATE_SUCCESS)
+                TKResult result = TKCommandEx(tkmsg, Request.VCard.Data).Result;
+                if (result != null)
                 {
-                    //apply write operations
-                    WriteOperationsToCard(result.card_messages, Request.VCard);
+                    if (result.status == (uint)TicketingKernel.Status.LOAD &&
+                        result.result == (uint)TicketingKernel.Result.OK)
+                    {
+                        Request.SuccessfullLoad();
+                        //apply write operations
+                        WriteOperationsToCard(result.card_messages, Request.VCard);
+                        //Parse TKMSG xml to find date_initial and date_final
+                        var attribs = ParseTKMsgLoadComplete(result.msg);
+                        Request.ResultantBalance = attribs.stored_value;
+                        return true;
+                    }
                 }
+                Request.FailedLoad((int)result.result);
             }
             return false;
         }
@@ -103,20 +107,29 @@ namespace VCBackend.ExternalServices.Ticketing
                     "<attrib type=\"sale_number_daily\">" + Request.Id + "</attrib>" +
                     "<attrib type=\"date_initial\">" + Request.DateInitial.Value.ToString("yyyy-MM-dd HH:mm:ss") + "</attrib>" +
                     "</attribs></product></load></tkmsg>";
-                LoadResult result = LoadProductEx(tkmsg, Request, Request.VCardToken.Data).Result;
-                if (Request.State == LoadRequest.STATE_SUCCESS)
+                TKResult result = TKCommandEx(tkmsg, Request.VCardToken.Data).Result;
+                if (result != null)
                 {
-                    //apply write operations
-                    WriteOperationsToCard(result.card_messages, Request.VCardToken);
-                    //Parse TKMSG xml to find date_initial and date_final
-                    var attribs = ParseTKMsg(result.msg);
-                    return true;
+                    if (result.status == (uint)TicketingKernel.Status.LOAD &&
+                        result.result == (uint)TicketingKernel.Result.OK)
+                    {
+                        Request.SuccessfullLoad();
+                        //apply write operations
+                        WriteOperationsToCard(result.card_messages, Request.VCardToken);
+                        //Parse TKMSG xml to find date_initial and date_final
+                        var attribs = ParseTKMsgLoadComplete(result.msg);
+                        Request.VCardToken.DateInitial = attribs.date_initial;
+                        Request.VCardToken.DateInitial = attribs.date_final;
+                        Request.VCardToken.Ammount = attribs.stored_value;
+                        return true;
+                    }
                 }
+                Request.FailedLoad((int)result.result);
             }
             return false;
         }
 
-        private async Task<LoadResult> LoadProductEx(String TKMsg, LoadRequest Request, String Data)
+        private async Task<TKResult> TKCommandEx(String TKMsg, String CardData)
         {
             //Call WS to get a server url to load the card
             var getURLTask = Client.GetAsync(ServerUri);
@@ -124,7 +137,7 @@ namespace VCBackend.ExternalServices.Ticketing
             //While waiting for the response, do some work
             var card = new JObject();
             card["type"] = "CTS512B";
-            card["data"] = Data;
+            card["data"] = CardData;
 
             Regex r = new Regex(@"/^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/");
 
@@ -145,19 +158,7 @@ namespace VCBackend.ExternalServices.Ticketing
             var response = Client.PostAsJsonAsync(tkUri, loadReq).Result;
             strRsp = response.Content.ReadAsStringAsync().Result;
             jsonRsp = JObject.Parse(strRsp);
-            var rslt = jsonRsp.ToObject<LoadResult>();
-
-            if (rslt.result != null)
-            {
-                if (rslt.result == 0)
-                    Request.SuccessfullLoad();
-                else Request.FailedLoad((int)rslt.result);
-            }
-            else Request.FailedLoad();
-
-            if (Request.State == LoadRequest.STATE_FAILED)
-                rslt.card_messages.Clear(); // just to make sure, no write messages are returned!
-
+            var rslt = jsonRsp.ToObject<TKResult>();
             return rslt;
         }
 
@@ -185,7 +186,7 @@ namespace VCBackend.ExternalServices.Ticketing
             }
         }
 
-        private object ParseTKMsg(String TKMsg)
+        private TokenProductAttribs ParseTKMsgLoadComplete(String TKMsg)
         {
             int date_initial = 0, date_final = 0, stored_value = 0;
 
@@ -224,7 +225,21 @@ namespace VCBackend.ExternalServices.Ticketing
                 }
             }
 
-            return new { date_initial = date_initial, date_final = date_final, stored_value = stored_value };
+            return new TokenProductAttribs(date_initial, date_final, stored_value);
+        }
+    }
+
+    public class TokenProductAttribs
+    {
+        public DateTime date_initial { get; private set; }
+        public DateTime date_final { get; private set; }
+        public Double stored_value { get; private set; }
+
+        public TokenProductAttribs(int date_initial, int date_final, int ammount)
+        {
+            this.date_initial = new DateTime(1970, 1, 1, 0, 0, 0).AddSeconds(date_initial);
+            this.date_final = new DateTime(1970, 1, 1, 0, 0, 0).AddSeconds(date_final);
+            this.stored_value = ammount * 0.01; // 525 = 5.25
         }
     }
 
@@ -237,15 +252,83 @@ namespace VCBackend.ExternalServices.Ticketing
         public VCardWriteOperation() { }
     }
 
-    public class LoadResult
+    public class TKResult
     {
+        public uint status { get; set; }
         public uint result { get; set; }
         public string msg { get; set; }
         public IList<VCardWriteOperation> card_messages { get; set; }
 
-        public LoadResult()
+        public TKResult()
         {
             card_messages = new List<VCardWriteOperation>();
+        }
+    }
+
+    public class TicketingKernel
+    {
+
+        public enum Status : uint
+        {
+            DETECTION = 0,
+            READ = 1,
+            LOAD = 2,
+            VALIDATE = 3,
+            UNDO = 4,
+            DIAGNOSTICS = 5,
+            UNLOAD = 6,
+            SAVE = 7,
+            ISSUE = 9,
+            UPDATEPROFILE = 10,
+            EXTERNAL_VALID = 1000,
+            TRACE = 0x544B0000,
+            CANCEL = 0x544B0001,
+            COUPLERINFO = 0x544B0002,
+            COUPLERERROR = 0x544B0003,
+            COUPLERSAMCHECK = 0x544B0004,
+            COUPLERSAMADD = 0x544B0005,
+            ANTENNAOFF = 0x544C0000,
+            SEARCHCARD = 0x544C0001,
+            CALYPSO_TXRXTPDU = 0x544C0002,
+            CTS512B_READ = 0x544C0003,
+            CTS512B_UPDATE = 0x544C0004
+        }
+
+        public enum Result : uint
+        {
+            OK = 0x00000000,
+            ANTI_PASSBACK = 0x000001E1,
+            BAD_CONFIG = 0x000002E1,
+            BLACKLISTED_CARD = 0x000003E1,
+            CARD_BLOCKED = 0x000004E1,
+            CARD_EXPIRED = 0x000005E1,
+            CARD_READ = 0x000006E1,
+            CARD_WRITE = 0x000007E1,
+            EXPIRED_JOURNEY = 0x000008E1,
+            GENERAL_ERROR = 0x000009E1,
+            INVALID_DATE = 0x00000AE1,
+            INVALID_JOURNEY = 0x00000BE1,
+            INVALID_OPERATOR = 0x00000CE1,
+            INVALID_PARKING = 0x00000DE1,
+            INVALID_PRODUCT = 0x00000EE1,
+            INVALID_SERVICE = 0x00000FE1,
+            INVALID_STOP = 0x000010E1,
+            INVALID_TIME = 0x000011E1,
+            NO_MORE_JOURNEYS = 0x000012E1,
+            NO_MORE_TOKENS = 0x000013E1,
+            NOT_AUTHORIZED = 0x000014E1,
+            NOT_VALIDATED = 0x000015E1,
+            NOT_YET_VALID = 0x000016E1,
+            OUT_OF_DATE = 0x000017E1,
+            READER_ERROR = 0x000018E1,
+            SAM_ERROR = 0x000019E1,
+            SAM_NOT_DETECTED = 0x00001AE1,
+            CARD_EMPTY = 0x00001BE1,
+            CARD_REMOVED = 0x00001CE1,
+            CARD_DETECTED = 0x00001DE1,
+            WRONG_CARD = 0x00001EE1,
+            DISCARDED = 0x00001EE2,
+            CONFLICT = 0x00001EE3,
         }
     }
 }
