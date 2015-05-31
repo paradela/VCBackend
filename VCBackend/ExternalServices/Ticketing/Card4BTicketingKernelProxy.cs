@@ -21,10 +21,55 @@ namespace VCBackend.ExternalServices.Ticketing
             Client = new HttpClient(); 
         }
 
+        //This method should validate the validity of the request in the catalog
+        public bool ApproveLoadCardRequest(LoadCard Request)
+        {
+            if (Request != null)
+            {
+                if (
+                    Request.Price > 0 &&
+                    Request.SaleDate.Year == DateTime.Now.Year &&
+                    Request.SaleDate.DayOfYear == DateTime.Now.DayOfYear &&
+                    Request.State == LoadRequest.STATE_CREATED
+                    )
+                {
+
+                    Request.ProdId = "2065208";
+                    Request.ApproveLoad();
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public bool ApproveLoadTokenRequest(LoadToken Request)
+        {
+            if (Request != null)
+            {
+                if (
+                    Request.SaleDate.Year == DateTime.Now.Year &&
+                    Request.SaleDate.DayOfYear == DateTime.Now.DayOfYear &&
+                    Request.State == LoadRequest.STATE_CREATED &&
+                    Request.DateInitial.HasValue &&
+                    Request.DateInitial.Value.AddMinutes(10) >= DateTime.Now &&
+                    Request.DateInitial.Value.Year == DateTime.Now.Year &&
+                    Request.DateInitial.Value.DayOfYear == DateTime.Now.DayOfYear
+                    )
+                {
+
+                    Request.ProdId = "2065209";
+                    Request.Price = 100.0;
+                    Request.ApproveLoad();
+                    return true;
+                }
+            }
+            return false;
+        }
+
         public bool LoadCard(LoadCard Request)
         {
             if (Request.State == LoadRequest.STATE_APPROVED 
-                && Request.Price >= 500)
+                && Request.Price >= 0)
             {
                 string tkmsg = 
                     "<tkmsg><load>" +
@@ -48,6 +93,7 @@ namespace VCBackend.ExternalServices.Ticketing
         {
             if (Request.State == LoadRequest.STATE_APPROVED)
             {
+                Request.ProdId = "2065209";
                 string tkmsg =
                     "<tkmsg><load>" +
                     "<product card_value=\"2065209\"><attribs>" +
@@ -55,7 +101,7 @@ namespace VCBackend.ExternalServices.Ticketing
                     "<attrib type=\"sale_device\">42</attrib>" +
                     "<attrib type=\"sale_date\">" + Request.SaleDate.ToString("yyyy-MM-dd") + "</attrib>" +
                     "<attrib type=\"sale_number_daily\">" + Request.Id + "</attrib>" +
-                    "<attrib type=\"date_initial\">" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "</attrib>" +
+                    "<attrib type=\"date_initial\">" + Request.DateInitial.Value.ToString("yyyy-MM-dd HH:mm:ss") + "</attrib>" +
                     "</attribs></product></load></tkmsg>";
                 LoadResult result = LoadProductEx(tkmsg, Request, Request.VCardToken.Data).Result;
                 if (Request.State == LoadRequest.STATE_SUCCESS)
@@ -63,7 +109,7 @@ namespace VCBackend.ExternalServices.Ticketing
                     //apply write operations
                     WriteOperationsToCard(result.card_messages, Request.VCardToken);
                     //Parse TKMSG xml to find date_initial and date_final
-
+                    var attribs = ParseTKMsg(result.msg);
                     return true;
                 }
             }
@@ -141,14 +187,44 @@ namespace VCBackend.ExternalServices.Ticketing
 
         private object ParseTKMsg(String TKMsg)
         {
-            uint date_initial = 0, date_final = 0;
+            int date_initial = 0, date_final = 0, stored_value = 0;
 
             using (XmlReader reader = XmlReader.Create(new StringReader(TKMsg)))
             {
+                reader.ReadToFollowing("products");
+                string products = reader.ReadInnerXml();
 
+                using (XmlReader prodReader = XmlReader.Create(new StringReader(products)))
+                {
+                    while (prodReader.Read())
+                    {
+                        if (prodReader.Name.Equals("attrib") && (prodReader.NodeType == XmlNodeType.Element))
+                        {
+                            prodReader.MoveToFirstAttribute();
+                            if (prodReader.Name.Equals("type"))
+                            {
+                                switch (prodReader.Value)
+                                {
+                                    case "date_initial":
+                                        prodReader.MoveToElement();
+                                        date_initial = prodReader.ReadElementContentAsInt();
+                                        break;
+                                    case "date_final":
+                                        prodReader.MoveToElement();
+                                        date_final = prodReader.ReadElementContentAsInt();
+                                        break;
+                                    case "stored_value":
+                                        prodReader.MoveToElement();
+                                        stored_value = prodReader.ReadElementContentAsInt();
+                                        break;
+                                }
+                            }
+                        }
+                    }
+                }
             }
 
-            return new { };
+            return new { date_initial = date_initial, date_final = date_final, stored_value = stored_value };
         }
     }
 

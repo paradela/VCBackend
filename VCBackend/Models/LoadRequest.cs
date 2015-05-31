@@ -20,13 +20,11 @@ namespace VCBackend
             this.LoadResult = ERROR_UNKNOWN;
         }
 
-        public bool ApproveLoad(String ProdId, Double Price)
+        public bool ApproveLoad()
         {
-            if (State == STATE_CREATED && ProdId != String.Empty && Price > 0.0)
+            if (State == STATE_CREATED)
             {
                 this.State = STATE_APPROVED;
-                this.ProdId = ProdId;
-                this.Price = Price;
                 return true;
             }
             return false;

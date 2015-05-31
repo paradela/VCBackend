@@ -2,7 +2,7 @@
 -- --------------------------------------------------
 -- Entity Designer DDL Script for SQL Server 2005, 2008, 2012 and Azure
 -- --------------------------------------------------
--- Date Created: 04/27/2015 23:26:01
+-- Date Created: 05/30/2015 23:50:31
 -- Generated from EDMX file: C:\Users\Ricardo\Source\Repos\VCBackend\VCBackend\Model.edmx
 -- --------------------------------------------------
 
@@ -35,11 +35,17 @@ GO
 IF OBJECT_ID(N'[dbo].[FK_AccountPaymentRequest]', 'F') IS NOT NULL
     ALTER TABLE [dbo].[PaymentRequestSet] DROP CONSTRAINT [FK_AccountPaymentRequest];
 GO
-IF OBJECT_ID(N'[dbo].[FK_Default_inherits_Device]', 'F') IS NOT NULL
-    ALTER TABLE [dbo].[DeviceSet_Default] DROP CONSTRAINT [FK_Default_inherits_Device];
+IF OBJECT_ID(N'[dbo].[FK_LoadTokenVCardToken]', 'F') IS NOT NULL
+    ALTER TABLE [dbo].[LoadRequestSet_LoadToken] DROP CONSTRAINT [FK_LoadTokenVCardToken];
 GO
-IF OBJECT_ID(N'[dbo].[FK_Mobile_inherits_Device]', 'F') IS NOT NULL
-    ALTER TABLE [dbo].[DeviceSet_Mobile] DROP CONSTRAINT [FK_Mobile_inherits_Device];
+IF OBJECT_ID(N'[dbo].[FK_LoadCardVCard]', 'F') IS NOT NULL
+    ALTER TABLE [dbo].[LoadRequestSet_LoadCard] DROP CONSTRAINT [FK_LoadCardVCard];
+GO
+IF OBJECT_ID(N'[dbo].[FK_LoadToken_inherits_LoadRequest]', 'F') IS NOT NULL
+    ALTER TABLE [dbo].[LoadRequestSet_LoadToken] DROP CONSTRAINT [FK_LoadToken_inherits_LoadRequest];
+GO
+IF OBJECT_ID(N'[dbo].[FK_LoadCard_inherits_LoadRequest]', 'F') IS NOT NULL
+    ALTER TABLE [dbo].[LoadRequestSet_LoadCard] DROP CONSTRAINT [FK_LoadCard_inherits_LoadRequest];
 GO
 
 -- --------------------------------------------------
@@ -67,11 +73,11 @@ GO
 IF OBJECT_ID(N'[dbo].[LoadRequestSet]', 'U') IS NOT NULL
     DROP TABLE [dbo].[LoadRequestSet];
 GO
-IF OBJECT_ID(N'[dbo].[DeviceSet_Default]', 'U') IS NOT NULL
-    DROP TABLE [dbo].[DeviceSet_Default];
+IF OBJECT_ID(N'[dbo].[LoadRequestSet_LoadToken]', 'U') IS NOT NULL
+    DROP TABLE [dbo].[LoadRequestSet_LoadToken];
 GO
-IF OBJECT_ID(N'[dbo].[DeviceSet_Mobile]', 'U') IS NOT NULL
-    DROP TABLE [dbo].[DeviceSet_Mobile];
+IF OBJECT_ID(N'[dbo].[LoadRequestSet_LoadCard]', 'U') IS NOT NULL
+    DROP TABLE [dbo].[LoadRequestSet_LoadCard];
 GO
 
 -- --------------------------------------------------
@@ -119,7 +125,8 @@ CREATE TABLE [dbo].[VCardTokenSet] (
     [Id] int IDENTITY(1,1) NOT NULL,
     [Data] nvarchar(max)  NOT NULL,
     [AccountId] int  NOT NULL,
-    [Validity] time  NOT NULL,
+    [DateInitial] datetime  NOT NULL,
+    [DateFinal] datetime  NOT NULL,
     [AccountVCardToken_VCardToken_Id] int  NOT NULL
 );
 GO
@@ -145,22 +152,24 @@ CREATE TABLE [dbo].[LoadRequestSet] (
     [Id] int IDENTITY(1,1) NOT NULL,
     [AccountId] int  NOT NULL,
     [ProdId] nvarchar(max)  NOT NULL,
-    [Quantity] int  NOT NULL,
     [Price] float  NOT NULL,
-    [DateInitial] datetime  NULL,
-    [CardAuth] nvarchar(max)  NOT NULL
+    [SaleDate] datetime  NOT NULL,
+    [State] nvarchar(max)  NOT NULL,
+    [LoadResult] int  NOT NULL
 );
 GO
 
--- Creating table 'DeviceSet_Default'
-CREATE TABLE [dbo].[DeviceSet_Default] (
-    [Id] int  NOT NULL
+-- Creating table 'LoadRequestSet_LoadToken'
+CREATE TABLE [dbo].[LoadRequestSet_LoadToken] (
+    [Id] int  NOT NULL,
+    [VCardToken_Id] int  NOT NULL
 );
 GO
 
--- Creating table 'DeviceSet_Mobile'
-CREATE TABLE [dbo].[DeviceSet_Mobile] (
-    [Id] int  NOT NULL
+-- Creating table 'LoadRequestSet_LoadCard'
+CREATE TABLE [dbo].[LoadRequestSet_LoadCard] (
+    [Id] int  NOT NULL,
+    [VCard_Id] int  NOT NULL
 );
 GO
 
@@ -210,15 +219,15 @@ ADD CONSTRAINT [PK_LoadRequestSet]
     PRIMARY KEY CLUSTERED ([Id] ASC);
 GO
 
--- Creating primary key on [Id] in table 'DeviceSet_Default'
-ALTER TABLE [dbo].[DeviceSet_Default]
-ADD CONSTRAINT [PK_DeviceSet_Default]
+-- Creating primary key on [Id] in table 'LoadRequestSet_LoadToken'
+ALTER TABLE [dbo].[LoadRequestSet_LoadToken]
+ADD CONSTRAINT [PK_LoadRequestSet_LoadToken]
     PRIMARY KEY CLUSTERED ([Id] ASC);
 GO
 
--- Creating primary key on [Id] in table 'DeviceSet_Mobile'
-ALTER TABLE [dbo].[DeviceSet_Mobile]
-ADD CONSTRAINT [PK_DeviceSet_Mobile]
+-- Creating primary key on [Id] in table 'LoadRequestSet_LoadCard'
+ALTER TABLE [dbo].[LoadRequestSet_LoadCard]
+ADD CONSTRAINT [PK_LoadRequestSet_LoadCard]
     PRIMARY KEY CLUSTERED ([Id] ASC);
 GO
 
@@ -316,20 +325,50 @@ ON [dbo].[PaymentRequestSet]
     ([AccountId]);
 GO
 
--- Creating foreign key on [Id] in table 'DeviceSet_Default'
-ALTER TABLE [dbo].[DeviceSet_Default]
-ADD CONSTRAINT [FK_Default_inherits_Device]
+-- Creating foreign key on [VCardToken_Id] in table 'LoadRequestSet_LoadToken'
+ALTER TABLE [dbo].[LoadRequestSet_LoadToken]
+ADD CONSTRAINT [FK_LoadTokenVCardToken]
+    FOREIGN KEY ([VCardToken_Id])
+    REFERENCES [dbo].[VCardTokenSet]
+        ([Id])
+    ON DELETE NO ACTION ON UPDATE NO ACTION;
+GO
+
+-- Creating non-clustered index for FOREIGN KEY 'FK_LoadTokenVCardToken'
+CREATE INDEX [IX_FK_LoadTokenVCardToken]
+ON [dbo].[LoadRequestSet_LoadToken]
+    ([VCardToken_Id]);
+GO
+
+-- Creating foreign key on [VCard_Id] in table 'LoadRequestSet_LoadCard'
+ALTER TABLE [dbo].[LoadRequestSet_LoadCard]
+ADD CONSTRAINT [FK_LoadCardVCard]
+    FOREIGN KEY ([VCard_Id])
+    REFERENCES [dbo].[VCardSet]
+        ([Id])
+    ON DELETE NO ACTION ON UPDATE NO ACTION;
+GO
+
+-- Creating non-clustered index for FOREIGN KEY 'FK_LoadCardVCard'
+CREATE INDEX [IX_FK_LoadCardVCard]
+ON [dbo].[LoadRequestSet_LoadCard]
+    ([VCard_Id]);
+GO
+
+-- Creating foreign key on [Id] in table 'LoadRequestSet_LoadToken'
+ALTER TABLE [dbo].[LoadRequestSet_LoadToken]
+ADD CONSTRAINT [FK_LoadToken_inherits_LoadRequest]
     FOREIGN KEY ([Id])
-    REFERENCES [dbo].[DeviceSet]
+    REFERENCES [dbo].[LoadRequestSet]
         ([Id])
     ON DELETE CASCADE ON UPDATE NO ACTION;
 GO
 
--- Creating foreign key on [Id] in table 'DeviceSet_Mobile'
-ALTER TABLE [dbo].[DeviceSet_Mobile]
-ADD CONSTRAINT [FK_Mobile_inherits_Device]
+-- Creating foreign key on [Id] in table 'LoadRequestSet_LoadCard'
+ALTER TABLE [dbo].[LoadRequestSet_LoadCard]
+ADD CONSTRAINT [FK_LoadCard_inherits_LoadRequest]
     FOREIGN KEY ([Id])
-    REFERENCES [dbo].[DeviceSet]
+    REFERENCES [dbo].[LoadRequestSet]
         ([Id])
     ON DELETE CASCADE ON UPDATE NO ACTION;
 GO

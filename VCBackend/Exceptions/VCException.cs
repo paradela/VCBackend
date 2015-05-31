@@ -127,4 +127,13 @@ namespace VCBackend.Exceptions
         }
     }
 
+    public class InvalidLoadRequest : VCException
+    {
+        public InvalidLoadRequest(String Message)
+            : base(Message)
+        {
+            Error = "InvalidLoadRequest";
+        }
+    }
+
 }

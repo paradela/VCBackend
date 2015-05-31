@@ -159,7 +159,6 @@
     <Content Include="Global.asax" />
     <Content Include="index.html" />
     <Content Include="Model.edmx.sql" />
-    <Content Include="VCardService.svc" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
@@ -234,7 +233,7 @@
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
     <Compile Include="Services\CancelPaymentService.cs" />
-    <Compile Include="Services\CreateVCTokenService.cs" />
+    <Compile Include="Services\GetVCTokenService.cs" />
     <Compile Include="Services\EndPaymentService.cs" />
     <Compile Include="Services\BeginPaymentService.cs" />
     <Compile Include="Services\GetUserDevicesService.cs" />
@@ -284,9 +283,6 @@
     <Compile Include="Utility\Time\Time.cs" />
     <Compile Include="VCard.cs">
       <DependentUpon>Model.tt</DependentUpon>
-    </Compile>
-    <Compile Include="VCardService.svc.cs">
-      <DependentUpon>VCardService.svc</DependentUpon>
     </Compile>
     <Compile Include="VCardToken.cs">
       <DependentUpon>Model.tt</DependentUpon>

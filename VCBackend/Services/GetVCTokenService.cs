@@ -11,18 +11,10 @@ using VCBackend.ExternalServices.Ticketing;
 
 namespace VCBackend.Services
 {
-    public class CreateVCTokenService : IService
+    public class GetVCTokenService : IService
     {
         private String productid, dateinitial;
         private VCardTokenDto dto;
-
-        public String ProductId
-        {
-            set
-            {
-                productid = value;
-            }
-        }
 
         public String DateInitial
         {
@@ -40,7 +32,7 @@ namespace VCBackend.Services
             }
         }
 
-        public CreateVCTokenService(UnitOfWork UnitOfWork, Device AuthDevice)
+        public GetVCTokenService(UnitOfWork UnitOfWork, Device AuthDevice)
             : base(UnitOfWork, AuthDevice) { }
 
         public override bool ExecuteService()
@@ -50,11 +42,9 @@ namespace VCBackend.Services
             if (dateinitial == null)
                 return false;
 
-            DateTime date = DateTime.ParseExact(dateinitial, "dd-MM-yyyy HH:mm",
+            DateTime date = DateTime.ParseExact(dateinitial, "yyyy-MM-dd HH:mm",
                                        System.Globalization.CultureInfo.InvariantCulture);
 
-            if(date.AddMinutes(10) < DateTime.Now) 
-                throw new VCException("Invalid initial date.");
             User u = AuthDevice.Owner;
 
             VCardToken token;
@@ -68,9 +58,33 @@ namespace VCBackend.Services
 
                 var load = new LoadToken(token);
 
+                load.AccountId = u.Account.Id;
+                load.DateInitial = date;
+
+                if (!tk.ApproveLoadTokenRequest(load))
+                {
+                    transaction.Rollback();
+                    throw new InvalidLoadRequest("Initial date needs to be set for today!");
+                }
+
+                try
+                {
+                    u.Account.Withdraw(load.Price);
+                }
+                catch (VCException ex)
+                {
+                    transaction.Rollback();
+                    throw ex;
+                }
+
+
                 UnitOfWork.Save(); // just to guarantee that loadToken has an ID.
 
-                
+                if (!tk.LoadToken(load))
+                {
+                    transaction.Rollback();
+                    throw new InvalidLoadRequest("The token loading request failed!");
+                }
 
                 transaction.Commit();
             }

@@ -108,7 +108,7 @@ namespace VCBackend.Controllers
 
         [Route("pay/{method}/cancel")]
         [VCAuthenticate]
-        public void DeletePaymentRequest([FromUri] String AuthDevice, [FromUri] String method, [FromUri] String p)
+        public void DeletePaymentRequest([FromUri] String method, [FromUri] String p)
         {
             try
             {
@@ -129,16 +129,34 @@ namespace VCBackend.Controllers
                 throw new HttpResponseException(new ErrorResponse(ex));
             }
         }
-
-        [Route("vcard/load/{product}")]
-        [VCAuthenticate]
-        public void PostLoadProduct([FromUri] String p)
-        {
-        }
-
+        //?d="2015-05-31 01:02"
         [Route("vcard/token")]
         [VCAuthenticate]
-        public void GetToken()
+        public VCardTokenDto GetToken([FromUri] String d)
+        {
+            try
+            {
+                UnitOfWork uw = new UnitOfWork();
+                int AuthDev = VCAuthenticate.GetAuthenticatedDevice(ActionContext);
+                Device dev = uw.DeviceRepository.GetByID(AuthDev);
+                GetVCTokenService service = new GetVCTokenService(uw, dev);
+                service.DateInitial = d;
+                service.ExecuteService();
+                return service.VCardTokenDto;
+            }
+            catch (VCException ex)
+            {
+                throw new HttpResponseException(new ErrorResponse(ex));
+            }
+            catch (Exception ex)
+            {
+                throw new HttpResponseException(new ErrorResponse(ex));
+            }
+        }
+
+        [Route("vcard/load/{ammount}")]
+        [VCAuthenticate]
+        public void PostLoadProduct([FromUri] String ammount)
         {
         }
 
