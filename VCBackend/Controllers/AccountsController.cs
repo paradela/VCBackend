@@ -4,12 +4,19 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using System.Web;
+using System.Web.WebSockets;
+using System.Net.WebSockets;
+using System.Net.Http.Headers;
+using System.Threading.Tasks;
+using System.Threading;
 using VCBackend.Filters;
 using VCBackend.Models.Dto;
 using VCBackend.Exceptions;
 using VCBackend.Errors;
 using VCBackend.Services;
 using VCBackend.Repositories;
+using VCBackend.Utility.Security;
 
 namespace VCBackend.Controllers
 {
@@ -179,6 +186,66 @@ namespace VCBackend.Controllers
             {
                 throw new HttpResponseException(new ErrorResponse(ex));
             }
+        }
+
+        [Route("vcard/ws")]
+        [VCAuthenticate]
+        public HttpResponseMessage GetWebSocketValidation([FromUri] String t)
+        {//t[oken] is parsed in the VCardTxRxAPDU callback to get the authenticated user
+            if (HttpRuntime.UsingIntegratedPipeline && HttpContext.Current.IsWebSocketRequest)
+            {
+                HttpContext.Current.AcceptWebSocketRequest(VCardTxRxAPDU);
+            }
+            return new HttpResponseMessage(HttpStatusCode.SwitchingProtocols);
+        }
+
+        private async Task VCardTxRxAPDU(AspNetWebSocketContext context)
+        {
+            WebSocket socket = context.WebSocket;
+            UnitOfWork uw = new UnitOfWork();
+
+            Device dev = GetAuthenticatedDevice(context, uw);
+
+            if (dev == null) return;
+
+            using (var trx = uw.TransactionBegin())
+            {
+                ArraySegment<byte> buffer = new ArraySegment<byte>(new byte[1024]);
+                VCard card = dev.Owner.Account.VCard;
+
+                while (true)
+                {
+                    WebSocketReceiveResult result = await socket.ReceiveAsync(buffer, CancellationToken.None);
+                    if (socket.State == WebSocketState.Open)
+                    {
+                        byte[] apdu = new byte[result.Count];
+                        System.Array.Copy(buffer.Array, apdu, result.Count);
+                        byte[] res = card.IsoATxRxAPDU(apdu);
+                        buffer = new ArraySegment<byte>(res);
+
+                        await socket.SendAsync(
+                            buffer, WebSocketMessageType.Binary, true, CancellationToken.None);
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+
+                trx.Commit();
+            }
+        }
+
+        private static Device GetAuthenticatedDevice(AspNetWebSocketContext context, UnitOfWork uw)
+        {
+            var query = context.RequestUri.Query;
+            var queryCollection = System.Web.HttpUtility.ParseQueryString(query);
+            var token = queryCollection["t"];
+            var payload = AuthToken.ValidateToken(token);
+            var uid = payload["user_id"];
+            var did = payload["device_id"];
+            Device dev = uw.DeviceRepository.Get(filter: d => (d.Owner.Id == (int)uid && d.Token != token && d.Id == (int)did)).FirstOrDefault();
+            return dev;
         }
 
     }
