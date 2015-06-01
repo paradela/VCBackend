@@ -24,8 +24,15 @@ namespace VCBackend.Tests
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
             };
             VCardToken token = new VCardToken(emptyCard);
+            DateTime date = DateTime.ParseExact("2015-06-01 18:44", "yyyy-MM-dd HH:mm",
+                                       System.Globalization.CultureInfo.InvariantCulture);
+            var load = new LoadToken(token);
 
-            //tk.LoadToken(token, 1);
+            load.DateInitial = date;
+
+            bool approve = tk.ApproveLoadTokenRequest(load);
+
+            bool res = tk.LoadToken(load);
         }
         //[TestMethod]
         //public void TestUserCreation()

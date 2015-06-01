@@ -119,7 +119,7 @@ namespace VCBackend.ExternalServices.Ticketing
                         //Parse TKMSG xml to find date_initial and date_final
                         var attribs = ParseTKMsgLoadComplete(result.msg);
                         Request.VCardToken.DateInitial = attribs.date_initial;
-                        Request.VCardToken.DateInitial = attribs.date_final;
+                        Request.VCardToken.DateFinal = attribs.date_final;
                         Request.VCardToken.Ammount = attribs.stored_value;
                         return true;
                     }
@@ -139,7 +139,7 @@ namespace VCBackend.ExternalServices.Ticketing
             card["type"] = "CTS512B";
             card["data"] = CardData;
 
-            Regex r = new Regex(@"/^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/");
+            Regex r = new Regex(@"(http?:\/\/)?([\da-z\.-]+)(\.([a-z\.]{2,6}))?(\:[0-9]{2,6})?([\/\w \.-]*)*\/?");
 
             var loadReq = new JObject();
             loadReq["tkmsg"] = TKMsg;
@@ -195,29 +195,32 @@ namespace VCBackend.ExternalServices.Ticketing
                 reader.ReadToFollowing("products");
                 string products = reader.ReadInnerXml();
 
+
                 using (XmlReader prodReader = XmlReader.Create(new StringReader(products)))
                 {
+                    string attrib = "";
                     while (prodReader.Read())
                     {
-                        if (prodReader.Name.Equals("attrib") && (prodReader.NodeType == XmlNodeType.Element))
+                        if (prodReader.NodeType == XmlNodeType.Element && prodReader.Name == "attrib")
                         {
-                            prodReader.MoveToFirstAttribute();
-                            if (prodReader.Name.Equals("type"))
+                            attrib = prodReader.GetAttribute("type");
+                            while (prodReader.Read())
                             {
-                                switch (prodReader.Value)
+                                if (prodReader.NodeType == XmlNodeType.Text)
                                 {
-                                    case "date_initial":
-                                        prodReader.MoveToElement();
-                                        date_initial = prodReader.ReadElementContentAsInt();
-                                        break;
-                                    case "date_final":
-                                        prodReader.MoveToElement();
-                                        date_final = prodReader.ReadElementContentAsInt();
-                                        break;
-                                    case "stored_value":
-                                        prodReader.MoveToElement();
-                                        stored_value = prodReader.ReadElementContentAsInt();
-                                        break;
+                                    switch (attrib)
+                                    {
+                                        case "date_initial":
+                                            date_initial = Int32.Parse(prodReader.Value);
+                                            break;
+                                        case "date_final":
+                                            date_final = Int32.Parse(prodReader.Value);
+                                            break;
+                                        case "stored_value":
+                                            stored_value = Int32.Parse(prodReader.Value);
+                                            break;
+                                    }
+                                    break;
                                 }
                             }
                         }
