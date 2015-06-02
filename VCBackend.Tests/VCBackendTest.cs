@@ -24,8 +24,7 @@ namespace VCBackend.Tests
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
             };
             VCardToken token = new VCardToken(emptyCard);
-            DateTime date = DateTime.ParseExact("2015-06-02 00:39", "yyyy-MM-dd HH:mm",
-                                       System.Globalization.CultureInfo.InvariantCulture);
+            DateTime date = DateTime.Now;
             var load = new LoadToken(token);
 
             load.DateInitial = date;
