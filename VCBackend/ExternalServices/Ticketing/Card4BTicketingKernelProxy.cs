@@ -47,7 +47,7 @@ namespace VCBackend.ExternalServices.Ticketing
                      throw new InvalidLoadRequest("Initial token date is not valid!");
 
                 Request.ProdId = "2065209";
-                Request.Price = 100.0;
+                Request.Price = 1.0;
                 Request.ApproveLoad();
                 return true;
             }
@@ -68,7 +68,7 @@ namespace VCBackend.ExternalServices.Ticketing
                 string tkmsg = 
                     "<tkmsg><load>" +
                     "<product card_value=\"2065208\"><attribs>" +
-                    "<attrib type=\"stored_value\">" + Request.Price + "</attrib>" +
+                    "<attrib type=\"stored_value\">" + (int)Request.Price * 100 + "</attrib>" +
                     "<attrib type=\"sale_device\">42</attrib>" +
                     "<attrib type=\"sale_date\">" + Request.SaleDate.ToString("yyyy-MM-dd") + "</attrib>" +
                     "<attrib type=\"sale_number_daily\">" + Request.Id + "</attrib>" +
@@ -101,7 +101,7 @@ namespace VCBackend.ExternalServices.Ticketing
                 string tkmsg =
                     "<tkmsg><load>" +
                     "<product card_value=\"2065209\"><attribs>" +
-                    "<attrib type=\"stored_value\">" + Request.Price + "</attrib>" +
+                    "<attrib type=\"stored_value\">" + (int)Request.Price * 100 + "</attrib>" +
                     "<attrib type=\"sale_device\">42</attrib>" +
                     "<attrib type=\"sale_date\">" + Request.SaleDate.ToString("yyyy-MM-dd") + "</attrib>" +
                     "<attrib type=\"sale_number_daily\">" + Request.Id + "</attrib>" +

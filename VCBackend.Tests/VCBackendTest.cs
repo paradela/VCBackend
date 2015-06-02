@@ -13,7 +13,7 @@ namespace VCBackend.Tests
     public class VCBackendTest
     {
         [TestMethod]
-        public void TestTKProxy()
+        public void TestLoadToken()
         {
             Card4BTicketingKernelProxy tk = new Card4BTicketingKernelProxy();
             byte[] emptyCard = new byte[]
@@ -24,7 +24,7 @@ namespace VCBackend.Tests
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
             };
             VCardToken token = new VCardToken(emptyCard);
-            DateTime date = DateTime.ParseExact("2015-06-01 18:44", "yyyy-MM-dd HH:mm",
+            DateTime date = DateTime.ParseExact("2015-06-02 00:39", "yyyy-MM-dd HH:mm",
                                        System.Globalization.CultureInfo.InvariantCulture);
             var load = new LoadToken(token);
 
@@ -34,6 +34,28 @@ namespace VCBackend.Tests
 
             bool res = tk.LoadToken(load);
         }
+
+        [TestMethod]
+        public void TestLoadCard()
+        {
+            Card4BTicketingKernelProxy tk = new Card4BTicketingKernelProxy();
+            byte[] emptyCard = new byte[]
+            {
+            0x60, 0x02, 0x01, 0xE4, 0x08, 0x08, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+            };
+            VCard token = new VCard(emptyCard);
+
+            var load = new LoadCard(token);
+            load.Price = 10.0;
+
+            bool approve = tk.ApproveLoadCardRequest(load);
+
+            bool res = tk.LoadCard(load);
+        }
+
         //[TestMethod]
         //public void TestUserCreation()
         //{
