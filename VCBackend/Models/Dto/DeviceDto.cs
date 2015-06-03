@@ -15,6 +15,7 @@ namespace VCBackend.Models.Dto
     {
         public DeviceTypeDto Type { get; set; }
         public String Name { get; set; }
+        public String Id { get; set; }
 
         public void Serialize(Device entity)
         {
@@ -23,6 +24,7 @@ namespace VCBackend.Models.Dto
             Name = dev.Name;
             Type = (dev.DeviceId == null) ?
                 DeviceTypeDto.DTO_DEFAULT_DEVICE : DeviceTypeDto.DTO_MOBILE_DEVICE;
+            Id = dev.DeviceId;
         }
     }
 }
