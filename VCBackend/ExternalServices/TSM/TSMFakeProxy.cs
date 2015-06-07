@@ -40,7 +40,11 @@ namespace VCBackend.ExternalServices.TSM
             Account Account = UnitOfWork.AccountRepository.GetByID(AccountId);
             VCard card = Account.CreateCard(emptyCard);
             if (card != null)
+            {
+                UnitOfWork.VCardRepository.Add(card);
+                UnitOfWork.Save();
                 return card.Id;
+            }
             else return ERROR;
         }
 

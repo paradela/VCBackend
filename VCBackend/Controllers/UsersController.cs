@@ -110,6 +110,16 @@ namespace VCBackend.Controllers
             else return null;
         }
 
+        //GET api/user/test
+        [Route("test")]
+        public UserDto GetUserTest()
+        {
+            User u = new User("Teste", "test@mail.pt", "Password");
+            UserDto dto = new UserDto();
+            dto.Serialize(u);
+            return dto;
+        }
+
         //POST api/user/device?t=123token
         [Route("device")]
         [VCAuthenticate]

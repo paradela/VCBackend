@@ -2,8 +2,8 @@
 -- --------------------------------------------------
 -- Entity Designer DDL Script for SQL Server 2005, 2008, 2012 and Azure
 -- --------------------------------------------------
--- Date Created: 06/01/2015 18:37:53
--- Generated from EDMX file: C:\Users\Card4b\Source\Repos\VCBackend\VCBackend\Model.edmx
+-- Date Created: 06/07/2015 00:07:51
+-- Generated from EDMX file: C:\Users\Ricardo\Source\Repos\VCBackend\VCBackend\Model.edmx
 -- --------------------------------------------------
 
 SET QUOTED_IDENTIFIER OFF;
@@ -38,8 +38,8 @@ GO
 IF OBJECT_ID(N'[dbo].[FK_LoadTokenVCardToken]', 'F') IS NOT NULL
     ALTER TABLE [dbo].[LoadRequestSet_LoadToken] DROP CONSTRAINT [FK_LoadTokenVCardToken];
 GO
-IF OBJECT_ID(N'[dbo].[FK_LoadCardVCard]', 'F') IS NOT NULL
-    ALTER TABLE [dbo].[LoadRequestSet_LoadCard] DROP CONSTRAINT [FK_LoadCardVCard];
+IF OBJECT_ID(N'[dbo].[FK_VCardLoadCard]', 'F') IS NOT NULL
+    ALTER TABLE [dbo].[LoadRequestSet_LoadCard] DROP CONSTRAINT [FK_VCardLoadCard];
 GO
 IF OBJECT_ID(N'[dbo].[FK_LoadToken_inherits_LoadRequest]', 'F') IS NOT NULL
     ALTER TABLE [dbo].[LoadRequestSet_LoadToken] DROP CONSTRAINT [FK_LoadToken_inherits_LoadRequest];
@@ -164,8 +164,7 @@ GO
 CREATE TABLE [dbo].[LoadRequestSet_LoadToken] (
     [DateInitial] datetime  NULL,
     [DateFinal] datetime  NULL,
-    [Id] int  NOT NULL,
-    [VCardToken_Id] int  NOT NULL
+    [Id] int  NOT NULL
 );
 GO
 
@@ -329,32 +328,26 @@ ON [dbo].[PaymentRequestSet]
     ([AccountId]);
 GO
 
--- Creating foreign key on [VCardToken_Id] in table 'LoadRequestSet_LoadToken'
+-- Creating foreign key on [Id] in table 'LoadRequestSet_LoadToken'
 ALTER TABLE [dbo].[LoadRequestSet_LoadToken]
 ADD CONSTRAINT [FK_LoadTokenVCardToken]
-    FOREIGN KEY ([VCardToken_Id])
+    FOREIGN KEY ([Id])
     REFERENCES [dbo].[VCardTokenSet]
         ([Id])
     ON DELETE NO ACTION ON UPDATE NO ACTION;
 GO
 
--- Creating non-clustered index for FOREIGN KEY 'FK_LoadTokenVCardToken'
-CREATE INDEX [IX_FK_LoadTokenVCardToken]
-ON [dbo].[LoadRequestSet_LoadToken]
-    ([VCardToken_Id]);
-GO
-
 -- Creating foreign key on [VCard_Id] in table 'LoadRequestSet_LoadCard'
 ALTER TABLE [dbo].[LoadRequestSet_LoadCard]
-ADD CONSTRAINT [FK_LoadCardVCard]
+ADD CONSTRAINT [FK_VCardLoadCard]
     FOREIGN KEY ([VCard_Id])
     REFERENCES [dbo].[VCardSet]
         ([Id])
     ON DELETE NO ACTION ON UPDATE NO ACTION;
 GO
 
--- Creating non-clustered index for FOREIGN KEY 'FK_LoadCardVCard'
-CREATE INDEX [IX_FK_LoadCardVCard]
+-- Creating non-clustered index for FOREIGN KEY 'FK_VCardLoadCard'
+CREATE INDEX [IX_FK_VCardLoadCard]
 ON [dbo].[LoadRequestSet_LoadCard]
     ([VCard_Id]);
 GO

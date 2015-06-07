@@ -9,7 +9,6 @@ namespace VCBackend
     public partial class VCard
     {
         private static String AID = "00A404000A43344243545335313242";
-        public VCard() { }
         public VCard(byte[] Data)
         {
             this.Data = System.Convert.ToBase64String(Data);

@@ -5,6 +5,7 @@ using System.Web;
 using VCBackend.Exceptions;
 using VCBackend.Utility.Security;
 using VCBackend.ExternalServices.TSM;
+using VCBackend.Repositories;
 
 namespace VCBackend
 {
@@ -34,6 +35,7 @@ namespace VCBackend
         {
             VCard card = new VCard(EmptyCard);
             this.VCard = card;
+            card.AccountId = this.Id;
             return card;
         }
 

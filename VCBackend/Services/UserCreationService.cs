@@ -54,7 +54,16 @@ namespace VCBackend.Services
             UnitOfWork.UserRepository.Add(newUser);
             UnitOfWork.Save();
 
+            newUser = UnitOfWork.UserRepository.Get(filter: q => (q.Email == newUser.Email)).FirstOrDefault();
+
+            device = UnitOfWork.DeviceRepository.Get(filter: q => (q.Owner.Id == newUser.Id)).FirstOrDefault();
+
+            if(newUser != null && device != null)
+                device.Token = AuthToken.GetAPIAccessJwt(newUser, device);
+
             account.InitializeAccount();
+
+            UnitOfWork.Save();
 
             this.token = new TokenDto(token);
 

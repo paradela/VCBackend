@@ -24,7 +24,7 @@
         <EntityTypeShape EntityType="Model.LoadCard" Width="1.5" PointX="0.75" PointY="8.875" />
         <InheritanceConnector EntityType="Model.LoadCard" />
         <AssociationConnector Association="Model.LoadTokenVCardToken" />
-        <AssociationConnector Association="Model.LoadCardVCard" />
+        <AssociationConnector Association="Model.VCardLoadCard" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>
