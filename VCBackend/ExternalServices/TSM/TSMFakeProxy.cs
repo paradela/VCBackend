@@ -52,8 +52,12 @@ namespace VCBackend.ExternalServices.TSM
         {
             VCard card = UnitOfWork.VCardRepository.GetByID(CardId);
 
-            if (card != null) 
-                return card.InitCard(INT2LE(CardId));
+            if (card != null)
+            {
+                bool res = card.InitCard(INT2LE(CardId));
+                UnitOfWork.Save();
+                return res;
+            }
             else return false;
         }
     }

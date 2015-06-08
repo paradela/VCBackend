@@ -46,8 +46,8 @@ namespace VCBackend.ExternalServices.Payments
                 transaction.description = "Payment to load the virtual card.";
 
                 var redirect_urls = new RedirectUrls();
-                redirect_urls.return_url = "http://localhost:64390/api/pay/paypal/end";
-                redirect_urls.cancel_url = "http://localhost:64390/api/pay/paypal/cancel";
+                redirect_urls.return_url = "http://vcardcallback/paypal/end";
+                redirect_urls.cancel_url = "http://vcardcallback/paypal/cancel";
 
                 var payment = new Payment();
                 payment.intent = "sale";
@@ -75,7 +75,7 @@ namespace VCBackend.ExternalServices.Payments
             {
                 throw ex;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 throw new PayPalPaymentFailed(String.Format("Error calling PayPal."));
             }

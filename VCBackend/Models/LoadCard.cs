@@ -7,6 +7,10 @@ namespace VCBackend
 {
     public partial class LoadCard
     {
+        public LoadCard()
+        {
+        }
+
         public LoadCard(VCard Card)
         {
             VCard = Card;

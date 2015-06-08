@@ -15,7 +15,7 @@ namespace VCBackend.ExternalServices.Ticketing
     public class Card4BTicketingKernelProxy
     {
         private HttpClient Client;
-        private static String ServerUri = "http://localhost:81/api/tk/server";
+        private static String ServerUri = "http://192.168.75.118:81/api/tk/server";
 
         public Card4BTicketingKernelProxy()
         {
@@ -145,7 +145,7 @@ namespace VCBackend.ExternalServices.Ticketing
             loadReq["tkmsg"] = TKMsg;
             loadReq["card"] = card;
 
-            await getURLTask; //wait for call to be finnished
+            //await getURLTask; //wait for call to be finnished
 
             //read the URL
             string strRsp = getURLTask.Result.Content.ReadAsStringAsync().Result;
@@ -155,9 +155,15 @@ namespace VCBackend.ExternalServices.Ticketing
             if (!r.IsMatch(tkUri)) return null;
 
             //call the loading server
-            var response = Client.PostAsJsonAsync(tkUri, loadReq).Result;
-            strRsp = response.Content.ReadAsStringAsync().Result;
+            var loadTask = Client.PostAsJsonAsync(tkUri, loadReq); 
+
+            //await loadTask;
+
+            //var response = loadTask.Result;
+
+            strRsp = loadTask.Result.Content.ReadAsStringAsync().Result;
             jsonRsp = JObject.Parse(strRsp);
+
             var rslt = jsonRsp.ToObject<TKResult>();
             return rslt;
         }

@@ -7,6 +7,9 @@ namespace VCBackend
 {
     public partial class LoadToken
     {
+        public LoadToken()
+        {
+        }
         public LoadToken(VCardToken Token)
         {
             VCardToken = Token;
