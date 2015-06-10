@@ -80,8 +80,7 @@ namespace VCBackend.Services
             token = UnitOfWork.VCardTokenRepository.GetByID(token.Id);
 
             //ToDo: Secure token
-            //String secureToken = secure.RijndaelEncrypt(token);
-            String secureToken = token.Data;
+            String secureToken = secure.RijndaelEncrypt(token);
 
             VCardTokenDto = new VCardTokenDto(secureToken);
             VCardTokenDto.Serialize(token);
