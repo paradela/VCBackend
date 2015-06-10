@@ -4,7 +4,7 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="69930aa420c84948af2a0dea1bd8cbd1" Name="Diagram1" >
+      <Diagram DiagramId="69930aa420c84948af2a0dea1bd8cbd1" Name="Diagram1" ZoomLevel="104" >
         <EntityTypeShape EntityType="Model.User" Width="1.5" PointX="6.75" PointY="0.625" IsExpanded="true" />
         <EntityTypeShape EntityType="Model.Account" Width="1.5" PointX="1.125" PointY="3.25" />
         <EntityTypeShape EntityType="Model.Device" Width="1.5" PointX="9.625" PointY="2.625" />
@@ -15,16 +15,10 @@
         <EntityTypeShape EntityType="Model.VCardToken" Width="1.5" PointX="2.5" PointY="6.125" />
         <AssociationConnector Association="Model.AccountVCardToken" />
         <EntityTypeShape EntityType="Model.PaymentRequest" Width="1.5" PointX="6.625" PointY="3.125" />
-        <EntityTypeShape EntityType="Model.LoadRequest" PointX="4.625" PointY="5.875" Width="1.5" />
-        <AssociationConnector Association="Model.AccountLoadRequest" />
+        <EntityTypeShape EntityType="Model.LoadRequest" PointX="1.25" PointY="8.75" Width="1.5" />
         <AssociationConnector Association="Model.AccountPaymentRequest" />
-        <EntityTypeShape EntityType="Model.LoadToken" Width="1.5" PointX="3.375" PointY="8.875" />
-        <InheritanceConnector EntityType="Model.LoadToken" ManuallyRouted="false" >
-        </InheritanceConnector>
-        <EntityTypeShape EntityType="Model.LoadCard" Width="1.5" PointX="0.75" PointY="8.875" />
-        <InheritanceConnector EntityType="Model.LoadCard" />
-        <AssociationConnector Association="Model.LoadTokenVCardToken" />
-        <AssociationConnector Association="Model.VCardLoadCard" />
+        <AssociationConnector Association="Model.VCardLoadRequest" />
+        <AssociationConnector Association="Model.VCardTokenLoadRequest" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

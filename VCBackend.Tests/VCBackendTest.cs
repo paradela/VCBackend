@@ -25,7 +25,7 @@ namespace VCBackend.Tests
             };
             VCardToken token = new VCardToken(emptyCard);
             DateTime date = DateTime.Now;
-            var load = new LoadToken(token);
+            var load = new LoadRequest(token);
 
             load.DateInitial = date;
 
@@ -47,7 +47,7 @@ namespace VCBackend.Tests
             };
             VCard token = new VCard(emptyCard);
 
-            var load = new LoadCard(token);
+            var load = new LoadRequest(token);
             load.Price = 10.0;
 
             bool approve = tk.ApproveLoadCardRequest(load);

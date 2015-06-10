@@ -209,13 +209,7 @@
     <Compile Include="ExternalServices\Payments\PayPalMethod.cs" />
     <Compile Include="ExternalServices\Ticketing\Card4BTicketingKernelProxy.cs" />
     <Compile Include="ExternalServices\TSM\TSMFakeProxy.cs" />
-    <Compile Include="LoadCard.cs">
-      <DependentUpon>Model.tt</DependentUpon>
-    </Compile>
     <Compile Include="LoadRequest.cs">
-      <DependentUpon>Model.tt</DependentUpon>
-    </Compile>
-    <Compile Include="LoadToken.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
     <Compile Include="Model.Context.cs">
@@ -229,9 +223,7 @@
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Dto\CardBalanceDto.cs" />
-    <Compile Include="Models\LoadCard.cs" />
     <Compile Include="Models\LoadRequest.cs" />
-    <Compile Include="Models\LoadToken.cs" />
     <Compile Include="PaymentRequest.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>

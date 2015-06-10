@@ -15,9 +15,25 @@ namespace VCBackend
 
         public LoadRequest()
         {
+        }
+
+        public LoadRequest(VCard Card)
+        {
+            this.VCard = Card;
+            this.VCardId = Card.Id;
             this.SaleDate = DateTime.Now;
             this.State = STATE_CREATED;
             this.LoadResult = ERROR_UNKNOWN;
+            this.ResultantBalance = 0;
+        }
+
+        public LoadRequest(VCardToken Token)
+        {
+            this.VCardToken = Token;
+            this.SaleDate = DateTime.Now;
+            this.State = STATE_CREATED;
+            this.LoadResult = ERROR_UNKNOWN;
+            this.ResultantBalance = 0;
         }
 
         public bool ApproveLoad()

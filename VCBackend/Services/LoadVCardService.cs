@@ -25,7 +25,7 @@ namespace VCBackend.Services
             using (var transaction = UnitOfWork.TransactionBegin())
             {
                 Card4BTicketingKernelProxy tk = new Card4BTicketingKernelProxy();
-                var load = new LoadCard(u.Account.VCard);
+                var load = new LoadRequest(u.Account.VCard);
 
                 try
                 {

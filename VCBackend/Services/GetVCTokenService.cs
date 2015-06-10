@@ -34,50 +34,46 @@ namespace VCBackend.Services
 
             VCardToken token;
 
-            //using (var transaction = UnitOfWork.TransactionBegin())
-            //{
-            VCard card = u.Account.VCard;
-            Card4BTicketingKernelProxy tk = new Card4BTicketingKernelProxy();
-
-            token = card.CreateVCardToken(u.Account);
-
-            token.DateFinal = date;
-            token.DateInitial = date;
-
-            var load = new LoadToken(token);
-
-            load.AccountId = u.Account.Id;
-            load.DateInitial = date;
-            load.DateFinal = date;
-
-            try
+            using (var transaction = UnitOfWork.TransactionBegin())
             {
-                if (!tk.ApproveLoadTokenRequest(load))
+                VCard card = u.Account.VCard;
+                Card4BTicketingKernelProxy tk = new Card4BTicketingKernelProxy();
+
+                token = card.CreateVCardToken(u.Account);
+
+                token.DateFinal = date;
+                token.DateInitial = date;
+
+                var load = new LoadRequest(token);
+                load.DateInitial = date;
+                token.LoadRequest = load;
+
+                try
                 {
-                    // transaction.Rollback();
-                    throw new InvalidLoadRequest("Request to load no valid.");
+                    if (!tk.ApproveLoadTokenRequest(load))
+                    {
+                        transaction.Rollback();
+                        throw new InvalidLoadRequest("Request to load no valid.");
+                    }
+
+                    u.Account.Withdraw(load.Price);
+
+                    UnitOfWork.Save(); // just to guarantee that loadToken has an ID.
+
+                    if (!tk.LoadToken(load))
+                    {
+                        transaction.Rollback();
+                        throw new InvalidLoadRequest(String.Format("The token loading request failed with result: {0}", load.LoadResult));
+                    }
+                }
+                catch (VCException ex)
+                {
+                    transaction.Rollback();
+                    throw ex;
                 }
 
-                u.Account.Withdraw(load.Price);
-
-                //u.Account.LoadRequest.Add(load);
-
-                UnitOfWork.Save(); // just to guarantee that loadToken has an ID.
-
-                if (!tk.LoadToken(load))
-                {
-                    //transaction.Rollback();
-                    throw new InvalidLoadRequest(String.Format("The token loading request failed with result: {0}", load.LoadResult));
-                }
+                transaction.Commit();
             }
-            catch (VCException ex)
-            {
-                //transaction.Rollback();
-                throw ex;
-            }
-
-                //transaction.Commit();
-            //}
 
             VCardEncryptor secure = new VCardEncryptor(u);
 

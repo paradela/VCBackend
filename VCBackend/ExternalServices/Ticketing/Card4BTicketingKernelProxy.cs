@@ -23,10 +23,11 @@ namespace VCBackend.ExternalServices.Ticketing
         }
 
         //This method should validate the validity of the request in the catalog
-        public bool ApproveLoadCardRequest(LoadCard Request)
+        public bool ApproveLoadCardRequest(LoadRequest Request)
         {
             if (Request != null)
             {
+                if (Request.VCard == null) throw new InvalidLoadRequest(String.Format("Load Card Request must have a VCard associated!"));
                 if (Request.Price <= 0) throw new InvalidLoadRequest(String.Format("Ammount of {0} is not valid.", Request.Price));
                 if (Request.SaleDate.Date != DateTime.Today.Date) throw new InvalidLoadRequest("Internal error: sale date must be today");
                 if (Request.State != LoadRequest.STATE_CREATED) throw new InvalidLoadRequest("Internal error: request not valid!");
@@ -37,14 +38,15 @@ namespace VCBackend.ExternalServices.Ticketing
             return false;
         }
 
-        public bool ApproveLoadTokenRequest(LoadToken Request)
+        public bool ApproveLoadTokenRequest(LoadRequest Request)
         {
             if (Request != null)
             {
-                 if (Request.SaleDate.Date != DateTime.Today.Date) throw new InvalidLoadRequest("Internal error: sale date must be today");
-                 if (Request.State != LoadRequest.STATE_CREATED) throw new InvalidLoadRequest("Internal error: request not valid!");
-                 if (!Request.DateInitial.HasValue || Request.DateInitial.Value.AddMinutes(10).Date < DateTime.Today.Date) 
-                     throw new InvalidLoadRequest("Initial token date is not valid!");
+                if (Request.VCardToken == null) throw new InvalidLoadRequest("Load Token Request must have a VCardToken associated!");
+                if (Request.SaleDate.Date != DateTime.Today.Date) throw new InvalidLoadRequest("Internal error: sale date must be today");
+                if (Request.State != LoadRequest.STATE_CREATED) throw new InvalidLoadRequest("Internal error: request not valid!");
+                if (!Request.DateInitial.HasValue || Request.DateInitial.Value.AddMinutes(10).Date < DateTime.Today.Date) 
+                    throw new InvalidLoadRequest("Initial token date is not valid!");
 
                 Request.ProdId = "2065209";
                 Request.Price = 1.0;
@@ -60,7 +62,7 @@ namespace VCBackend.ExternalServices.Ticketing
             return true;
         }
 
-        public bool LoadCard(LoadCard Request)
+        public bool LoadCard(LoadRequest Request)
         {
             if (Request.State == LoadRequest.STATE_APPROVED 
                 && Request.Price >= 0)
@@ -73,7 +75,7 @@ namespace VCBackend.ExternalServices.Ticketing
                     "<attrib type=\"sale_date\">" + Request.SaleDate.ToString("yyyy-MM-dd") + "</attrib>" +
                     "<attrib type=\"sale_number_daily\">" + Request.Id + "</attrib>" +
                     "</attribs></product></load></tkmsg>";
-                TKResult result = TKCommandEx(tkmsg, Request.VCard.Data).Result;
+                TKResult result = TKCommandEx(tkmsg, Request.VCard.Data);
                 if (result != null)
                 {
                     if (result.status == (uint)TicketingKernel.Status.LOAD &&
@@ -93,7 +95,7 @@ namespace VCBackend.ExternalServices.Ticketing
             return false;
         }
 
-        public bool LoadToken(LoadToken Request)
+        public bool LoadToken(LoadRequest Request)
         {
             if (Request.State == LoadRequest.STATE_APPROVED)
             {
@@ -107,7 +109,7 @@ namespace VCBackend.ExternalServices.Ticketing
                     "<attrib type=\"sale_number_daily\">" + Request.Id + "</attrib>" +
                     "<attrib type=\"date_initial\">" + Request.DateInitial.Value.ToString("yyyy-MM-dd HH:mm:ss") + "</attrib>" +
                     "</attribs></product></load></tkmsg>";
-                TKResult result = TKCommandEx(tkmsg, Request.VCardToken.Data).Result;
+                TKResult result = TKCommandEx(tkmsg, Request.VCardToken.Data);
                 if (result != null)
                 {
                     if (result.status == (uint)TicketingKernel.Status.LOAD &&
@@ -119,8 +121,11 @@ namespace VCBackend.ExternalServices.Ticketing
                         //Parse TKMSG xml to find date_initial and date_final
                         var attribs = ParseTKMsgLoadComplete(result.msg);
                         Request.VCardToken.DateInitial = attribs.date_initial;
+                        Request.DateInitial = attribs.date_initial;
                         Request.VCardToken.DateFinal = attribs.date_final;
+                        Request.DateFinal = attribs.date_final;
                         Request.VCardToken.Amount = attribs.stored_value;
+                        Request.ResultantBalance = attribs.stored_value;
                         return true;
                     }
                 }
@@ -129,7 +134,7 @@ namespace VCBackend.ExternalServices.Ticketing
             return false;
         }
 
-        private async Task<TKResult> TKCommandEx(String TKMsg, String CardData)
+        private TKResult TKCommandEx(String TKMsg, String CardData)
         {
             //Call WS to get a server url to load the card
             var getURLTask = Client.GetAsync(ServerUri);
@@ -145,8 +150,6 @@ namespace VCBackend.ExternalServices.Ticketing
             loadReq["tkmsg"] = TKMsg;
             loadReq["card"] = card;
 
-            //await getURLTask; //wait for call to be finnished
-
             //read the URL
             string strRsp = getURLTask.Result.Content.ReadAsStringAsync().Result;
             var jsonRsp = JObject.Parse(strRsp);
@@ -156,10 +159,6 @@ namespace VCBackend.ExternalServices.Ticketing
 
             //call the loading server
             var loadTask = Client.PostAsJsonAsync(tkUri, loadReq); 
-
-            //await loadTask;
-
-            //var response = loadTask.Result;
 
             strRsp = loadTask.Result.Content.ReadAsStringAsync().Result;
             jsonRsp = JObject.Parse(strRsp);

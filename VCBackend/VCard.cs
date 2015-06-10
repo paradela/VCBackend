@@ -17,7 +17,7 @@ namespace VCBackend
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public VCard()
         {
-            this.LoadCard = new HashSet<LoadCard>();
+            this.LoadRequest = new HashSet<LoadRequest>();
         }
     
         public int Id { get; set; }
@@ -25,6 +25,6 @@ namespace VCBackend
         public int AccountId { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<LoadCard> LoadCard { get; set; }
+        public virtual ICollection<LoadRequest> LoadRequest { get; set; }
     }
 }

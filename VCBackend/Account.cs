@@ -18,7 +18,6 @@ namespace VCBackend
         public Account()
         {
             this.VCardToken = new HashSet<VCardToken>();
-            this.LoadRequest = new HashSet<LoadRequest>();
             this.PaymentRequest = new HashSet<PaymentRequest>();
         }
     
@@ -28,8 +27,6 @@ namespace VCBackend
         public virtual VCard VCard { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<VCardToken> VCardToken { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<LoadRequest> LoadRequest { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<PaymentRequest> PaymentRequest { get; set; }
     }

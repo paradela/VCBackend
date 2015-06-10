@@ -13,8 +13,6 @@
     <EntitySet Name="VCardTokenSet" EntityType="Model.Store.VCardTokenSet" store:Type="Tables" Schema="dbo" />
     <EntitySet Name="PaymentRequestSet" EntityType="Model.Store.PaymentRequestSet" store:Type="Tables" Schema="dbo" />
     <EntitySet Name="LoadRequestSet" EntityType="Model.Store.LoadRequestSet" store:Type="Tables" Schema="dbo" />
-    <EntitySet Name="LoadRequestSet_LoadToken" EntityType="Model.Store.LoadRequestSet_LoadToken" store:Type="Tables" Schema="dbo" />
-    <EntitySet Name="LoadRequestSet_LoadCard" EntityType="Model.Store.LoadRequestSet_LoadCard" store:Type="Tables" Schema="dbo" />
     <AssociationSet Name="UserDevice" Association="Model.Store.UserDevice">
       <End Role="User" EntitySet="UserSet" />
       <End Role="Device" EntitySet="DeviceSet" />
@@ -31,29 +29,17 @@
       <End Role="Account" EntitySet="AccountSet" />
       <End Role="VCardToken" EntitySet="VCardTokenSet" />
     </AssociationSet>
-    <AssociationSet Name="AccountLoadRequest" Association="Model.Store.AccountLoadRequest">
-      <End Role="Account" EntitySet="AccountSet" />
-      <End Role="LoadRequest" EntitySet="LoadRequestSet" />
-    </AssociationSet>
     <AssociationSet Name="AccountPaymentRequest" Association="Model.Store.AccountPaymentRequest">
       <End Role="Account" EntitySet="AccountSet" />
       <End Role="PaymentRequest" EntitySet="PaymentRequestSet" />
     </AssociationSet>
-    <AssociationSet Name="LoadTokenVCardToken" Association="Model.Store.LoadTokenVCardToken">
-      <End Role="LoadToken" EntitySet="LoadRequestSet_LoadToken" />
-      <End Role="VCardToken" EntitySet="VCardTokenSet" />
-    </AssociationSet>
-    <AssociationSet Name="VCardLoadCard" Association="Model.Store.VCardLoadCard">
+    <AssociationSet Name="VCardLoadRequest" Association="Model.Store.VCardLoadRequest">
       <End Role="VCard" EntitySet="VCardSet" />
-      <End Role="LoadCard" EntitySet="LoadRequestSet_LoadCard" />
-    </AssociationSet>
-    <AssociationSet Name="FK_LoadToken_inherits_LoadRequest" Association="Model.Store.FK_LoadToken_inherits_LoadRequest">
       <End Role="LoadRequest" EntitySet="LoadRequestSet" />
-      <End Role="LoadToken" EntitySet="LoadRequestSet_LoadToken" />
     </AssociationSet>
-    <AssociationSet Name="FK_LoadCard_inherits_LoadRequest" Association="Model.Store.FK_LoadCard_inherits_LoadRequest">
+    <AssociationSet Name="VCardTokenLoadRequest" Association="Model.Store.VCardTokenLoadRequest">
+      <End Role="VCardToken" EntitySet="VCardTokenSet" />
       <End Role="LoadRequest" EntitySet="LoadRequestSet" />
-      <End Role="LoadCard" EntitySet="LoadRequestSet_LoadCard" />
     </AssociationSet>
   </EntityContainer>
   <EntityType Name="UserSet">
@@ -103,6 +89,7 @@
     <Property Name="DateFinal" Type="datetime" Nullable="false" />
     <Property Name="Amount" Type="float" Nullable="true" />
     <Property Name="AccountVCardToken_VCardToken_Id" Type="int" Nullable="false" />
+    <Property Name="LoadRequest_Id" Type="int" Nullable="false" />
   </EntityType>
   <EntityType Name="PaymentRequestSet">
     <Key>
@@ -125,28 +112,15 @@
       <PropertyRef Name="Id" />
     </Key>
     <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-    <Property Name="AccountId" Type="int" Nullable="false" />
     <Property Name="ProdId" Type="nvarchar(max)" Nullable="false" />
     <Property Name="Price" Type="float" Nullable="false" />
     <Property Name="SaleDate" Type="datetime" Nullable="false" />
     <Property Name="State" Type="nvarchar(max)" Nullable="false" />
     <Property Name="LoadResult" Type="int" Nullable="false" />
-  </EntityType>
-  <EntityType Name="LoadRequestSet_LoadToken">
-    <Key>
-      <PropertyRef Name="Id" />
-    </Key>
+    <Property Name="ResultantBalance" Type="float" Nullable="false" />
     <Property Name="DateInitial" Type="datetime" Nullable="true" />
     <Property Name="DateFinal" Type="datetime" Nullable="true" />
-    <Property Name="Id" Type="int" Nullable="false" />
-  </EntityType>
-  <EntityType Name="LoadRequestSet_LoadCard">
-    <Key>
-      <PropertyRef Name="Id" />
-    </Key>
-    <Property Name="ResultantBalance" Type="float" Nullable="true" />
-    <Property Name="Id" Type="int" Nullable="false" />
-    <Property Name="VCard_Id" Type="int" Nullable="false" />
+    <Property Name="VCardId" Type="int" Nullable="true" />
   </EntityType>
   <Association Name="UserDevice">
     <End Role="User" Type="Model.Store.UserSet" Multiplicity="1" />
@@ -196,18 +170,6 @@
       </Dependent>
     </ReferentialConstraint>
   </Association>
-  <Association Name="AccountLoadRequest">
-    <End Role="Account" Type="Model.Store.AccountSet" Multiplicity="1" />
-    <End Role="LoadRequest" Type="Model.Store.LoadRequestSet" Multiplicity="*" />
-    <ReferentialConstraint>
-      <Principal Role="Account">
-        <PropertyRef Name="Id" />
-      </Principal>
-      <Dependent Role="LoadRequest">
-        <PropertyRef Name="AccountId" />
-      </Dependent>
-    </ReferentialConstraint>
-  </Association>
   <Association Name="AccountPaymentRequest">
     <End Role="Account" Type="Model.Store.AccountSet" Multiplicity="1" />
     <End Role="PaymentRequest" Type="Model.Store.PaymentRequestSet" Multiplicity="*" />
@@ -220,55 +182,27 @@
       </Dependent>
     </ReferentialConstraint>
   </Association>
-  <Association Name="LoadTokenVCardToken">
-    <End Role="LoadToken" Type="Model.Store.LoadRequestSet_LoadToken" Multiplicity="0..1" />
-    <End Role="VCardToken" Type="Model.Store.VCardTokenSet" Multiplicity="1" />
-    <ReferentialConstraint>
-      <Principal Role="VCardToken">
-        <PropertyRef Name="Id" />
-      </Principal>
-      <Dependent Role="LoadToken">
-        <PropertyRef Name="Id" />
-      </Dependent>
-    </ReferentialConstraint>
-  </Association>
-  <Association Name="VCardLoadCard">
-    <End Role="VCard" Type="Model.Store.VCardSet" Multiplicity="1" />
-    <End Role="LoadCard" Type="Model.Store.LoadRequestSet_LoadCard" Multiplicity="*" />
+  <Association Name="VCardLoadRequest">
+    <End Role="VCard" Type="Model.Store.VCardSet" Multiplicity="0..1" />
+    <End Role="LoadRequest" Type="Model.Store.LoadRequestSet" Multiplicity="*" />
     <ReferentialConstraint>
       <Principal Role="VCard">
         <PropertyRef Name="Id" />
       </Principal>
-      <Dependent Role="LoadCard">
-        <PropertyRef Name="VCard_Id" />
+      <Dependent Role="LoadRequest">
+        <PropertyRef Name="VCardId" />
       </Dependent>
     </ReferentialConstraint>
   </Association>
-  <Association Name="FK_LoadToken_inherits_LoadRequest">
-    <End Role="LoadRequest" Type="Model.Store.LoadRequestSet" Multiplicity="1">
-      <OnDelete Action="Cascade" />
-    </End>
-    <End Role="LoadToken" Type="Model.Store.LoadRequestSet_LoadToken" Multiplicity="0..1" />
+  <Association Name="VCardTokenLoadRequest">
+    <End Role="VCardToken" Type="Model.Store.VCardTokenSet" Multiplicity="*" />
+    <End Role="LoadRequest" Type="Model.Store.LoadRequestSet" Multiplicity="1" />
     <ReferentialConstraint>
       <Principal Role="LoadRequest">
         <PropertyRef Name="Id" />
       </Principal>
-      <Dependent Role="LoadToken">
-        <PropertyRef Name="Id" />
-      </Dependent>
-    </ReferentialConstraint>
-  </Association>
-  <Association Name="FK_LoadCard_inherits_LoadRequest">
-    <End Role="LoadRequest" Type="Model.Store.LoadRequestSet" Multiplicity="1">
-      <OnDelete Action="Cascade" />
-    </End>
-    <End Role="LoadCard" Type="Model.Store.LoadRequestSet_LoadCard" Multiplicity="0..1" />
-    <ReferentialConstraint>
-      <Principal Role="LoadRequest">
-        <PropertyRef Name="Id" />
-      </Principal>
-      <Dependent Role="LoadCard">
-        <PropertyRef Name="Id" />
+      <Dependent Role="VCardToken">
+        <PropertyRef Name="LoadRequest_Id" />
       </Dependent>
     </ReferentialConstraint>
   </Association>
@@ -300,21 +234,17 @@
           </AssociationSet>
           <EntitySet Name="PaymentRequestSet" EntityType="Model.PaymentRequest" />
           <EntitySet Name="LoadRequestSet" EntityType="Model.LoadRequest" />
-          <AssociationSet Name="AccountLoadRequest" Association="Model.AccountLoadRequest">
-            <End EntitySet="AccountSet" Role="Account" />
-            <End EntitySet="LoadRequestSet" Role="LoadRequest" />
-          </AssociationSet>
           <AssociationSet Name="AccountPaymentRequest" Association="Model.AccountPaymentRequest">
             <End Role="Account" EntitySet="AccountSet" />
             <End Role="PaymentRequest" EntitySet="PaymentRequestSet" />
           </AssociationSet>
-          <AssociationSet Name="LoadTokenVCardToken" Association="Model.LoadTokenVCardToken">
-            <End Role="LoadToken" EntitySet="LoadRequestSet" />
-            <End Role="VCardToken" EntitySet="VCardTokenSet" />
-          </AssociationSet>
-          <AssociationSet Name="VCardLoadCard" Association="Model.VCardLoadCard">
+          <AssociationSet Name="VCardLoadRequest" Association="Model.VCardLoadRequest">
             <End Role="VCard" EntitySet="VCardSet" />
-            <End Role="LoadCard" EntitySet="LoadRequestSet" />
+            <End Role="LoadRequest" EntitySet="LoadRequestSet" />
+          </AssociationSet>
+          <AssociationSet Name="VCardTokenLoadRequest" Association="Model.VCardTokenLoadRequest">
+            <End Role="VCardToken" EntitySet="VCardTokenSet" />
+            <End Role="LoadRequest" EntitySet="LoadRequestSet" />
           </AssociationSet>
           </EntityContainer>
         <EntityType Name="User">
@@ -336,7 +266,6 @@
           <Property Name="Balance" Type="Double" Nullable="false" />
           <NavigationProperty Name="VCard" Relationship="Model.AccountVCard" FromRole="Account" ToRole="VCard" />
           <NavigationProperty Name="VCardToken" Relationship="Model.AccountVCardToken" FromRole="Account" ToRole="VCardToken" />
-          <NavigationProperty Name="LoadRequest" Relationship="Model.AccountLoadRequest" FromRole="Account" ToRole="LoadRequest" />
           <NavigationProperty Name="PaymentRequest" Relationship="Model.AccountPaymentRequest" FromRole="Account" ToRole="PaymentRequest" />
         </EntityType>
         <EntityType Name="Device" Abstract="false">
@@ -357,7 +286,7 @@
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="Data" Type="String" Nullable="false" MaxLength="Max" Unicode="true" FixedLength="false" />
           <Property Name="AccountId" Type="Int32" Nullable="false" />
-          <NavigationProperty Name="LoadCard" Relationship="Model.VCardLoadCard" FromRole="VCard" ToRole="LoadCard" />
+          <NavigationProperty Name="LoadRequest" Relationship="Model.VCardLoadRequest" FromRole="VCard" ToRole="LoadRequest" />
         </EntityType>
         <Association Name="UserDevice">
           <End Type="Model.User" Role="User" Multiplicity="1" />
@@ -389,6 +318,7 @@
           <Property Name="DateInitial" Type="DateTime" Nullable="false" />
           <Property Name="DateFinal" Type="DateTime" Nullable="false" />
           <Property Name="Amount" Type="Double" Nullable="true" />
+          <NavigationProperty Name="LoadRequest" Relationship="Model.VCardTokenLoadRequest" FromRole="VCardToken" ToRole="LoadRequest" />
         </EntityType>
         <Association Name="AccountVCardToken">
           <End Type="Model.Account" Role="Account" Multiplicity="1" />
@@ -410,30 +340,23 @@
           <Property Name="PayerId" Type="String" Nullable="true" />
           <Property Name="AccountId" Type="Int32" Nullable="false" />
         </EntityType>
-        <EntityType Name="LoadRequest" Abstract="true">
+        <EntityType Name="LoadRequest" Abstract="false">
           <Key>
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" Type="Int32" />
-          <Property Name="AccountId" Nullable="false" Type="Int32" />
           <Property Name="ProdId" Nullable="false" Type="String" />
-          <Property Name="Price" Type="Double" Nullable="false" cg:SetterAccess="Public" />
-          <Property Name="SaleDate" Type="DateTime" Nullable="false" />
-          <Property Name="State" Type="String" Nullable="false" cg:SetterAccess="Private" />
-          <Property Name="LoadResult" Type="Int32" Nullable="false" cg:SetterAccess="Private" />
+          <Property Name="Price" cg:SetterAccess="Public" Nullable="false" Type="Double" />
+          <Property Name="SaleDate" Nullable="false" Type="DateTime" />
+          <Property Name="State" cg:SetterAccess="Private" Nullable="false" Type="String" />
+          <Property Name="LoadResult" cg:SetterAccess="Private" Nullable="false" Type="Int32" />
+          <Property Name="ResultantBalance" Type="Double" Nullable="false" />
+          <Property Name="DateInitial" Type="DateTime" Nullable="true" />
+          <Property Name="DateFinal" Type="DateTime" Nullable="true" />
+          <NavigationProperty Name="VCard" Relationship="Model.VCardLoadRequest" FromRole="LoadRequest" ToRole="VCard" />
+          <Property Name="VCardId" Type="Int32" Nullable="true" />
+          <NavigationProperty Name="VCardToken" Relationship="Model.VCardTokenLoadRequest" FromRole="LoadRequest" ToRole="VCardToken" />
         </EntityType>
-        <Association Name="AccountLoadRequest">
-          <End Type="Model.Account" Multiplicity="1" Role="Account" />
-          <End Type="Model.LoadRequest" Multiplicity="*" Role="LoadRequest" />
-          <ReferentialConstraint>
-            <Principal Role="Account">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="LoadRequest">
-              <PropertyRef Name="AccountId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="AccountPaymentRequest">
           <End Type="Model.Account" Role="Account" Multiplicity="1" />
           <End Type="Model.PaymentRequest" Role="PaymentRequest" Multiplicity="*" />
@@ -446,30 +369,21 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <EntityType Name="LoadToken" BaseType="Model.LoadRequest" >
-          <NavigationProperty Name="VCardToken" Relationship="Model.LoadTokenVCardToken" FromRole="LoadToken" ToRole="VCardToken" cg:SetterAccess="Private" />
-          <Property Name="DateInitial" Type="DateTime" Nullable="true" />
-          <Property Name="DateFinal" Type="DateTime" Nullable="true" />
-        </EntityType>
-        <EntityType Name="LoadCard" BaseType="Model.LoadRequest" >
-          <Property Name="ResultantBalance" Type="Double" Nullable="true" />
-          <NavigationProperty Name="VCard" Relationship="Model.VCardLoadCard" FromRole="LoadCard" ToRole="VCard" />
-        </EntityType>
-        <Association Name="LoadTokenVCardToken">
-          <End Type="Model.LoadToken" Role="LoadToken" Multiplicity="0..1" />
-          <End Type="Model.VCardToken" Role="VCardToken" Multiplicity="1" />
+        <Association Name="VCardLoadRequest">
+          <End Type="Model.VCard" Role="VCard" Multiplicity="0..1" />
+          <End Type="Model.LoadRequest" Role="LoadRequest" Multiplicity="*" />
           <ReferentialConstraint>
-            <Principal Role="VCardToken">
+            <Principal Role="VCard">
               <PropertyRef Name="Id" />
             </Principal>
-            <Dependent Role="LoadToken">
-              <PropertyRef Name="Id" />
+            <Dependent Role="LoadRequest">
+              <PropertyRef Name="VCardId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="VCardLoadCard">
-          <End Type="Model.VCard" Role="VCard" Multiplicity="1" />
-          <End Type="Model.LoadCard" Role="LoadCard" Multiplicity="*" />
+        <Association Name="VCardTokenLoadRequest">
+          <End Type="Model.VCardToken" Role="VCardToken" Multiplicity="0..1" />
+          <End Type="Model.LoadRequest" Role="LoadRequest" Multiplicity="1" />
         </Association>
       </Schema>
     </edmx:ConceptualModels>
@@ -548,25 +462,15 @@
       <EntityTypeMapping TypeName="IsTypeOf(Model.LoadRequest)">
         <MappingFragment StoreEntitySet="LoadRequestSet">
           <ScalarProperty Name="Id" ColumnName="Id" />
-          <ScalarProperty Name="AccountId" ColumnName="AccountId" />
           <ScalarProperty Name="ProdId" ColumnName="ProdId" />
           <ScalarProperty Name="Price" ColumnName="Price" />
           <ScalarProperty Name="SaleDate" ColumnName="SaleDate" />
           <ScalarProperty Name="State" ColumnName="State" />
           <ScalarProperty Name="LoadResult" ColumnName="LoadResult" />
-        </MappingFragment>
-      </EntityTypeMapping>
-      <EntityTypeMapping TypeName="IsTypeOf(Model.LoadToken)">
-        <MappingFragment StoreEntitySet="LoadRequestSet_LoadToken">
-          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="ResultantBalance" ColumnName="ResultantBalance" />
           <ScalarProperty Name="DateInitial" ColumnName="DateInitial" />
           <ScalarProperty Name="DateFinal" ColumnName="DateFinal" />
-        </MappingFragment>
-      </EntityTypeMapping>
-      <EntityTypeMapping TypeName="IsTypeOf(Model.LoadCard)">
-        <MappingFragment StoreEntitySet="LoadRequestSet_LoadCard">
-          <ScalarProperty Name="Id" ColumnName="Id" />
-          <ScalarProperty Name="ResultantBalance" ColumnName="ResultantBalance" />
+          <ScalarProperty Name="VCardId" ColumnName="VCardId" />
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>
@@ -594,11 +498,11 @@
         <ScalarProperty Name="Id" ColumnName="Id" />
       </EndProperty>
     </AssociationSetMapping>
-    <AssociationSetMapping Name="VCardLoadCard" TypeName="Model.VCardLoadCard" StoreEntitySet="LoadRequestSet_LoadCard">
-      <EndProperty Name="VCard">
-        <ScalarProperty Name="Id" ColumnName="VCard_Id" />
+    <AssociationSetMapping Name="VCardTokenLoadRequest" TypeName="Model.VCardTokenLoadRequest" StoreEntitySet="VCardTokenSet">
+      <EndProperty Name="LoadRequest">
+        <ScalarProperty Name="Id" ColumnName="LoadRequest_Id" />
       </EndProperty>
-      <EndProperty Name="LoadCard">
+      <EndProperty Name="VCardToken">
         <ScalarProperty Name="Id" ColumnName="Id" />
       </EndProperty>
     </AssociationSetMapping>

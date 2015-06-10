@@ -2,7 +2,7 @@
 -- --------------------------------------------------
 -- Entity Designer DDL Script for SQL Server 2005, 2008, 2012 and Azure
 -- --------------------------------------------------
--- Date Created: 06/10/2015 16:16:23
+-- Date Created: 06/10/2015 22:03:01
 -- Generated from EDMX file: C:\Users\Ricardo\Source\Repos\VCBackend\VCBackend\Model.edmx
 -- --------------------------------------------------
 
@@ -29,23 +29,14 @@ GO
 IF OBJECT_ID(N'[dbo].[FK_AccountVCardToken]', 'F') IS NOT NULL
     ALTER TABLE [dbo].[VCardTokenSet] DROP CONSTRAINT [FK_AccountVCardToken];
 GO
-IF OBJECT_ID(N'[dbo].[FK_AccountLoadRequest]', 'F') IS NOT NULL
-    ALTER TABLE [dbo].[LoadRequestSet] DROP CONSTRAINT [FK_AccountLoadRequest];
-GO
 IF OBJECT_ID(N'[dbo].[FK_AccountPaymentRequest]', 'F') IS NOT NULL
     ALTER TABLE [dbo].[PaymentRequestSet] DROP CONSTRAINT [FK_AccountPaymentRequest];
 GO
-IF OBJECT_ID(N'[dbo].[FK_LoadTokenVCardToken]', 'F') IS NOT NULL
-    ALTER TABLE [dbo].[LoadRequestSet_LoadToken] DROP CONSTRAINT [FK_LoadTokenVCardToken];
+IF OBJECT_ID(N'[dbo].[FK_VCardLoadRequest]', 'F') IS NOT NULL
+    ALTER TABLE [dbo].[LoadRequestSet] DROP CONSTRAINT [FK_VCardLoadRequest];
 GO
-IF OBJECT_ID(N'[dbo].[FK_VCardLoadCard]', 'F') IS NOT NULL
-    ALTER TABLE [dbo].[LoadRequestSet_LoadCard] DROP CONSTRAINT [FK_VCardLoadCard];
-GO
-IF OBJECT_ID(N'[dbo].[FK_LoadToken_inherits_LoadRequest]', 'F') IS NOT NULL
-    ALTER TABLE [dbo].[LoadRequestSet_LoadToken] DROP CONSTRAINT [FK_LoadToken_inherits_LoadRequest];
-GO
-IF OBJECT_ID(N'[dbo].[FK_LoadCard_inherits_LoadRequest]', 'F') IS NOT NULL
-    ALTER TABLE [dbo].[LoadRequestSet_LoadCard] DROP CONSTRAINT [FK_LoadCard_inherits_LoadRequest];
+IF OBJECT_ID(N'[dbo].[FK_VCardTokenLoadRequest]', 'F') IS NOT NULL
+    ALTER TABLE [dbo].[VCardTokenSet] DROP CONSTRAINT [FK_VCardTokenLoadRequest];
 GO
 
 -- --------------------------------------------------
@@ -72,12 +63,6 @@ IF OBJECT_ID(N'[dbo].[PaymentRequestSet]', 'U') IS NOT NULL
 GO
 IF OBJECT_ID(N'[dbo].[LoadRequestSet]', 'U') IS NOT NULL
     DROP TABLE [dbo].[LoadRequestSet];
-GO
-IF OBJECT_ID(N'[dbo].[LoadRequestSet_LoadToken]', 'U') IS NOT NULL
-    DROP TABLE [dbo].[LoadRequestSet_LoadToken];
-GO
-IF OBJECT_ID(N'[dbo].[LoadRequestSet_LoadCard]', 'U') IS NOT NULL
-    DROP TABLE [dbo].[LoadRequestSet_LoadCard];
 GO
 
 -- --------------------------------------------------
@@ -128,7 +113,8 @@ CREATE TABLE [dbo].[VCardTokenSet] (
     [DateInitial] datetime  NOT NULL,
     [DateFinal] datetime  NOT NULL,
     [Amount] float  NULL,
-    [AccountVCardToken_VCardToken_Id] int  NOT NULL
+    [AccountVCardToken_VCardToken_Id] int  NOT NULL,
+    [LoadRequest_Id] int  NOT NULL
 );
 GO
 
@@ -151,28 +137,15 @@ GO
 -- Creating table 'LoadRequestSet'
 CREATE TABLE [dbo].[LoadRequestSet] (
     [Id] int IDENTITY(1,1) NOT NULL,
-    [AccountId] int  NOT NULL,
     [ProdId] nvarchar(max)  NOT NULL,
     [Price] float  NOT NULL,
     [SaleDate] datetime  NOT NULL,
     [State] nvarchar(max)  NOT NULL,
-    [LoadResult] int  NOT NULL
-);
-GO
-
--- Creating table 'LoadRequestSet_LoadToken'
-CREATE TABLE [dbo].[LoadRequestSet_LoadToken] (
+    [LoadResult] int  NOT NULL,
+    [ResultantBalance] float  NOT NULL,
     [DateInitial] datetime  NULL,
     [DateFinal] datetime  NULL,
-    [Id] int  NOT NULL
-);
-GO
-
--- Creating table 'LoadRequestSet_LoadCard'
-CREATE TABLE [dbo].[LoadRequestSet_LoadCard] (
-    [ResultantBalance] float  NULL,
-    [Id] int  NOT NULL,
-    [VCard_Id] int  NOT NULL
+    [VCardId] int  NULL
 );
 GO
 
@@ -219,18 +192,6 @@ GO
 -- Creating primary key on [Id] in table 'LoadRequestSet'
 ALTER TABLE [dbo].[LoadRequestSet]
 ADD CONSTRAINT [PK_LoadRequestSet]
-    PRIMARY KEY CLUSTERED ([Id] ASC);
-GO
-
--- Creating primary key on [Id] in table 'LoadRequestSet_LoadToken'
-ALTER TABLE [dbo].[LoadRequestSet_LoadToken]
-ADD CONSTRAINT [PK_LoadRequestSet_LoadToken]
-    PRIMARY KEY CLUSTERED ([Id] ASC);
-GO
-
--- Creating primary key on [Id] in table 'LoadRequestSet_LoadCard'
-ALTER TABLE [dbo].[LoadRequestSet_LoadCard]
-ADD CONSTRAINT [PK_LoadRequestSet_LoadCard]
     PRIMARY KEY CLUSTERED ([Id] ASC);
 GO
 
@@ -298,21 +259,6 @@ ON [dbo].[VCardTokenSet]
     ([AccountVCardToken_VCardToken_Id]);
 GO
 
--- Creating foreign key on [AccountId] in table 'LoadRequestSet'
-ALTER TABLE [dbo].[LoadRequestSet]
-ADD CONSTRAINT [FK_AccountLoadRequest]
-    FOREIGN KEY ([AccountId])
-    REFERENCES [dbo].[AccountSet]
-        ([Id])
-    ON DELETE NO ACTION ON UPDATE NO ACTION;
-GO
-
--- Creating non-clustered index for FOREIGN KEY 'FK_AccountLoadRequest'
-CREATE INDEX [IX_FK_AccountLoadRequest]
-ON [dbo].[LoadRequestSet]
-    ([AccountId]);
-GO
-
 -- Creating foreign key on [AccountId] in table 'PaymentRequestSet'
 ALTER TABLE [dbo].[PaymentRequestSet]
 ADD CONSTRAINT [FK_AccountPaymentRequest]
@@ -328,46 +274,34 @@ ON [dbo].[PaymentRequestSet]
     ([AccountId]);
 GO
 
--- Creating foreign key on [Id] in table 'LoadRequestSet_LoadToken'
-ALTER TABLE [dbo].[LoadRequestSet_LoadToken]
-ADD CONSTRAINT [FK_LoadTokenVCardToken]
-    FOREIGN KEY ([Id])
-    REFERENCES [dbo].[VCardTokenSet]
-        ([Id])
-    ON DELETE NO ACTION ON UPDATE NO ACTION;
-GO
-
--- Creating foreign key on [VCard_Id] in table 'LoadRequestSet_LoadCard'
-ALTER TABLE [dbo].[LoadRequestSet_LoadCard]
-ADD CONSTRAINT [FK_VCardLoadCard]
-    FOREIGN KEY ([VCard_Id])
+-- Creating foreign key on [VCardId] in table 'LoadRequestSet'
+ALTER TABLE [dbo].[LoadRequestSet]
+ADD CONSTRAINT [FK_VCardLoadRequest]
+    FOREIGN KEY ([VCardId])
     REFERENCES [dbo].[VCardSet]
         ([Id])
     ON DELETE NO ACTION ON UPDATE NO ACTION;
 GO
 
--- Creating non-clustered index for FOREIGN KEY 'FK_VCardLoadCard'
-CREATE INDEX [IX_FK_VCardLoadCard]
-ON [dbo].[LoadRequestSet_LoadCard]
-    ([VCard_Id]);
+-- Creating non-clustered index for FOREIGN KEY 'FK_VCardLoadRequest'
+CREATE INDEX [IX_FK_VCardLoadRequest]
+ON [dbo].[LoadRequestSet]
+    ([VCardId]);
 GO
 
--- Creating foreign key on [Id] in table 'LoadRequestSet_LoadToken'
-ALTER TABLE [dbo].[LoadRequestSet_LoadToken]
-ADD CONSTRAINT [FK_LoadToken_inherits_LoadRequest]
-    FOREIGN KEY ([Id])
+-- Creating foreign key on [LoadRequest_Id] in table 'VCardTokenSet'
+ALTER TABLE [dbo].[VCardTokenSet]
+ADD CONSTRAINT [FK_VCardTokenLoadRequest]
+    FOREIGN KEY ([LoadRequest_Id])
     REFERENCES [dbo].[LoadRequestSet]
         ([Id])
-    ON DELETE CASCADE ON UPDATE NO ACTION;
+    ON DELETE NO ACTION ON UPDATE NO ACTION;
 GO
 
--- Creating foreign key on [Id] in table 'LoadRequestSet_LoadCard'
-ALTER TABLE [dbo].[LoadRequestSet_LoadCard]
-ADD CONSTRAINT [FK_LoadCard_inherits_LoadRequest]
-    FOREIGN KEY ([Id])
-    REFERENCES [dbo].[LoadRequestSet]
-        ([Id])
-    ON DELETE CASCADE ON UPDATE NO ACTION;
+-- Creating non-clustered index for FOREIGN KEY 'FK_VCardTokenLoadRequest'
+CREATE INDEX [IX_FK_VCardTokenLoadRequest]
+ON [dbo].[VCardTokenSet]
+    ([LoadRequest_Id]);
 GO
 
 -- --------------------------------------------------
