@@ -11,7 +11,7 @@ namespace VCBackend.Services
 {
     public class LoadVCardService : IService
     {
-        public double Ammount { private get; set; }
+        public double Amount { private get; set; }
 
         public CardBalanceDto CardBalanceDto { get; private set; }
 
@@ -24,8 +24,11 @@ namespace VCBackend.Services
 
             using (var transaction = UnitOfWork.TransactionBegin())
             {
+                VCard card = u.Account.VCard;
                 Card4BTicketingKernelProxy tk = new Card4BTicketingKernelProxy();
-                var load = new LoadRequest(u.Account.VCard);
+                var load = new LoadRequest(card);
+                load.Price = Amount;
+                card.LoadRequest.Add(load);
 
                 try
                 {

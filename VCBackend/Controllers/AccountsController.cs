@@ -174,7 +174,7 @@ namespace VCBackend.Controllers
                 double ammnt;
                 if (!Double.TryParse(ammount, out ammnt))
                     throw new InvalidLoadRequest(String.Format("Ammount {} is not a valid ammount.", ammount));
-                service.Ammount = ammnt;
+                service.Amount = ammnt;
                 service.ExecuteService();
                 return service.CardBalanceDto;
             }
