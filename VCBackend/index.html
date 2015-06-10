@@ -35,6 +35,12 @@
         <input type="text" value="PaymentId" id="paymentid" />
         <input type="button" value="Conclude" onclick="finishPayment()" />
     </div>
+    <div>
+        <h2>Get Token</h2>
+        <input type="time" value="Date Initial" id="dateinitial" />
+        <input type="button" value="Get" onclick="getToken()" />
+        <p id="cardtoken" />
+    </div>
 
   <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-2.0.3.min.js"></script>
   <script>
@@ -117,6 +123,21 @@
                   $('#balance').text('Balance: ' + value['Balance']);
               },
               "json"
+              );
+      }
+
+      function getToken() {
+          var date = new Date();
+          var time = date.getTime() / 1000;
+          var uri = 'api/account/vcard/token?t=' +
+              localStorage.getItem('token') +
+              '&d=' + Math.floor(time);
+          $.get(uri,
+              null,
+              function (value) {
+                  $('#cardtoken').text(String(value));
+              },
+              'json'
               );
       }
   </script>

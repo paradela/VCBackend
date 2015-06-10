@@ -101,7 +101,7 @@
     <Property Name="AccountId" Type="int" Nullable="false" />
     <Property Name="DateInitial" Type="datetime" Nullable="false" />
     <Property Name="DateFinal" Type="datetime" Nullable="false" />
-    <Property Name="Ammount" Type="float" Nullable="true" />
+    <Property Name="Amount" Type="float" Nullable="true" />
     <Property Name="AccountVCardToken_VCardToken_Id" Type="int" Nullable="false" />
   </EntityType>
   <EntityType Name="PaymentRequestSet">
@@ -388,7 +388,7 @@
           <Property Name="AccountId" Type="Int32" Nullable="false" />
           <Property Name="DateInitial" Type="DateTime" Nullable="false" />
           <Property Name="DateFinal" Type="DateTime" Nullable="false" />
-          <Property Name="Ammount" Type="Double" Nullable="true" />
+          <Property Name="Amount" Type="Double" Nullable="true" />
         </EntityType>
         <Association Name="AccountVCardToken">
           <End Type="Model.Account" Role="Account" Multiplicity="1" />
@@ -523,7 +523,7 @@
           <ScalarProperty Name="AccountId" ColumnName="AccountId" />
           <ScalarProperty Name="DateInitial" ColumnName="DateInitial" />
           <ScalarProperty Name="DateFinal" ColumnName="DateFinal" />
-          <ScalarProperty Name="Ammount" ColumnName="Ammount" />
+          <ScalarProperty Name="Amount" ColumnName="Amount" />
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>

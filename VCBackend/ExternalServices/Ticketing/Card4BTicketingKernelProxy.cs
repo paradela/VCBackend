@@ -15,7 +15,7 @@ namespace VCBackend.ExternalServices.Ticketing
     public class Card4BTicketingKernelProxy
     {
         private HttpClient Client;
-        private static String ServerUri = "http://192.168.75.118:81/api/tk/server";
+        private static String ServerUri = "http://localhost:81/api/tk/server";
 
         public Card4BTicketingKernelProxy()
         {
@@ -120,7 +120,7 @@ namespace VCBackend.ExternalServices.Ticketing
                         var attribs = ParseTKMsgLoadComplete(result.msg);
                         Request.VCardToken.DateInitial = attribs.date_initial;
                         Request.VCardToken.DateFinal = attribs.date_final;
-                        Request.VCardToken.Ammount = attribs.stored_value;
+                        Request.VCardToken.Amount = attribs.stored_value;
                         return true;
                     }
                 }

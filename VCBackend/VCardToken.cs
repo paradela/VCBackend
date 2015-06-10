@@ -19,6 +19,6 @@ namespace VCBackend
         public int AccountId { get; set; }
         public System.DateTime DateInitial { get; set; }
         public System.DateTime DateFinal { get; set; }
-        public Nullable<double> Ammount { get; set; }
+        public Nullable<double> Amount { get; set; }
     }
 }
