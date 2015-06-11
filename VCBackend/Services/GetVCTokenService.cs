@@ -65,6 +65,8 @@ namespace VCBackend.Services
                         transaction.Rollback();
                         throw new InvalidLoadRequest(String.Format("The token loading request failed with result: {0}", load.LoadResult));
                     }
+
+                    UnitOfWork.Save();
                 }
                 catch (VCException ex)
                 {
@@ -79,7 +81,6 @@ namespace VCBackend.Services
 
             token = UnitOfWork.VCardTokenRepository.GetByID(token.Id);
 
-            //ToDo: Secure token
             String secureToken = secure.RijndaelEncrypt(token);
 
             VCardTokenDto = new VCardTokenDto(secureToken);
