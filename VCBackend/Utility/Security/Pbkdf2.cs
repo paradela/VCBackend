@@ -14,7 +14,7 @@ namespace VCBackend.Utility.Security
             var algo = new System.Security.Cryptography.HMACSHA1(bytesPwd);
 
             var hashSize = 32;
-            byte[] saltBytes = new byte[64];
+            byte[] saltBytes = new byte[16];
 
             byte[] hashedPwd = CryptSharp.Utility.Pbkdf2.ComputeDerivedKey(algo, saltBytes, 1000, hashSize);
 
