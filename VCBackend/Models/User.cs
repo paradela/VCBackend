@@ -24,13 +24,13 @@ namespace VCBackend
             Devices.Add(device);
         }
 
-        public Device CreateDevice(String Name = null, String DeviceId = null)
+        public Device CreateDevice(String DeviceId = null)
         {
             Device device;
 
             if (DeviceId == null)
                 device = new Device();
-            else device = new Device(DeviceId, Name);
+            else device = new Device(DeviceId);
 
             //Generates a token that should be used next to register a device.
             device.Token = AuthToken.GetAPIAccessJwt(this, device);

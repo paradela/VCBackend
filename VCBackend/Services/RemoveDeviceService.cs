@@ -15,15 +15,15 @@ namespace VCBackend.Services
 
         public override bool ExecuteService()
         {
-            if (deviceid == null)
+            if (DeviceId == null)
                 return false;
             User user = AuthDevice.Owner;
 
-            if (!ValidateDeviceData(null, deviceid))
+            if (!ValidateDeviceData(null, DeviceId))
                 throw new InvalidDataFormat("Invalid id format");
 
             var dev = (from d in user.Devices
-                       where d.DeviceId == deviceid
+                       where d.DeviceId == DeviceId
                        select d).First();
             if (dev == null)
                 throw new DeviceNotFound("Device with given Id does not exist");

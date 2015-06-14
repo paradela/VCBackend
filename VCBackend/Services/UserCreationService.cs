@@ -47,6 +47,12 @@ namespace VCBackend.Services
 
             Device device = newUser.CreateDevice();
 
+            if (DeviceId != null &&
+                ValidateDeviceData(null, DeviceId))
+            {
+                device = newUser.CreateDevice(DeviceId);
+            }
+
             String token = device.Token;
 
             Account account = newUser.CreateAccount();

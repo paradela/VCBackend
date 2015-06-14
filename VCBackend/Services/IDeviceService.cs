@@ -10,14 +10,10 @@ namespace VCBackend.Services
 {
     public abstract class IDeviceService : IService
     {
-        protected String deviceid;
-
         public String DeviceId
         {
-            set
-            {
-                deviceid = value;
-            }
+            protected get;
+            set;
         }
 
         public IDeviceService(UnitOfWork UnitOfWork, Device AuthDevice = null) : base(UnitOfWork, AuthDevice) { }

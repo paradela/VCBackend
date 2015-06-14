@@ -36,7 +36,7 @@ namespace VCBackend.Services
 
             if (!ValidateUserData(Email: email))
                 throw new InvalidDataFormat("The user email has an invalid format.");
-            if(!ValidateDeviceData(DevId: deviceid))
+            if(!ValidateDeviceData(DevId: DeviceId))
                 throw new InvalidDataFormat("The device identifier has an invalid format.");
 
             IEnumerable<User> users = UnitOfWork.UserRepository.Get(filter: q => (q.Email == email && q.Password == HashedPwd));
@@ -46,15 +46,21 @@ namespace VCBackend.Services
                 User user = users.First<User>();
                 ICollection<Device> devices = user.Devices;
 
-                if (deviceid != null)
+                if (DeviceId != null)
                 {
-                    var q = UnitOfWork.DeviceRepository.Get(filter: d => (d.Owner.Id == user.Id && d.DeviceId == deviceid)).FirstOrDefault();
+                    var q = UnitOfWork.DeviceRepository.Get(filter: d => (d.Owner.Id == user.Id && d.DeviceId == DeviceId)).FirstOrDefault();
                     if (q != null)
                     {
                         q.Token = AuthToken.GetAPIAccessJwt(user, q);
                         token = q.Token;
                     }
-                    else throw new DeviceNotFound("Invalid Device identifier!");
+                    else
+                    {
+                        q = user.CreateDevice(
+                                DeviceId
+                            );
+                        q.Token = AuthToken.GetAPIAccessJwt(user, q);
+                    }
 
                 }
                 else

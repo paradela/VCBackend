@@ -20,7 +20,7 @@ namespace VCBackend.Controllers
     {
         //POST api/user?n="Name"&e="email@mail.pt"&p="passw0rd"
         [Route("")]
-        public TokenDto PostNewUser([FromUri] String n, [FromUri] String e, [FromUri] String p)
+        public TokenDto PostNewUser([FromUri] String n, [FromUri] String e, [FromUri] String p, [FromUri] String id = null)
         {
             try
             {
@@ -29,6 +29,7 @@ namespace VCBackend.Controllers
                 service.Name = n;
                 service.Email = e;
                 service.Password = p;
+                service.DeviceId = id;
                 if (service.ExecuteService())
                     return service.Token;
                 else return null;
@@ -120,32 +121,32 @@ namespace VCBackend.Controllers
             return dto;
         }
 
-        //POST api/user/device?t=123token
-        [Route("device")]
-        [VCAuthenticate]
-        public TokenDto PostAddDevice([FromUri] String n, [FromUri] String id)
-        {
-            try
-            {
-                UnitOfWork uw = new UnitOfWork();
-                int authDev = VCAuthenticate.GetAuthenticatedDevice(ActionContext);
-                Device dev = uw.DeviceRepository.GetByID(authDev);
-                AddDeviceService service = new AddDeviceService(uw, dev);
-                service.DeviceName = n;
-                service.DeviceId = id;
-                if (service.ExecuteService())
-                    return service.TokenDto;
-                else return null;
-            }
-            catch (VCException ex)
-            {
-                throw new HttpResponseException(new ErrorResponse(ex));
-            }
-            catch (Exception ex)
-            {
-                throw new HttpResponseException(new ErrorResponse(ex));
-            }
-        }
+        ////POST api/user/device?t=123token
+        //[Route("device")]
+        //[VCAuthenticate]
+        //public TokenDto PostAddDevice([FromUri] String n, [FromUri] String id)
+        //{
+        //    try
+        //    {
+        //        UnitOfWork uw = new UnitOfWork();
+        //        int authDev = VCAuthenticate.GetAuthenticatedDevice(ActionContext);
+        //        Device dev = uw.DeviceRepository.GetByID(authDev);
+        //        AddDeviceService service = new AddDeviceService(uw, dev);
+        //        service.DeviceName = n;
+        //        service.DeviceId = id;
+        //        if (service.ExecuteService())
+        //            return service.TokenDto;
+        //        else return null;
+        //    }
+        //    catch (VCException ex)
+        //    {
+        //        throw new HttpResponseException(new ErrorResponse(ex));
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        throw new HttpResponseException(new ErrorResponse(ex));
+        //    }
+        //}
 
         //DELETE api/user/device/id?t=123token
         [Route("device/{id}")]

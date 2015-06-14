@@ -15,9 +15,9 @@ namespace VCBackend
             this.DeviceId = null;
         }
 
-        public Device(String Name, String DeviceId)
+        public Device(String DeviceId)
         {
-            this.Name = Name;
+            this.Name = "Device";
             this.DeviceId = DeviceId;
         }
     }
