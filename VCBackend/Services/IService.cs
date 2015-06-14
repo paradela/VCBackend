@@ -8,31 +8,48 @@ namespace VCBackend.Services
 {
     public abstract class IService
     {
-        private readonly UnitOfWork unitofwork;
-        private readonly Device authDevice;
 
         public UnitOfWork UnitOfWork
         {
-            get
-            {
-                return unitofwork;
-            }
+            get;
+            private set;
         }
 
         public Device AuthDevice
         {
-            get
-            {
-                return authDevice;
-            }
+            get;
+            private set;
         }
 
         public IService(UnitOfWork UnitOfWork, Device AuthDevice = null)
         {
-            this.unitofwork = UnitOfWork;
-            this.authDevice = AuthDevice;
+            this.UnitOfWork = UnitOfWork;
+            this.AuthDevice = AuthDevice;
         }
 
-        public abstract bool ExecuteService();
+
+        public bool Execute()
+        {
+            bool result = false;
+
+            using (var trx = UnitOfWork.TransactionBegin())
+            {
+                try
+                {
+                    result = ExecuteService();
+                    trx.Commit();
+                }
+                catch (Exception ex)
+                {
+                    trx.Rollback();
+                    throw ex;
+                }
+            }
+
+            return result;
+        }
+
+
+        protected abstract bool ExecuteService();
     }
 }

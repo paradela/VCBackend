@@ -67,7 +67,7 @@ namespace VCBackend.Controllers
                 BeginPaymentService service = new BeginPaymentService(uw, dev);
                 service.Amount = a;
                 service.Method = method;
-                if (service.ExecuteService())
+                if (service.Execute())
                 {
                     return service.PaymentDto;
                 }
@@ -97,7 +97,7 @@ namespace VCBackend.Controllers
                 service.Method = method;
                 service.PayerId = u;
                 service.PaymentId = p;
-                if (service.ExecuteService())
+                if (service.Execute())
                 {
                     return service.BalanceDto;
                 }
@@ -125,7 +125,7 @@ namespace VCBackend.Controllers
                 CancelPaymentService service = new CancelPaymentService(uw, dev);
                 service.Method = method;
                 service.PaymentId = p;
-                service.ExecuteService();
+                service.Execute();
             }
             catch (VCException ex)
             {
@@ -148,7 +148,7 @@ namespace VCBackend.Controllers
                 Device dev = uw.DeviceRepository.GetByID(AuthDev);
                 GetVCTokenService service = new GetVCTokenService(uw, dev);
                 service.DateInitial = d;
-                service.ExecuteService();
+                service.Execute();
                 return service.VCardTokenDto;
             }
             catch (VCException ex)
@@ -175,7 +175,7 @@ namespace VCBackend.Controllers
                 if (!Double.TryParse(ammount, out ammnt))
                     throw new InvalidLoadRequest(String.Format("Ammount {} is not a valid ammount.", ammount));
                 service.Amount = ammnt;
-                service.ExecuteService();
+                service.Execute();
                 return service.CardBalanceDto;
             }
             catch (VCException ex)

@@ -50,7 +50,7 @@ namespace VCBackend.Services
         public EndPaymentService(UnitOfWork UnitOfWork, Device AuthDevice)
             : base(UnitOfWork, AuthDevice) { }
 
-        public override bool ExecuteService()
+        protected override bool ExecuteService()
         {
             if (method == null || payerid == null || paymentid == null)
                 return false;
@@ -65,28 +65,15 @@ namespace VCBackend.Services
 
             if (request == null) throw new PaymentNotFound(String.Format("No payment request registered with ID {0}.", paymentid));
 
-            using (var transactionCtx = UnitOfWork.TransactionBegin())
-            {
-                try
-                {
-                    request.PayerId = payerid;
-                    newRequest = payMethod.PaymentEnd(request);
-                    UnitOfWork.PaymentRepository.Update(newRequest);
+            request.PayerId = payerid;
+            newRequest = payMethod.PaymentEnd(request);
+            UnitOfWork.PaymentRepository.Update(newRequest);
 
-                    Account.AddFunds(request.Price);
-                    UnitOfWork.AccountRepository.Update(Account);
+            Account.AddFunds(request.Price);
+            UnitOfWork.AccountRepository.Update(Account);
 
-                    UnitOfWork.Save();
+            UnitOfWork.Save();
 
-                    transactionCtx.Commit();
-                }
-                catch (Exception ex)
-                {
-                    transactionCtx.Rollback();
-                    throw ex;
-                }
-
-            }
             dto = new BalanceDto();
             dto.Serialize(Account);
             return true;

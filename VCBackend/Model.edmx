@@ -13,6 +13,7 @@
     <EntitySet Name="VCardTokenSet" EntityType="Model.Store.VCardTokenSet" store:Type="Tables" Schema="dbo" />
     <EntitySet Name="PaymentRequestSet" EntityType="Model.Store.PaymentRequestSet" store:Type="Tables" Schema="dbo" />
     <EntitySet Name="LoadRequestSet" EntityType="Model.Store.LoadRequestSet" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="AccessTokensSet" EntityType="Model.Store.AccessTokensSet" store:Type="Tables" Schema="dbo" />
     <AssociationSet Name="UserDevice" Association="Model.Store.UserDevice">
       <End Role="User" EntitySet="UserSet" />
       <End Role="Device" EntitySet="DeviceSet" />
@@ -41,6 +42,10 @@
       <End Role="VCardToken" EntitySet="VCardTokenSet" />
       <End Role="LoadRequest" EntitySet="LoadRequestSet" />
     </AssociationSet>
+    <AssociationSet Name="DeviceAccessTokens" Association="Model.Store.DeviceAccessTokens">
+      <End Role="Device" EntitySet="DeviceSet" />
+      <End Role="AccessTokens" EntitySet="AccessTokensSet" />
+    </AssociationSet>
   </EntityContainer>
   <EntityType Name="UserSet">
     <Key>
@@ -66,8 +71,8 @@
     <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
     <Property Name="UserId" Type="int" Nullable="false" />
     <Property Name="Name" Type="nvarchar(max)" Nullable="false" />
-    <Property Name="Token" Type="nvarchar(max)" Nullable="false" />
     <Property Name="DeviceId" Type="nvarchar(max)" Nullable="true" />
+    <Property Name="AccessTokens_Id" Type="int" Nullable="false" />
   </EntityType>
   <EntityType Name="VCardSet">
     <Key>
@@ -121,6 +126,14 @@
     <Property Name="DateInitial" Type="datetime" Nullable="true" />
     <Property Name="DateFinal" Type="datetime" Nullable="true" />
     <Property Name="VCardId" Type="int" Nullable="true" />
+  </EntityType>
+  <EntityType Name="AccessTokensSet">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="AuthToken" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="RefreshToken" Type="nvarchar(max)" Nullable="false" />
   </EntityType>
   <Association Name="UserDevice">
     <End Role="User" Type="Model.Store.UserSet" Multiplicity="1" />
@@ -203,6 +216,18 @@
       </Principal>
       <Dependent Role="VCardToken">
         <PropertyRef Name="LoadRequest_Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="DeviceAccessTokens">
+    <End Role="Device" Type="Model.Store.DeviceSet" Multiplicity="*" />
+    <End Role="AccessTokens" Type="Model.Store.AccessTokensSet" Multiplicity="1" />
+    <ReferentialConstraint>
+      <Principal Role="AccessTokens">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Device">
+        <PropertyRef Name="AccessTokens_Id" />
       </Dependent>
     </ReferentialConstraint>
   </Association>
@@ -490,6 +515,15 @@
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>
+    <EntitySetMapping Name="AccessTokensSet">
+      <EntityTypeMapping TypeName="IsTypeOf(Model.AccessTokens)">
+        <MappingFragment StoreEntitySet="AccessTokensSet">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="AuthToken" ColumnName="AuthToken" />
+          <ScalarProperty Name="RefreshToken" ColumnName="RefreshToken" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
     <AssociationSetMapping Name="AccountVCard" TypeName="Model.AccountVCard" StoreEntitySet="VCardSet">
       <EndProperty Name="Account">
         <ScalarProperty Name="Id" ColumnName="AccountVCard_VCard_Id" />
@@ -519,6 +553,14 @@
         <ScalarProperty Name="Id" ColumnName="LoadRequest_Id" />
       </EndProperty>
       <EndProperty Name="VCardToken">
+        <ScalarProperty Name="Id" ColumnName="Id" />
+      </EndProperty>
+    </AssociationSetMapping>
+    <AssociationSetMapping Name="DeviceAccessTokens" TypeName="Model.DeviceAccessTokens" StoreEntitySet="DeviceSet">
+      <EndProperty Name="AccessTokens">
+        <ScalarProperty Name="Id" ColumnName="AccessTokens_Id" />
+      </EndProperty>
+      <EndProperty Name="Device">
         <ScalarProperty Name="Id" ColumnName="Id" />
       </EndProperty>
     </AssociationSetMapping>

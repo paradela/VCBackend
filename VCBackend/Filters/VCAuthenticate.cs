@@ -46,6 +46,10 @@ namespace VCBackend.Filters
                 //3. Validate the token
                 if (payload == null)
                     throw new HttpResponseException(new ErrorResponse(new InvalidAuthToken("The suplied token is not valid.")));
+                string type = (string)payload["type"];
+
+                if(type != AuthToken.API_ACCESS_TOKEN_TYPE_AUTH)
+                    throw new HttpResponseException(new ErrorResponse(new InvalidAuthToken("The suplied token is not a valid auth token")));
 
                 var uid = payload["user_id"];
                 var did = payload["device_id"];

@@ -12,7 +12,7 @@ namespace VCBackend.Services
 {
     public class UserLoginService : IUserService
     {
-        public AccessTokensDto AccessTokenDto
+        public AuthTokenDto AuthTokenDto
         {
             get;
             private set;
@@ -21,7 +21,7 @@ namespace VCBackend.Services
         public UserLoginService(UnitOfWork UnitOfWork)
             : base(UnitOfWork) { }
 
-        public override bool ExecuteService()
+        protected override bool ExecuteService()
         {
             AccessTokens token = null;
 
@@ -47,10 +47,12 @@ namespace VCBackend.Services
                     var q = UnitOfWork.DeviceRepository.Get(filter: d => (d.Owner.Id == user.Id && d.DeviceId == DeviceId)).FirstOrDefault();
                     if (q != null)
                     {
+                        UnitOfWork.AccessTokensRepository.Delete(q.AccessTokens);
                         token = new AccessTokens();
                         token.AuthToken = AuthToken.GetAPIAuthJwt(user, q);
                         token.RefreshToken = AuthToken.GetAPIRefreshJwt(user, q);
                         q.AccessTokens = token;
+                        UnitOfWork.AccessTokensRepository.Add(token);
                     }
                     else
                     {
@@ -67,16 +69,18 @@ namespace VCBackend.Services
                     var q = UnitOfWork.DeviceRepository.Get(filter: d => (d.Owner.Id == user.Id && d.DeviceId == null)).FirstOrDefault();
                     if (q != null)
                     {
+                        UnitOfWork.AccessTokensRepository.Delete(q.AccessTokens);
                         token = new AccessTokens();
                         token.AuthToken = AuthToken.GetAPIAuthJwt(user, q);
                         token.RefreshToken = AuthToken.GetAPIRefreshJwt(user, q);
                         q.AccessTokens = token;
+                        UnitOfWork.AccessTokensRepository.Add(token);
                     }
                     else throw new DeviceNotFound("Internal error, no devices to authenticate");
                 }
 
-                AccessTokenDto = new AccessTokensDto();
-                AccessTokenDto.Serialize(token);
+                AuthTokenDto = new AuthTokenDto();
+                AuthTokenDto.Serialize(token);
                 
                 UnitOfWork.UserRepository.Update(user);
                 UnitOfWork.Save();

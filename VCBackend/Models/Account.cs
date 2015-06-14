@@ -18,9 +18,9 @@ namespace VCBackend
             this.Balance = Balance;
         }
 
-        public bool InitializeAccount()
+        public bool InitializeAccount(UnitOfWork unitofwork)
         {
-            TSMFakeProxy proxy = new TSMFakeProxy();
+            TSMFakeProxy proxy = new TSMFakeProxy(unitofwork);
 
             int card = proxy.InstallCard(Id);
 

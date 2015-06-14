@@ -17,7 +17,7 @@ namespace VCBackend.Services
 
         public GetUserService(UnitOfWork UnitOfWork, Device AuthDevice) : base(UnitOfWork, AuthDevice) { }
 
-        public override bool ExecuteService()
+        protected override bool ExecuteService()
         {
             dto = new UserDto();
             dto.Serialize(AuthDevice.Owner);

@@ -15,8 +15,8 @@ namespace VCBackend.Utility.Security
         private static int API_REFRESH_TOKEN_VALIDITY_M = 6; // 6 months
         private static int CARD_KEY_VALIDITY = 60; // 1 min
 
-        private static String API_ACCESS_TOKEN_TYPE_AUTH = "AUTH";
-        private static String API_ACCESS_TOKEN_TYPE_REFRESH = "REFRESH";
+        public static String API_ACCESS_TOKEN_TYPE_AUTH = "AUTH";
+        public static String API_ACCESS_TOKEN_TYPE_REFRESH = "REFRESH";
 
         public static String GetAPIAuthJwt(User User, Device Device)
         {

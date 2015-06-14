@@ -58,7 +58,7 @@
               null,
               function (value) {
                   $('#token').text('Token: ' + value["AuthToken"]);
-                  localStorage.token = value;
+                  localStorage.setItem('token', value['AuthToken']);
               },
               "json"
               );

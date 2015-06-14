@@ -34,6 +34,8 @@ namespace VCBackend
 
             //Generates a token that should be used next to register a device.
             device.AccessTokens = new AccessTokens();
+            device.AccessTokens.AuthToken = "";
+            device.AccessTokens.RefreshToken = "";
 
             AddDevice(device);
 

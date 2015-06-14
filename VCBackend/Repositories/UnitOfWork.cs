@@ -12,6 +12,7 @@ namespace VCBackend.Repositories
         private ModelContainer context;
         private Repository<User> userRepository;
         private Repository<Device> deviceRepository;
+        private Repository<AccessTokens> accessTokensRepository;
         private Repository<Account> accountRepository;
         private Repository<VCard> vcardRepository;
         private Repository<VCardToken> tokenRepository;
@@ -45,6 +46,18 @@ namespace VCBackend.Repositories
                     this.deviceRepository = new Repository<Device>(context);
                 }
                 return deviceRepository;
+            }
+        }
+
+        public Repository<AccessTokens> AccessTokensRepository
+        {
+            get
+            {
+                if (this.accessTokensRepository == null)
+                {
+                    this.accessTokensRepository = new Repository<AccessTokens>(context);
+                }
+                return accessTokensRepository;
             }
         }
 

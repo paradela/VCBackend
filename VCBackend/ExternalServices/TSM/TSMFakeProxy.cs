@@ -20,9 +20,9 @@ namespace VCBackend.ExternalServices.TSM
 
         private UnitOfWork UnitOfWork;
 
-        public TSMFakeProxy()
+        public TSMFakeProxy(UnitOfWork UnitofWork)
         {
-            UnitOfWork = new UnitOfWork();
+            this.UnitOfWork = UnitofWork;
         }
 
         private byte[] INT2LE(int data)

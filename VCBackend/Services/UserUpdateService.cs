@@ -24,7 +24,7 @@ namespace VCBackend.Services
         public UserUpdateService(UnitOfWork UnitOfWork, Device AuthDevice)
             : base(UnitOfWork, AuthDevice) { }
 
-        public override bool ExecuteService()
+        protected override bool ExecuteService()
         {
             if (name == null && email == null && password == null)
                 return false;

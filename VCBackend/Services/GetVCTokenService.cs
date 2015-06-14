@@ -20,7 +20,7 @@ namespace VCBackend.Services
         public GetVCTokenService(UnitOfWork UnitOfWork, Device AuthDevice)
             : base(UnitOfWork, AuthDevice) { }
 
-        public override bool ExecuteService()
+        protected override bool ExecuteService()
         {
             if (DateInitial == null)
                 return false;
@@ -33,49 +33,29 @@ namespace VCBackend.Services
             User u = AuthDevice.Owner;
 
             VCardToken token;
+            VCard card = u.Account.VCard;
+            Card4BTicketingKernelProxy tk = new Card4BTicketingKernelProxy();
 
-            using (var transaction = UnitOfWork.TransactionBegin())
-            {
-                VCard card = u.Account.VCard;
-                Card4BTicketingKernelProxy tk = new Card4BTicketingKernelProxy();
+            token = card.CreateVCardToken(u.Account);
 
-                token = card.CreateVCardToken(u.Account);
+            token.DateFinal = date;
+            token.DateInitial = date;
 
-                token.DateFinal = date;
-                token.DateInitial = date;
+            var load = new LoadRequest(token);
+            load.DateInitial = date;
+            token.LoadRequest = load;
 
-                var load = new LoadRequest(token);
-                load.DateInitial = date;
-                token.LoadRequest = load;
+            if (!tk.ApproveLoadTokenRequest(load))
+                throw new InvalidLoadRequest("Request to load no valid.");
 
-                try
-                {
-                    if (!tk.ApproveLoadTokenRequest(load))
-                    {
-                        transaction.Rollback();
-                        throw new InvalidLoadRequest("Request to load no valid.");
-                    }
+            u.Account.Withdraw(load.Price);
 
-                    u.Account.Withdraw(load.Price);
+            UnitOfWork.Save(); // just to guarantee that loadToken has an ID.
 
-                    UnitOfWork.Save(); // just to guarantee that loadToken has an ID.
+            if (!tk.LoadToken(load))
+                throw new InvalidLoadRequest(String.Format("The token loading request failed with result: {0}", load.LoadResult));
 
-                    if (!tk.LoadToken(load))
-                    {
-                        transaction.Rollback();
-                        throw new InvalidLoadRequest(String.Format("The token loading request failed with result: {0}", load.LoadResult));
-                    }
-
-                    UnitOfWork.Save();
-                }
-                catch (VCException ex)
-                {
-                    transaction.Rollback();
-                    throw ex;
-                }
-
-                transaction.Commit();
-            }
+            UnitOfWork.Save();
 
             VCardEncryptor secure = new VCardEncryptor(u);
 

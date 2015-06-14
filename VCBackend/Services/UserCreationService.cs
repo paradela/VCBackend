@@ -20,7 +20,7 @@ namespace VCBackend.Services
         public UserCreationService(UnitOfWork UnitOfWork)
             : base(UnitOfWork) { }
 
-        public override bool ExecuteService()
+        protected override bool ExecuteService()
         {
             if (name == null || email == null || password == null)
                 return false;
@@ -31,7 +31,6 @@ namespace VCBackend.Services
             // First check wether exists on the Users DB a user with any of the given data.
             if (ExistUserWithEmail(email))
                 throw new EmailAlreadyRegistered("Given email address is already in use.");
-
 
             // Then if the user doesn't exist, we can create the user
             // A DefaultDevice is used to login with browsers.
@@ -54,29 +53,21 @@ namespace VCBackend.Services
             UnitOfWork.UserRepository.Add(newUser);
             UnitOfWork.Save();
 
-            newUser = UnitOfWork.UserRepository.Get(filter: q => (q.Email == newUser.Email)).FirstOrDefault();
+            account.InitializeAccount(UnitOfWork);
 
+            newUser = UnitOfWork.UserRepository.Get(filter: q => (q.Email == newUser.Email)).FirstOrDefault();
             device = UnitOfWork.DeviceRepository.Get(filter: q => (q.Owner.Id == newUser.Id)).FirstOrDefault();
 
-            if (newUser != null && device != null)
-            {
-                device.AccessTokens = new AccessTokens();
-                AccessToken = new AccessTokensDto();
-                device.AccessTokens.AuthToken = AuthToken.GetAPIAuthJwt(newUser, device);
-                device.AccessTokens.RefreshToken = AuthToken.GetAPIRefreshJwt(newUser, device);
-                AccessToken.Serialize(device.AccessTokens);
-            }
-            else
-            {
-                if(newUser != null)
-                    UnitOfWork.UserRepository.Delete(newUser.Id);
-                if (device != null)
-                    UnitOfWork.DeviceRepository.Delete(device.Id);
-                UnitOfWork.Save();
-                return false;
-            }
+            UnitOfWork.AccessTokensRepository.Delete(device.AccessTokens);
 
-            account.InitializeAccount();
+            device.AccessTokens = new AccessTokens();
+            AccessToken = new AccessTokensDto();
+            device.AccessTokens.AuthToken = AuthToken.GetAPIAuthJwt(newUser, device);
+            device.AccessTokens.RefreshToken = AuthToken.GetAPIRefreshJwt(newUser, device);
+
+            UnitOfWork.AccessTokensRepository.Add(device.AccessTokens);
+
+            AccessToken.Serialize(device.AccessTokens);
 
             UnitOfWork.Save();
 

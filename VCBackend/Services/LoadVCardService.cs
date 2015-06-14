@@ -18,47 +18,28 @@ namespace VCBackend.Services
         public LoadVCardService(UnitOfWork UnitOfWork, Device AuthDevice)
         : base(UnitOfWork, AuthDevice) { }
 
-        public override bool ExecuteService()
+        protected override bool ExecuteService()
         {
             User u = AuthDevice.Owner;
 
-            using (var transaction = UnitOfWork.TransactionBegin())
-            {
-                VCard card = u.Account.VCard;
-                Card4BTicketingKernelProxy tk = new Card4BTicketingKernelProxy();
-                var load = new LoadRequest(card);
-                load.Price = Amount;
-                card.LoadRequest.Add(load);
+            VCard card = u.Account.VCard;
+            Card4BTicketingKernelProxy tk = new Card4BTicketingKernelProxy();
+            var load = new LoadRequest(card);
+            load.Price = Amount;
+            card.LoadRequest.Add(load);
 
-                try
-                {
-                    if (!tk.ApproveLoadCardRequest(load))
-                    {
-                        transaction.Rollback();
-                        throw new InvalidLoadRequest("Request to load no valid.");
-                    }
+            if (!tk.ApproveLoadCardRequest(load))
+                throw new InvalidLoadRequest("Request to load no valid.");
 
-                    u.Account.Withdraw(load.Price);
+            u.Account.Withdraw(load.Price);
 
-                    UnitOfWork.Save(); // just to guarantee that loadToken has an ID.
+            UnitOfWork.Save(); // just to guarantee that loadToken has an ID.
 
-                    if (!tk.LoadCard(load))
-                    {
-                        transaction.Rollback();
-                        throw new InvalidLoadRequest(String.Format("The token loading request failed with result: {0}", load.LoadResult));
-                    }
-                }
-                catch (VCException ex)
-                {
-                    transaction.Rollback();
-                    throw ex;
-                }
+            if (!tk.LoadCard(load))
+                throw new InvalidLoadRequest(String.Format("The token loading request failed with result: {0}", load.LoadResult));
 
-                transaction.Commit();
-
-                CardBalanceDto = new CardBalanceDto();
-                CardBalanceDto.Serialize(load);
-            }
+            CardBalanceDto = new CardBalanceDto();
+            CardBalanceDto.Serialize(load);
 
             return true;
         }

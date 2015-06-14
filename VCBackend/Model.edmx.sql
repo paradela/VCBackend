@@ -2,7 +2,7 @@
 -- --------------------------------------------------
 -- Entity Designer DDL Script for SQL Server 2005, 2008, 2012 and Azure
 -- --------------------------------------------------
--- Date Created: 06/10/2015 22:03:01
+-- Date Created: 06/14/2015 16:37:55
 -- Generated from EDMX file: C:\Users\Ricardo\Source\Repos\VCBackend\VCBackend\Model.edmx
 -- --------------------------------------------------
 
@@ -38,6 +38,9 @@ GO
 IF OBJECT_ID(N'[dbo].[FK_VCardTokenLoadRequest]', 'F') IS NOT NULL
     ALTER TABLE [dbo].[VCardTokenSet] DROP CONSTRAINT [FK_VCardTokenLoadRequest];
 GO
+IF OBJECT_ID(N'[dbo].[FK_DeviceAccessTokens]', 'F') IS NOT NULL
+    ALTER TABLE [dbo].[DeviceSet] DROP CONSTRAINT [FK_DeviceAccessTokens];
+GO
 
 -- --------------------------------------------------
 -- Dropping existing tables
@@ -63,6 +66,9 @@ IF OBJECT_ID(N'[dbo].[PaymentRequestSet]', 'U') IS NOT NULL
 GO
 IF OBJECT_ID(N'[dbo].[LoadRequestSet]', 'U') IS NOT NULL
     DROP TABLE [dbo].[LoadRequestSet];
+GO
+IF OBJECT_ID(N'[dbo].[AccessTokensSet]', 'U') IS NOT NULL
+    DROP TABLE [dbo].[AccessTokensSet];
 GO
 
 -- --------------------------------------------------
@@ -91,8 +97,8 @@ CREATE TABLE [dbo].[DeviceSet] (
     [Id] int IDENTITY(1,1) NOT NULL,
     [UserId] int  NOT NULL,
     [Name] nvarchar(max)  NOT NULL,
-    [Token] nvarchar(max)  NOT NULL,
-    [DeviceId] nvarchar(max)  NULL
+    [DeviceId] nvarchar(max)  NULL,
+    [AccessTokens_Id] int  NOT NULL
 );
 GO
 
@@ -149,6 +155,14 @@ CREATE TABLE [dbo].[LoadRequestSet] (
 );
 GO
 
+-- Creating table 'AccessTokensSet'
+CREATE TABLE [dbo].[AccessTokensSet] (
+    [Id] int IDENTITY(1,1) NOT NULL,
+    [AuthToken] nvarchar(max)  NOT NULL,
+    [RefreshToken] nvarchar(max)  NOT NULL
+);
+GO
+
 -- --------------------------------------------------
 -- Creating all PRIMARY KEY constraints
 -- --------------------------------------------------
@@ -192,6 +206,12 @@ GO
 -- Creating primary key on [Id] in table 'LoadRequestSet'
 ALTER TABLE [dbo].[LoadRequestSet]
 ADD CONSTRAINT [PK_LoadRequestSet]
+    PRIMARY KEY CLUSTERED ([Id] ASC);
+GO
+
+-- Creating primary key on [Id] in table 'AccessTokensSet'
+ALTER TABLE [dbo].[AccessTokensSet]
+ADD CONSTRAINT [PK_AccessTokensSet]
     PRIMARY KEY CLUSTERED ([Id] ASC);
 GO
 
@@ -302,6 +322,21 @@ GO
 CREATE INDEX [IX_FK_VCardTokenLoadRequest]
 ON [dbo].[VCardTokenSet]
     ([LoadRequest_Id]);
+GO
+
+-- Creating foreign key on [AccessTokens_Id] in table 'DeviceSet'
+ALTER TABLE [dbo].[DeviceSet]
+ADD CONSTRAINT [FK_DeviceAccessTokens]
+    FOREIGN KEY ([AccessTokens_Id])
+    REFERENCES [dbo].[AccessTokensSet]
+        ([Id])
+    ON DELETE NO ACTION ON UPDATE NO ACTION;
+GO
+
+-- Creating non-clustered index for FOREIGN KEY 'FK_DeviceAccessTokens'
+CREATE INDEX [IX_FK_DeviceAccessTokens]
+ON [dbo].[DeviceSet]
+    ([AccessTokens_Id]);
 GO
 
 -- --------------------------------------------------
