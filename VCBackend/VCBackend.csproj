@@ -238,6 +238,7 @@
     <Compile Include="Services\BeginPaymentService.cs" />
     <Compile Include="Services\GetUserDevicesService.cs" />
     <Compile Include="Services\LoadVCardService.cs" />
+    <Compile Include="Services\RefreshAccessTokenService.cs" />
     <Compile Include="User.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>

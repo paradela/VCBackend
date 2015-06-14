@@ -12,7 +12,7 @@ namespace VCBackend.Services
 {
     public class UserLoginService : IUserService
     {
-        public AuthTokenDto AuthTokenDto
+        public AccessTokensDto TokensDto
         {
             get;
             private set;
@@ -79,8 +79,8 @@ namespace VCBackend.Services
                     else throw new DeviceNotFound("Internal error, no devices to authenticate");
                 }
 
-                AuthTokenDto = new AuthTokenDto();
-                AuthTokenDto.Serialize(token);
+                TokensDto = new AccessTokensDto();
+                TokensDto.Serialize(token);
                 
                 UnitOfWork.UserRepository.Update(user);
                 UnitOfWork.Save();

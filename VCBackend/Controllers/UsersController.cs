@@ -46,7 +46,7 @@ namespace VCBackend.Controllers
 
         //POST api/user?u=email@mail.pt&p=Pa$$w0rd
         [Route("")]
-        public AuthTokenDto PostLogin([FromUri] String u, [FromUri] String p, [FromUri] String id = null)
+        public AccessTokensDto PostLogin([FromUri] String u, [FromUri] String p, [FromUri] String id = null)
         {
             try
             {
@@ -56,7 +56,29 @@ namespace VCBackend.Controllers
                 service.Password = p;
                 service.DeviceId = id;
                 if (service.Execute())
-                    return service.AuthTokenDto;
+                    return service.TokensDto;
+                else return null;
+            }
+            catch (VCException ex)
+            {
+                throw new HttpResponseException(new ErrorResponse(ex));
+            }
+            catch (Exception ex)
+            {
+                throw new HttpResponseException(new ErrorResponse(ex));
+            }
+        }
+        //GET api/user/refresh_token?r=123token
+        [Route("refresh_token")]
+        public AuthTokenDto GetRefreshedAuthToken([FromUri] String r)
+        {
+            try
+            {
+                UnitOfWork uw = new UnitOfWork();
+                RefreshAuthTokenService service = new RefreshAuthTokenService(uw);
+                service.RefreshToken = r;
+                if (service.Execute())
+                    return service.AuthToken;
                 else return null;
             }
             catch (VCException ex)

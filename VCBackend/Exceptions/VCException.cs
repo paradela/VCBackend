@@ -127,6 +127,15 @@ namespace VCBackend.Exceptions
         }
     }
 
+    public class InvalidRefreshToken : VCException
+    {
+        public InvalidRefreshToken(String Message)
+            : base(Message)
+        {
+            Error = "InvalidRefreshToken";
+        }
+    }
+
     public class InvalidLoadRequest : VCException
     {
         public InvalidLoadRequest(String Message)
