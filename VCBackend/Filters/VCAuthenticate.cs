@@ -40,16 +40,16 @@ namespace VCBackend.Filters
 
                 //2. If the token is not available, nothing to do
                 if (token == null || token == String.Empty)
-                    throw new HttpResponseException(new ErrorResponse(new InvalidAuthToken("Missing authentication token.")));
+                    throw new HttpResponseException(new BadTokenResponse(new InvalidAuthToken("Missing authentication token.")));
 
                 var payload = AuthToken.ValidateToken(token);
                 //3. Validate the token
                 if (payload == null)
-                    throw new HttpResponseException(new ErrorResponse(new InvalidAuthToken("The suplied token is not valid.")));
+                    throw new HttpResponseException(new BadTokenResponse(new InvalidAuthToken("The supplied token is not valid.")));
                 string type = (string)payload["type"];
 
                 if(type != AuthToken.API_ACCESS_TOKEN_TYPE_AUTH)
-                    throw new HttpResponseException(new ErrorResponse(new InvalidAuthToken("The suplied token is not a valid auth token")));
+                    throw new HttpResponseException(new BadTokenResponse(new InvalidAuthToken("The supplied token is not a valid auth token")));
 
                 var uid = payload["user_id"];
                 var did = payload["device_id"];
@@ -57,7 +57,7 @@ namespace VCBackend.Filters
                 Device dev = uw.DeviceRepository.GetByID((int)did);
 
                 if (dev == null || dev.Owner.Id != (int)uid || dev.AccessTokens.AuthToken != token)
-                    throw new HttpResponseException(new ErrorResponse(new InvalidAuthToken("The suplied token is no longer valid.")));
+                    throw new HttpResponseException(new BadTokenResponse(new InvalidAuthToken("The supplied token is no longer valid.")));
 
                 context.Request.Properties.Add(AUTH_DEVICE, did);
             }

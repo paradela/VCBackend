@@ -204,6 +204,7 @@
     <Compile Include="Device.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
+    <Compile Include="Errors\BadTokenResponse.cs" />
     <Compile Include="Errors\ErrorResponse.cs" />
     <Compile Include="Errors\JsonErrorContent.cs" />
     <Compile Include="Exceptions\VCException.cs" />
