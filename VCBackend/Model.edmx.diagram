@@ -19,6 +19,8 @@
         <AssociationConnector Association="Model.AccountPaymentRequest" />
         <AssociationConnector Association="Model.VCardLoadRequest" />
         <AssociationConnector Association="Model.VCardTokenLoadRequest" />
+        <EntityTypeShape EntityType="Model.AccessTokens" Width="1.5" PointX="12.25" PointY="3.5" />
+        <AssociationConnector Association="Model.DeviceAccessTokens" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

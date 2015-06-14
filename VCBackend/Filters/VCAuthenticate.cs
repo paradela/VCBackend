@@ -52,7 +52,7 @@ namespace VCBackend.Filters
 
                 Device dev = uw.DeviceRepository.GetByID((int)did);
 
-                if (dev == null || dev.Owner.Id != (int)uid || dev.Token != token)
+                if (dev == null || dev.Owner.Id != (int)uid || dev.AccessTokens.AuthToken != token)
                     throw new HttpResponseException(new ErrorResponse(new InvalidAuthToken("The suplied token is no longer valid.")));
 
                 context.Request.Properties.Add(AUTH_DEVICE, did);

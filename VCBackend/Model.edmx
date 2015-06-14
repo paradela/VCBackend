@@ -246,6 +246,11 @@
             <End Role="VCardToken" EntitySet="VCardTokenSet" />
             <End Role="LoadRequest" EntitySet="LoadRequestSet" />
           </AssociationSet>
+          <EntitySet Name="AccessTokensSet" EntityType="Model.AccessTokens" />
+          <AssociationSet Name="DeviceAccessTokens" Association="Model.DeviceAccessTokens">
+            <End Role="Device" EntitySet="DeviceSet" />
+            <End Role="AccessTokens" EntitySet="AccessTokensSet" />
+          </AssociationSet>
           </EntityContainer>
         <EntityType Name="User">
           <Key>
@@ -276,8 +281,8 @@
           <NavigationProperty Name="Owner" Relationship="Model.UserDevice" FromRole="Device" ToRole="User" />
           <Property Name="UserId" Type="Int32" Nullable="false" />
           <Property Name="Name" Type="String" Nullable="false" MaxLength="Max" Unicode="true" FixedLength="false" />
-          <Property Name="Token" Type="String" Nullable="false" MaxLength="Max" Unicode="true" FixedLength="false" />
           <Property Name="DeviceId" Type="String" Nullable="true" cg:SetterAccess="Private" MaxLength="Max" Unicode="true" FixedLength="false" />
+          <NavigationProperty Name="AccessTokens" Relationship="Model.DeviceAccessTokens" FromRole="Device" ToRole="AccessTokens" />
         </EntityType>
         <EntityType Name="VCard">
           <Key>
@@ -385,6 +390,18 @@
           <End Type="Model.VCardToken" Role="VCardToken" Multiplicity="0..1" />
           <End Type="Model.LoadRequest" Role="LoadRequest" Multiplicity="1" />
         </Association>
+        <EntityType Name="AccessTokens">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="AuthToken" Type="String" Nullable="false" />
+          <Property Name="RefreshToken" Type="String" Nullable="false" />
+        </EntityType>
+        <Association Name="DeviceAccessTokens">
+          <End Type="Model.Device" Role="Device" Multiplicity="1" />
+          <End Type="Model.AccessTokens" Role="AccessTokens" Multiplicity="1" />
+        </Association>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -415,7 +432,6 @@
           <ScalarProperty Name="Id" ColumnName="Id" />
           <ScalarProperty Name="UserId" ColumnName="UserId" />
           <ScalarProperty Name="Name" ColumnName="Name" />
-          <ScalarProperty Name="Token" ColumnName="Token" />
           <ScalarProperty Name="DeviceId" ColumnName="DeviceId" />
         </MappingFragment>
       </EntityTypeMapping>

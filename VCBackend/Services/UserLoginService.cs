@@ -12,14 +12,10 @@ namespace VCBackend.Services
 {
     public class UserLoginService : IUserService
     {
-        private TokenDto dto;
-
-        public TokenDto TokenDto
+        public AccessTokensDto AccessTokenDto
         {
-            get
-            {
-                return dto;
-            }
+            get;
+            private set;
         }
 
         public UserLoginService(UnitOfWork UnitOfWork)
@@ -27,7 +23,7 @@ namespace VCBackend.Services
 
         public override bool ExecuteService()
         {
-            String token = null;
+            AccessTokens token = null;
 
             if (email == null || password == null)
                 return false;
@@ -51,15 +47,18 @@ namespace VCBackend.Services
                     var q = UnitOfWork.DeviceRepository.Get(filter: d => (d.Owner.Id == user.Id && d.DeviceId == DeviceId)).FirstOrDefault();
                     if (q != null)
                     {
-                        q.Token = AuthToken.GetAPIAccessJwt(user, q);
-                        token = q.Token;
+                        token = new AccessTokens();
+                        token.AuthToken = AuthToken.GetAPIAuthJwt(user, q);
+                        token.RefreshToken = AuthToken.GetAPIRefreshJwt(user, q);
+                        q.AccessTokens = token;
                     }
                     else
                     {
-                        q = user.CreateDevice(
-                                DeviceId
-                            );
-                        q.Token = AuthToken.GetAPIAccessJwt(user, q);
+                        q = user.CreateDevice(DeviceId);
+                        token = new AccessTokens();
+                        token.AuthToken = AuthToken.GetAPIAuthJwt(user, q);
+                        token.RefreshToken = AuthToken.GetAPIRefreshJwt(user, q);
+                        q.AccessTokens = token;
                     }
 
                 }
@@ -68,13 +67,16 @@ namespace VCBackend.Services
                     var q = UnitOfWork.DeviceRepository.Get(filter: d => (d.Owner.Id == user.Id && d.DeviceId == null)).FirstOrDefault();
                     if (q != null)
                     {
-                        q.Token = AuthToken.GetAPIAccessJwt(user, q);
-                        token = q.Token;
+                        token = new AccessTokens();
+                        token.AuthToken = AuthToken.GetAPIAuthJwt(user, q);
+                        token.RefreshToken = AuthToken.GetAPIRefreshJwt(user, q);
+                        q.AccessTokens = token;
                     }
                     else throw new DeviceNotFound("Internal error, no devices to authenticate");
                 }
 
-                dto = new TokenDto(token);
+                AccessTokenDto = new AccessTokensDto();
+                AccessTokenDto.Serialize(token);
                 
                 UnitOfWork.UserRepository.Update(user);
                 UnitOfWork.Save();

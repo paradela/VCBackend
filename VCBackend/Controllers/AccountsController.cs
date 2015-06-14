@@ -244,7 +244,7 @@ namespace VCBackend.Controllers
             var payload = AuthToken.ValidateToken(token);
             var uid = payload["user_id"];
             var did = payload["device_id"];
-            Device dev = uw.DeviceRepository.Get(filter: d => (d.Owner.Id == (int)uid && d.Token != token && d.Id == (int)did)).FirstOrDefault();
+            Device dev = uw.DeviceRepository.Get(filter: d => (d.Owner.Id == (int)uid && d.AccessTokens.AuthToken != token && d.Id == (int)did)).FirstOrDefault();
             return dev;
         }
 

@@ -11,14 +11,10 @@ namespace VCBackend.Services
 {
     public class UserCreationService : IUserService
     {
-        private TokenDto token;
-
-        public TokenDto Token
+        public AccessTokensDto AccessToken
         {
-            get
-            {
-                return token;
-            }
+            get;
+            private set;
         }
 
         public UserCreationService(UnitOfWork UnitOfWork)
@@ -53,8 +49,6 @@ namespace VCBackend.Services
                 device = newUser.CreateDevice(DeviceId);
             }
 
-            String token = device.Token;
-
             Account account = newUser.CreateAccount();
 
             UnitOfWork.UserRepository.Add(newUser);
@@ -64,14 +58,30 @@ namespace VCBackend.Services
 
             device = UnitOfWork.DeviceRepository.Get(filter: q => (q.Owner.Id == newUser.Id)).FirstOrDefault();
 
-            if(newUser != null && device != null)
-                device.Token = AuthToken.GetAPIAccessJwt(newUser, device);
+            if (newUser != null && device != null)
+            {
+                device.AccessTokens = new AccessTokens();
+                AccessToken = new AccessTokensDto();
+                device.AccessTokens.AuthToken = AuthToken.GetAPIAuthJwt(newUser, device);
+                device.AccessTokens.RefreshToken = AuthToken.GetAPIRefreshJwt(newUser, device);
+                AccessToken.Serialize(device.AccessTokens);
+            }
+            else
+            {
+                if(newUser != null)
+                    UnitOfWork.UserRepository.Delete(newUser.Id);
+                if (device != null)
+                    UnitOfWork.DeviceRepository.Delete(device.Id);
+                UnitOfWork.Save();
+                return false;
+            }
 
             account.InitializeAccount();
 
             UnitOfWork.Save();
 
-            this.token = new TokenDto(token);
+            this.AccessToken = new AccessTokensDto();
+            this.AccessToken.Serialize(device.AccessTokens);
 
             return true;
         }

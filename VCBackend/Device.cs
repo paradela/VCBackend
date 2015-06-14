@@ -17,9 +17,9 @@ namespace VCBackend
         public int Id { get; set; }
         public int UserId { get; set; }
         public string Name { get; set; }
-        public string Token { get; set; }
         public string DeviceId { get; private set; }
     
         public virtual User Owner { get; set; }
+        public virtual AccessTokens AccessTokens { get; set; }
     }
 }

@@ -166,6 +166,9 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AccessTokens.cs">
+      <DependentUpon>Model.tt</DependentUpon>
+    </Compile>
     <Compile Include="Account.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
@@ -222,6 +225,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\Dto\AccessTokensDto.cs" />
     <Compile Include="Models\Dto\CardBalanceDto.cs" />
     <Compile Include="Models\LoadRequest.cs" />
     <Compile Include="PaymentRequest.cs">
@@ -255,7 +259,7 @@
     <Compile Include="Models\Dto\IDto.cs" />
     <Compile Include="Models\Dto\PaymentDto.cs" />
     <Compile Include="Models\Dto\PaymentMethodDto.cs" />
-    <Compile Include="Models\Dto\TokenDto.cs" />
+    <Compile Include="Models\Dto\AuthTokenDto.cs" />
     <Compile Include="Models\Dto\UserDto.cs" />
     <Compile Include="Models\Dto\VCardTokenDto.cs" />
     <Compile Include="Models\PaymentRequest.cs" />

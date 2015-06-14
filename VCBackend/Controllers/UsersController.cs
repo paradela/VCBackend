@@ -20,7 +20,7 @@ namespace VCBackend.Controllers
     {
         //POST api/user?n="Name"&e="email@mail.pt"&p="passw0rd"
         [Route("")]
-        public TokenDto PostNewUser([FromUri] String n, [FromUri] String e, [FromUri] String p, [FromUri] String id = null)
+        public AccessTokensDto PostNewUser([FromUri] String n, [FromUri] String e, [FromUri] String p, [FromUri] String id = null)
         {
             try
             {
@@ -31,7 +31,7 @@ namespace VCBackend.Controllers
                 service.Password = p;
                 service.DeviceId = id;
                 if (service.ExecuteService())
-                    return service.Token;
+                    return service.AccessToken;
                 else return null;
             }
             catch (VCException ex)
@@ -46,7 +46,7 @@ namespace VCBackend.Controllers
 
         //POST api/user?u=email@mail.pt&p=Pa$$w0rd
         [Route("")]
-        public TokenDto PostLogin([FromUri] String u, [FromUri] String p, [FromUri] String id = null)
+        public AccessTokensDto PostLogin([FromUri] String u, [FromUri] String p, [FromUri] String id = null)
         {
             try
             {
@@ -56,7 +56,7 @@ namespace VCBackend.Controllers
                 service.Password = p;
                 service.DeviceId = id;
                 if (service.ExecuteService())
-                    return service.TokenDto;
+                    return service.AccessTokenDto;
                 else return null;
             }
             catch (VCException ex)

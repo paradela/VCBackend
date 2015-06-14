@@ -11,25 +11,45 @@ namespace VCBackend.Utility.Security
         //should be loaded from a file!
         private static string AuthTokenSecret = "GQDstcKsx0NHjPOuXOYg5MbeJ1XT0uFiwDVvVBrk";
 
-        private static int API_KEY_VALIDITY = 1800; // 1 hour
+        private static int API_AUTH_TOKEN_VALIDITY_S = 1800; // 1 hour
+        private static int API_REFRESH_TOKEN_VALIDITY_M = 6; // 6 months
         private static int CARD_KEY_VALIDITY = 60; // 1 min
 
-        public static String GetAPIAccessJwt(User User, Device Device)
+        private static String API_ACCESS_TOKEN_TYPE_AUTH = "AUTH";
+        private static String API_ACCESS_TOKEN_TYPE_REFRESH = "REFRESH";
+
+        public static String GetAPIAuthJwt(User User, Device Device)
         {
             var now = Math.Round((DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds);
 
             var payload = new Dictionary<string, object>()
             {
-                { "user_id", User.Id },
-                { "device_id", Device.Id },
-                { "timestamp", now }
+                {      "type", API_ACCESS_TOKEN_TYPE_AUTH      },
+                {   "user_id", User.Id                         },
+                { "device_id", Device.Id                       },
+                { "timestamp", now                             },
+                {       "exp", now + API_AUTH_TOKEN_VALIDITY_S }
             };
 
-            
-            if (Device.DeviceId == null)
+            string token = JWT.JsonWebToken.Encode(payload, AuthTokenSecret, JWT.JwtHashAlgorithm.HS512);
+
+            return token;
+        }
+
+        public static String GetAPIRefreshJwt(User User, Device Device)
+        {
+            var utcNow = DateTime.UtcNow;
+            var now = Math.Round((utcNow - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds);
+            var validity = Math.Round((utcNow.AddMonths(API_REFRESH_TOKEN_VALIDITY_M) - 
+                new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds);
+            var payload = new Dictionary<string, object>()
             {
-                payload["exp"] = now + API_KEY_VALIDITY;
-            }
+                {      "type", API_ACCESS_TOKEN_TYPE_REFRESH },
+                {   "user_id", User.Id                       },
+                { "device_id", Device.Id                     },
+                { "timestamp", now                           },
+                {       "exp", now + validity                }
+            };
 
             string token = JWT.JsonWebToken.Encode(payload, AuthTokenSecret, JWT.JwtHashAlgorithm.HS512);
 

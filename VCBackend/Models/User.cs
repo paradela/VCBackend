@@ -33,7 +33,7 @@ namespace VCBackend
             else device = new Device(DeviceId);
 
             //Generates a token that should be used next to register a device.
-            device.Token = AuthToken.GetAPIAccessJwt(this, device);
+            device.AccessTokens = new AccessTokens();
 
             AddDevice(device);
 
