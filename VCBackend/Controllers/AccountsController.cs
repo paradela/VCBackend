@@ -161,9 +161,9 @@ namespace VCBackend.Controllers
             }
         }
 
-        [Route("vcard/load/{ammount}")]
+        [Route("vcard/load/{Amount}")]
         [VCAuthenticate]
-        public CardBalanceDto PostLoadProduct([FromUri] String ammount)
+        public CardBalanceDto PostLoadProduct([FromUri] String Amount)
         {
             try
             {
@@ -171,10 +171,11 @@ namespace VCBackend.Controllers
                 int AuthDev = VCAuthenticate.GetAuthenticatedDevice(ActionContext);
                 Device dev = uw.DeviceRepository.GetByID(AuthDev);
                 LoadVCardService service = new LoadVCardService(uw, dev);
-                double ammnt;
-                if (!Double.TryParse(ammount, out ammnt))
-                    throw new InvalidLoadRequest(String.Format("Ammount {} is not a valid ammount.", ammount));
-                service.Amount = ammnt;
+                int am;
+                if (!Int32.TryParse(Amount, out am))
+                    throw new InvalidLoadRequest(String.Format("Ammount {0} is not a valid ammount.", Amount));
+                double amount = am * 0.01;
+                service.Amount = amount;
                 service.Execute();
                 return service.CardBalanceDto;
             }

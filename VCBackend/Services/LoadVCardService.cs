@@ -38,6 +38,8 @@ namespace VCBackend.Services
             if (!tk.LoadCard(load))
                 throw new InvalidLoadRequest(String.Format("The token loading request failed with result: {0}", load.LoadResult));
 
+            UnitOfWork.Save(); //Store alterations in card
+
             CardBalanceDto = new CardBalanceDto();
             CardBalanceDto.Serialize(load);
 
