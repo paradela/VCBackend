@@ -228,8 +228,13 @@
     </Compile>
     <Compile Include="Models\Dto\AccessTokensDto.cs" />
     <Compile Include="Models\Dto\CardBalanceDto.cs" />
+    <Compile Include="Models\Dto\PBKeyDto.cs" />
     <Compile Include="Models\LoadRequest.cs" />
+    <Compile Include="Models\PBKey.cs" />
     <Compile Include="PaymentRequest.cs">
+      <DependentUpon>Model.tt</DependentUpon>
+    </Compile>
+    <Compile Include="PBKey.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
     <Compile Include="Services\CancelPaymentService.cs" />
@@ -242,7 +247,6 @@
     <Compile Include="User.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
-    <Compile Include="Utility\Security\VCardEncryptor.cs" />
     <Compile Include="Controllers\AccountsController.cs" />
     <Compile Include="Controllers\UsersController.cs" />
     <Compile Include="Filters\VCAuthenticate.cs" />
@@ -280,7 +284,7 @@
     <Compile Include="Services\UserLoginService.cs" />
     <Compile Include="Services\UserUpdateService.cs" />
     <Compile Include="Utility\Security\AuthToken.cs" />
-    <Compile Include="Utility\Security\Pbkdf2.cs" />
+    <Compile Include="Utility\Security\PasswordSecurity.cs" />
     <Compile Include="Utility\Time\Time.cs" />
     <Compile Include="VCard.cs">
       <DependentUpon>Model.tt</DependentUpon>

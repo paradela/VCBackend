@@ -22,20 +22,23 @@ namespace VCBackend.Services
 
         protected override bool ExecuteService()
         {
-            if (name == null || email == null || password == null)
+            if (Name == null || Email == null || Password == null || Pin == null)
                 return false;
 
-            if (!ValidateUserData(name, email, password)) 
+            if (!ValidateUserData(Name, Email, Password, Pin)) 
                 throw new InvalidDataFormat("One or more of the details passed have an incorrect format.");
 
             // First check wether exists on the Users DB a user with any of the given data.
-            if (ExistUserWithEmail(email))
+            if (ExistUserWithEmail(Email))
                 throw new EmailAlreadyRegistered("Given email address is already in use.");
 
             // Then if the user doesn't exist, we can create the user
             // A DefaultDevice is used to login with browsers.
             // They will not have full access to the API
-            User newUser = new User(name, email, Pbkdf2.DeriveKey(password));
+            PBKey pbKey = new PBKey();
+            pbKey.Initialize(Pin);
+
+            User newUser = new User(Name, Email, PasswordSecurity.GetSHA512(Password), pbKey);
 
             //UnitOfWork.UserRepository.Add(newUser);
             //UnitOfWork.Save();

@@ -7,7 +7,7 @@
       <Diagram DiagramId="69930aa420c84948af2a0dea1bd8cbd1" Name="Diagram1" ZoomLevel="104" >
         <EntityTypeShape EntityType="Model.User" Width="1.5" PointX="6.75" PointY="0.625" IsExpanded="true" />
         <EntityTypeShape EntityType="Model.Account" Width="1.5" PointX="1.125" PointY="3.25" />
-        <EntityTypeShape EntityType="Model.Device" Width="1.5" PointX="9.625" PointY="2.625" />
+        <EntityTypeShape EntityType="Model.Device" Width="1.5" PointX="9.625" PointY="3.125" />
         <EntityTypeShape EntityType="Model.VCard" Width="1.5" PointX="0.5" PointY="6.125" />
         <AssociationConnector Association="Model.UserDevice" />
         <AssociationConnector Association="Model.AccountVCard" />
@@ -21,6 +21,8 @@
         <AssociationConnector Association="Model.VCardTokenLoadRequest" />
         <EntityTypeShape EntityType="Model.AccessTokens" Width="1.5" PointX="12.25" PointY="3.5" />
         <AssociationConnector Association="Model.DeviceAccessTokens" />
+        <EntityTypeShape EntityType="Model.PBKey" Width="1.5" PointX="11.5" PointY="0.75" />
+        <AssociationConnector Association="Model.UserPBKey" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

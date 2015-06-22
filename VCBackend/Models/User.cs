@@ -10,12 +10,13 @@ namespace VCBackend
 {
     public partial class User
     {
-        public User(String Name, String Email, String Password)
+        public User(String Name, String Email, String PasswordHash, PBKey PbKey)
         {
             this.Name = Name;
             this.Email = Email;
-            this.Password = Password;
+            this.Password = PasswordHash;
             this.Devices = new List<Device>();
+            this.PBKey = PbKey;
         }
         
         public void AddDevice(Device device)

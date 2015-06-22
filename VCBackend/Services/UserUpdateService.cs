@@ -11,14 +11,10 @@ namespace VCBackend.Services
 {
     public class UserUpdateService : IUserService
     {
-        private UserDto dto;
-
         public UserDto UserDto
         {
-            get
-            {
-                return UserDto;
-            }
+            get;
+            private set;
         }
 
         public UserUpdateService(UnitOfWork UnitOfWork, Device AuthDevice)
@@ -26,31 +22,33 @@ namespace VCBackend.Services
 
         protected override bool ExecuteService()
         {
-            if (name == null && email == null && password == null)
+            if (Name == null && Email == null && Password == null && Pin == null)
                 return false;
 
             User user = AuthDevice.Owner;
             /*
              * Validate if the new user details are well formed
              */
-            if (!ValidateUserData(name, email, password)) throw new InvalidDataFormat("One or more of the details passed have an incorrect format.");
+            if (!ValidateUserData(Name, Email, Password, Pin)) throw new InvalidDataFormat("One or more of the details passed have an incorrect format.");
 
-            if (name != null)
-                user.Name = name;
-            if (email != null)
+            if (Name != null)
+                user.Name = Name;
+            if (Email != null)
             {
-                if (ExistUserWithEmail(email))
+                if (ExistUserWithEmail(Email))
                     throw new EmailAlreadyRegistered("Email already in use.");
-                user.Email = email;
+                user.Email = Email;
             }
-            if (password != null)
-                user.Password = Pbkdf2.DeriveKey(password);
+            if (Password != null)
+                user.Password = PasswordSecurity.GetSHA512(Password);
+            if (Pin != null)
+                user.PBKey.Initialize(Pin);
 
             UnitOfWork.UserRepository.Update(user);
             UnitOfWork.Save();
 
-            this.dto = new UserDto();
-            this.dto.Serialize(user);
+            this.UserDto = new UserDto();
+            this.UserDto.Serialize(user);
 
             return true;
         }

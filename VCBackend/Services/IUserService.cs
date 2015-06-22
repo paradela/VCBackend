@@ -9,9 +9,6 @@ namespace VCBackend.Services
 {
     public abstract class IUserService : IDeviceService
     {
-        protected String name;
-        protected String email;
-        protected String password;
 
         public IUserService(UnitOfWork UnitOfWork, Device AuthDevice = null)
             : base(UnitOfWork, AuthDevice)
@@ -19,24 +16,24 @@ namespace VCBackend.Services
 
         public String Name
         {
-            set
-            {
-                name = value;
-            }
+            protected get;
+            set;
         }
         public String Email
         {
-            set
-            {
-                email = value;
-            }
+            protected get;
+            set;
         }
         public String Password
         {
-            set
-            {
-                password = value;
-            }
+            protected get;
+            set;
+        }
+
+        public String Pin
+        {
+            protected get;
+            set;
         }
 
         //http://stackoverflow.com/questions/5859632/regular-expression-for-password-validation
@@ -65,17 +62,38 @@ namespace VCBackend.Services
             return meetsLengthRequirements && hasUpperCaseLetter && hasLowerCaseLetter && hasDecimalDigit;
         }
 
+        protected bool ValidatePin(char[] pin)
+        {
+            const int MIN_LENGTH = 4;
+
+            if (pin == null) throw new ArgumentNullException();
+
+            if (pin.Length == MIN_LENGTH)
+            {
+                foreach (char c in pin)
+                {
+                    if (c >= '0' && c <= '9') continue;
+                    else return false;
+                }
+                return true;
+            }
+            else return false;
+
+        }
+
         
          //This method validates if the attributes are wel formed.
          //It will not look for those that are @null!!
 
-        protected bool ValidateUserData(String Name = null, String Email = null, String Password = null)
+        protected bool ValidateUserData(String name = null, String email = null, String password = null, String pin = null)
         {
             Regex nameRgx = new Regex(@"[A-zÀ-ú-]{2}[A-zÀ-ú-\s]*");
             Regex emailRgx = new Regex(@"^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$");
-            bool validName = (Name != null) ? nameRgx.IsMatch(Name) : true;
-            bool validEmail = (Email != null) ? emailRgx.IsMatch(Email) : true;
-            bool validPwd = (Password != null) ? ValidatePassword(Password) : true;
+            Regex pinRgx = new Regex(@"[0-9]{4}");
+            bool validName = (name != null) ? nameRgx.IsMatch(name) : true;
+            bool validEmail = (email != null) ? emailRgx.IsMatch(email) : true;
+            bool validPwd = (password != null) ? ValidatePassword(password) : true;
+            bool validPin = (pin != null) ? pinRgx.IsMatch(pin) : true;
             return validName && validEmail && validPwd;
         }
 

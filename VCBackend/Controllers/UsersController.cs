@@ -18,9 +18,9 @@ namespace VCBackend.Controllers
     [RoutePrefix("api/user")]
     public class UsersController : ApiController
     {
-        //POST api/user?n="Name"&e="email@mail.pt"&p="passw0rd"
+        //POST api/user?n=Name&e=email@mail.pt&p=passw0rd&pin=123&id=00adbfd-asdasd-23423
         [Route("")]
-        public AccessTokensDto PostNewUser([FromUri] String n, [FromUri] String e, [FromUri] String p, [FromUri] String id = null)
+        public AccessTokensDto PostNewUser([FromUri] String n, [FromUri] String e, [FromUri] String p, [FromUri] String pin, [FromUri] String id = null)
         {
             try
             {
@@ -29,6 +29,7 @@ namespace VCBackend.Controllers
                 service.Name = n;
                 service.Email = e;
                 service.Password = p;
+                service.Pin = pin;
                 service.DeviceId = id;
                 if (service.Execute())
                     return service.AccessToken;
@@ -94,7 +95,7 @@ namespace VCBackend.Controllers
         //POST api/user/edit?t=123token&n=Jon Doe&e=jon.doe@mail.pt&p=Pa$$w0rd
         [Route("edit")]
         [VCAuthenticate]
-        public UserDto PostUpdateUser([FromUri] String n = null, [FromUri] String e = null, [FromUri] String p = null)
+        public UserDto PostUpdateUser([FromUri] String n = null, [FromUri] String e = null, [FromUri] String p = null, [FromUri] String pin = null)
         {
             try
             {
@@ -105,6 +106,7 @@ namespace VCBackend.Controllers
                 service.Name = n;
                 service.Email = e;
                 service.Password = p;
+                service.Pin = pin;
                 if (service.Execute())
                     return service.UserDto;
                 return null;
@@ -137,7 +139,7 @@ namespace VCBackend.Controllers
         [Route("test")]
         public UserDto GetUserTest()
         {
-            User u = new User("Teste", "test@mail.pt", "Password");
+            User u = new User("Teste", "test@mail.pt", "Password", null);
             UserDto dto = new UserDto();
             dto.Serialize(u);
             return dto;

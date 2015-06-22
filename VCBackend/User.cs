@@ -28,5 +28,6 @@ namespace VCBackend
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Device> Devices { get; set; }
         public virtual Account Account { get; set; }
+        public virtual PBKey PBKey { get; set; }
     }
 }

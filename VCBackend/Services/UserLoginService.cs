@@ -25,17 +25,17 @@ namespace VCBackend.Services
         {
             AccessTokens token = null;
 
-            if (email == null || password == null)
+            if (Email == null || Password == null)
                 return false;
 
-            String HashedPwd = Pbkdf2.DeriveKey(password);
+            String HashedPwd = PasswordSecurity.GetSHA512(Password);
 
-            if (!ValidateUserData(Email: email))
+            if (!ValidateUserData(email: Email))
                 throw new InvalidDataFormat("The user email has an invalid format.");
             if(!ValidateDeviceData(DevId: DeviceId))
                 throw new InvalidDataFormat("The device identifier has an invalid format.");
 
-            IEnumerable<User> users = UnitOfWork.UserRepository.Get(filter: q => (q.Email == email && q.Password == HashedPwd));
+            IEnumerable<User> users = UnitOfWork.UserRepository.Get(filter: q => (q.Email == Email && q.Password == HashedPwd));
 
             if (users.Count() == 1)
             {

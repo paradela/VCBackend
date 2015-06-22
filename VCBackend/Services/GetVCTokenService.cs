@@ -57,14 +57,9 @@ namespace VCBackend.Services
 
             UnitOfWork.Save();
 
-            VCardEncryptor secure = new VCardEncryptor(u);
-
             token = UnitOfWork.VCardTokenRepository.GetByID(token.Id);
 
-            String secureToken = secure.RijndaelEncrypt(token);
-
-            VCardTokenDto = new VCardTokenDto(secureToken);
-            VCardTokenDto.Serialize(token);
+            VCardTokenDto = u.PBKey.RijndaelEncrypt(token);
 
             return true;
         }
