@@ -228,6 +228,7 @@
     </Compile>
     <Compile Include="Models\Dto\AccessTokensDto.cs" />
     <Compile Include="Models\Dto\CardBalanceDto.cs" />
+    <Compile Include="Models\Dto\LoadResultDto.cs" />
     <Compile Include="Models\Dto\PBKeyDto.cs" />
     <Compile Include="Models\LoadRequest.cs" />
     <Compile Include="Models\PBKey.cs" />
@@ -238,11 +239,13 @@
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
     <Compile Include="Services\CancelPaymentService.cs" />
+    <Compile Include="Services\GetAccountBalanceService.cs" />
     <Compile Include="Services\GetVCTokenService.cs" />
     <Compile Include="Services\EndPaymentService.cs" />
     <Compile Include="Services\BeginPaymentService.cs" />
     <Compile Include="Services\GetUserDevicesService.cs" />
     <Compile Include="Services\LoadVCardService.cs" />
+    <Compile Include="Services\ReadVCardBalanceService.cs" />
     <Compile Include="Services\RefreshAccessTokenService.cs" />
     <Compile Include="User.cs">
       <DependentUpon>Model.tt</DependentUpon>

@@ -13,7 +13,7 @@ namespace VCBackend.Services
     {
         public double Amount { private get; set; }
 
-        public CardBalanceDto CardBalanceDto { get; private set; }
+        public LoadResultDto CardBalanceDto { get; private set; }
 
         public LoadVCardService(UnitOfWork UnitOfWork, Device AuthDevice)
         : base(UnitOfWork, AuthDevice) { }
@@ -40,7 +40,7 @@ namespace VCBackend.Services
 
             UnitOfWork.Save(); //Store alterations in card
 
-            CardBalanceDto = new CardBalanceDto();
+            CardBalanceDto = new LoadResultDto();
             CardBalanceDto.Serialize(load);
 
             return true;

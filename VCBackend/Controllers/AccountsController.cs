@@ -136,6 +136,31 @@ namespace VCBackend.Controllers
                 throw new HttpResponseException(new ErrorResponse(ex));
             }
         }
+
+        [Route("balance")]
+        [VCAuthenticate]
+        public BalanceDto GetAccountBalance()
+        {
+            try
+            {
+                UnitOfWork uw = new UnitOfWork();
+                int AuthDev = VCAuthenticate.GetAuthenticatedDevice(ActionContext);
+                Device dev = uw.DeviceRepository.GetByID(AuthDev);
+                GetAccountBalanceService service = new GetAccountBalanceService(uw, dev);
+                if (service.Execute())
+                    return service.Balance;
+                return null;
+            }
+            catch (VCException ex)
+            {
+                throw new HttpResponseException(new ErrorResponse(ex));
+            }
+            catch (Exception ex)
+            {
+                throw new HttpResponseException(new ErrorResponse(ex));
+            }
+        }
+
         //?d="2015-05-31 01:02"
         [Route("vcard/token")]
         [VCAuthenticate]
@@ -161,9 +186,33 @@ namespace VCBackend.Controllers
             }
         }
 
+        [Route("vcard/balance")]
+        [VCAuthenticate]
+        public CardBalanceDto GetVCardBalance()
+        {
+            try
+            {
+                UnitOfWork uw = new UnitOfWork();
+                int AuthDev = VCAuthenticate.GetAuthenticatedDevice(ActionContext);
+                Device dev = uw.DeviceRepository.GetByID(AuthDev);
+                ReadVCardBalanceService service = new ReadVCardBalanceService(uw, dev);
+                service.Execute();
+                return service.BalanceDto;
+            }
+            catch (VCException ex)
+            {
+                throw new HttpResponseException(new ErrorResponse(ex));
+            }
+            catch (Exception ex)
+            {
+                throw new HttpResponseException(new ErrorResponse(ex));
+            }
+        }
+
+
         [Route("vcard/load/{Amount}")]
         [VCAuthenticate]
-        public CardBalanceDto PostLoadProduct([FromUri] String Amount)
+        public LoadResultDto PostLoadProduct([FromUri] String Amount)
         {
             try
             {

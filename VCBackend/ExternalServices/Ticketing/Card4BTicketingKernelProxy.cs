@@ -56,10 +56,18 @@ namespace VCBackend.ExternalServices.Ticketing
             return false;
         }
 
-        public bool ReadCard(VCard Card)
+        public double ReadCardBalance(VCard Card)
         {
-            //TODO
-            return true;
+            string tkmsg = "<tkmsg><read /></tkmsg>";
+            TKResult result = TKCommandEx(tkmsg, Card.Data);
+            if (result != null && 
+                result.status == (uint)TicketingKernel.Status.READ &&
+                result.result == (uint)TicketingKernel.Result.OK)
+            {
+                ProductAttribs attribs = ParseTKMsgNotifyComplete(result.msg);
+                return attribs.stored_value;
+            }
+            return -1;
         }
 
         public bool LoadCard(LoadRequest Request)
@@ -85,7 +93,7 @@ namespace VCBackend.ExternalServices.Ticketing
                         //apply write operations
                         WriteOperationsToCard(result.card_messages, Request.VCard);
                         //Parse TKMSG xml to find date_initial and date_final
-                        var attribs = ParseTKMsgLoadComplete(result.msg);
+                        var attribs = ParseTKMsgNotifyComplete(result.msg);
                         Request.ResultantBalance = attribs.stored_value;
                         return true;
                     }
@@ -119,7 +127,7 @@ namespace VCBackend.ExternalServices.Ticketing
                         //apply write operations
                         WriteOperationsToCard(result.card_messages, Request.VCardToken);
                         //Parse TKMSG xml to find date_initial and date_final
-                        var attribs = ParseTKMsgLoadComplete(result.msg);
+                        var attribs = ParseTKMsgNotifyComplete(result.msg);
                         Request.VCardToken.DateInitial = attribs.date_initial;
                         Request.DateInitial = attribs.date_initial;
                         Request.VCardToken.DateFinal = attribs.date_final;
@@ -191,9 +199,9 @@ namespace VCBackend.ExternalServices.Ticketing
             }
         }
 
-        private TokenProductAttribs ParseTKMsgLoadComplete(String TKMsg)
+        private ProductAttribs ParseTKMsgNotifyComplete(String TKMsg)
         {
-            int date_initial = 0, date_final = 0, stored_value = 0;
+            ProductAttribs attribs = new ProductAttribs();
 
             using (XmlReader reader = XmlReader.Create(new StringReader(TKMsg)))
             {
@@ -213,16 +221,17 @@ namespace VCBackend.ExternalServices.Ticketing
                             {
                                 if (prodReader.NodeType == XmlNodeType.Text)
                                 {
+                                    int value = Int32.Parse(prodReader.Value);
                                     switch (attrib)
                                     {
                                         case "date_initial":
-                                            date_initial = Int32.Parse(prodReader.Value);
+                                            attribs.SetDateInitialFromSec(value);
                                             break;
                                         case "date_final":
-                                            date_final = Int32.Parse(prodReader.Value);
+                                            attribs.SetDateFinalFromSec(value);
                                             break;
                                         case "stored_value":
-                                            stored_value = Int32.Parse(prodReader.Value);
+                                            attribs.SetAmountFromCents(value);
                                             break;
                                     }
                                     break;
@@ -232,22 +241,33 @@ namespace VCBackend.ExternalServices.Ticketing
                     }
                 }
             }
-
-            return new TokenProductAttribs(date_initial, date_final, stored_value);
+            return attribs;
         }
     }
 
-    public class TokenProductAttribs
+    public class ProductAttribs
     {
         public DateTime date_initial { get; private set; }
         public DateTime date_final { get; private set; }
         public Double stored_value { get; private set; }
 
-        public TokenProductAttribs(int date_initial, int date_final, int ammount)
+        public ProductAttribs()
+        {   
+        }
+
+        public void SetDateInitialFromSec(int dateInitial)
         {
-            this.date_initial = new DateTime(1970, 1, 1, 0, 0, 0).AddSeconds(date_initial);
-            this.date_final = new DateTime(1970, 1, 1, 0, 0, 0).AddSeconds(date_final);
-            this.stored_value = ammount * 0.01; // 525 = 5.25
+            this.date_initial = new DateTime(1970, 1, 1, 0, 0, 0).AddSeconds(dateInitial);
+        }
+
+        public void SetDateFinalFromSec(int dateFinal)
+        {
+            this.date_final = new DateTime(1970, 1, 1, 0, 0, 0).AddSeconds(dateFinal);
+        }
+
+        public void SetAmountFromCents(int amount)
+        {
+            this.stored_value = amount * 0.01; // 525 = 5.25
         }
     }
 

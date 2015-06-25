@@ -5,17 +5,8 @@ using System.Web;
 
 namespace VCBackend.Models.Dto
 {
-    public class CardBalanceDto : IDto<LoadRequest>
+    public class CardBalanceDto
     {
-        public Double TotalBalance { get; set; }
-        public Double LoadAmmount { get; set; }
-
-
-
-        public void Serialize(LoadRequest entity)
-        {
-            TotalBalance = entity.ResultantBalance;
-            LoadAmmount = entity.Price;
-        }
+        public double Balance { get; set; }
     }
 }
