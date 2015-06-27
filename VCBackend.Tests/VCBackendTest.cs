@@ -53,6 +53,8 @@ namespace VCBackend.Tests
             bool approve = tk.ApproveLoadCardRequest(load);
 
             bool res = tk.LoadCard(load);
+
+            double balance = tk.ReadCardBalance(token);
         }
 
         //[TestMethod]

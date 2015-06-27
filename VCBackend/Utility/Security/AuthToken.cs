@@ -11,7 +11,7 @@ namespace VCBackend.Utility.Security
         //should be loaded from a file!
         private static string AuthTokenSecret = "GQDstcKsx0NHjPOuXOYg5MbeJ1XT0uFiwDVvVBrk";
 
-        private static int API_AUTH_TOKEN_VALIDITY_S = 1800; // 1 hour
+        private static int API_AUTH_TOKEN_VALIDITY_S = 1800; // 0,5 hour
         private static int API_REFRESH_TOKEN_VALIDITY_M = 6; // 6 months
         private static int CARD_KEY_VALIDITY = 60; // 1 min
 

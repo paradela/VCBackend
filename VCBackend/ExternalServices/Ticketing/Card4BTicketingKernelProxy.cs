@@ -28,7 +28,7 @@ namespace VCBackend.ExternalServices.Ticketing
             if (Request != null)
             {
                 if (Request.VCard == null) throw new InvalidLoadRequest(String.Format("Load Card Request must have a VCard associated!"));
-                if (Request.Price >= 5.0 && Request.Price <= 50.0) throw new InvalidLoadRequest(String.Format("Ammount of {0} is not valid.", Request.Price));
+                if (Request.Price <= 5.0 && Request.Price >= 50.0) throw new InvalidLoadRequest(String.Format("Ammount of {0} is not valid.", Request.Price));
                 if (Request.SaleDate.Date != DateTime.Today.Date) throw new InvalidLoadRequest("Internal error: sale date must be today");
                 if (Request.State != LoadRequest.STATE_CREATED) throw new InvalidLoadRequest("Internal error: request not valid!");
                 Request.ProdId = "2065208";

@@ -249,41 +249,61 @@ namespace VCBackend.Controllers
             return new HttpResponseMessage(HttpStatusCode.SwitchingProtocols);
         }
 
+        private static const byte MSG_APDU = 0x01;
+        private static const byte MSG_AUTH_TOKEN = 0x02;
+        private static const byte MSG_REFRESG_TOKEN = 0x03;
+        private static const byte ERROR_OK = 0xA0;
+        private static const byte ERROR_EXPIRED_TOKEN = 0xA1;
+        private static const byte ERROR_INVALID_TOKEN = 0xA2;
+        private static const byte ERROR_NOT_AUTHENTICATED = 0xA3;
+
         private async Task VCardTxRxAPDU(AspNetWebSocketContext context)
         {
             WebSocket socket = context.WebSocket;
             UnitOfWork uw = new UnitOfWork();
+            bool authenticated = false;
 
-            Device dev = GetAuthenticatedDevice(context, uw);
+            ArraySegment<byte> buffer = new ArraySegment<byte>(new byte[1024]);
+            VCard card = null;
 
-            if (dev == null) return;
-
-            using (var trx = uw.TransactionBegin())
+            while (true)
             {
-                ArraySegment<byte> buffer = new ArraySegment<byte>(new byte[1024]);
-                VCard card = dev.Owner.Account.VCard;
-
-                while (true)
+                WebSocketReceiveResult result = await socket.ReceiveAsync(buffer, CancellationToken.None);
+                if (socket.State == WebSocketState.Open)
                 {
-                    WebSocketReceiveResult result = await socket.ReceiveAsync(buffer, CancellationToken.None);
-                    if (socket.State == WebSocketState.Open)
-                    {
-                        byte[] apdu = new byte[result.Count];
-                        System.Array.Copy(buffer.Array, apdu, result.Count);
-                        byte[] res = card.IsoATxRxAPDU(apdu);
-                        buffer = new ArraySegment<byte>(res);
+                    byte[] res;
+                    byte[] apdu = new byte[result.Count - 1];
+                    System.Array.Copy(buffer.Array, 1, apdu, 0, result.Count);
+                    byte type = buffer.Array[0];
 
-                        await socket.SendAsync(
-                            buffer, WebSocketMessageType.Binary, true, CancellationToken.None);
-                    }
-                    else
+                    switch (type)
                     {
-                        break;
+                        case MSG_APDU:
+                            if (authenticated)
+                                res = card.IsoATxRxAPDU(apdu);
+                            else res = new byte[] { ERROR_NOT_AUTHENTICATED };
+                            break;
+                        case MSG_AUTH_TOKEN:
+                            break;
+                        case MSG_REFRESG_TOKEN:
+                            break;
                     }
+
+                    uw.Save();
+
+                    buffer = new ArraySegment<byte>(res);
+                    
+                    await socket.SendAsync(
+                        buffer, WebSocketMessageType.Binary, true, CancellationToken.None);
                 }
-
-                trx.Commit();
+                else
+                {
+                    break;
+                }
             }
+
+              //  trx.Commit();
+            //}
         }
 
         private static Device GetAuthenticatedDevice(AspNetWebSocketContext context, UnitOfWork uw)
