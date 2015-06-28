@@ -12,6 +12,15 @@ namespace VCBackend.Tests
     [TestClass]
     public class VCBackendTest
     {
+        //[TestMethod]
+        //public void TestCenas()
+        //{
+        //    //[115 116 114 105 110 103 ]
+        //    byte[] a = new byte[] { 0x73, 0x74, 0x72, 0x69, 0x6e, 0x67 };
+        //    String s = System.Text.Encoding.UTF8.GetString(a, 0, a.Length);
+        //    Assert.AreEqual("string", s);
+        //}
+
         [TestMethod]
         public void TestLoadToken()
         {

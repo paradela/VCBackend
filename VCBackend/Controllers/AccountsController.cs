@@ -10,6 +10,7 @@ using System.Net.WebSockets;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using System.Threading;
+using System.Text;
 using VCBackend.Filters;
 using VCBackend.Models.Dto;
 using VCBackend.Exceptions;
@@ -238,28 +239,58 @@ namespace VCBackend.Controllers
             }
         }
 
-        [Route("vcard/ws")]
+        [Route("vcard/run/apdu")]
         [VCAuthenticate]
-        public HttpResponseMessage GetWebSocketValidation([FromUri] String t)
-        {//t[oken] is parsed in the VCardTxRxAPDU callback to get the authenticated user
-            if (HttpRuntime.UsingIntegratedPipeline && HttpContext.Current.IsWebSocketRequest)
+        public ApduResponseDto PostCardApdu([FromUri] String b64apdu)
+        {
+            try
             {
-                HttpContext.Current.AcceptWebSocketRequest(VCardTxRxAPDU);
+                UnitOfWork uw = new UnitOfWork();
+                int AuthDev = VCAuthenticate.GetAuthenticatedDevice(ActionContext);
+                Device dev = uw.DeviceRepository.GetByID(AuthDev);
+                RunApduService service = new RunApduService(uw, dev);
+                service.B64Apdu = b64apdu;
+                service.Execute();
+                return service.ResponseDto;
             }
-            return new HttpResponseMessage(HttpStatusCode.SwitchingProtocols);
+            catch (VCException ex)
+            {
+                throw new HttpResponseException(new ErrorResponse(ex));
+            }
+            catch (Exception ex)
+            {
+                throw new HttpResponseException(new ErrorResponse(ex));
+            }
+
         }
 
-        private static const byte MSG_APDU = 0x01;
-        private static const byte MSG_AUTH_TOKEN = 0x02;
-        private static const byte MSG_REFRESG_TOKEN = 0x03;
-        private static const byte ERROR_OK = 0xA0;
-        private static const byte ERROR_EXPIRED_TOKEN = 0xA1;
-        private static const byte ERROR_INVALID_TOKEN = 0xA2;
-        private static const byte ERROR_NOT_AUTHENTICATED = 0xA3;
+        //[Route("vcard/ws")]
+        //public HttpResponseMessage GetWebSocketValidation()
+        //{
+        //    if (HttpRuntime.UsingIntegratedPipeline && HttpContext.Current.IsWebSocketRequest)
+        //    {
+        //        HttpContext.Current.AcceptWebSocketRequest(VCardTxRxAPDU);
+        //    }
+        //    return new HttpResponseMessage(HttpStatusCode.SwitchingProtocols);
+        //}
 
+        private const byte OK = 0x00;
+        private const byte MSG_APDU = 0x01;
+        private const byte MSG_AUTH_TOKEN = 0x02;
+        private const byte MSG_REFRESG_TOKEN = 0x03;
+        private const byte ERROR_EXPIRED_TOKEN = 0xA1;
+        private const byte ERROR_INVALID_TOKEN = 0xA2;
+        private const byte ERROR_NOT_AUTHENTICATED = 0xA3;
+        private const byte ERROR_UNKNOWN = 0xA4;
+
+        /*
+         * 0        1                     n
+         * |type_msg|------msg-----------|
+         */
         private async Task VCardTxRxAPDU(AspNetWebSocketContext context)
         {
             WebSocket socket = context.WebSocket;
+            
             UnitOfWork uw = new UnitOfWork();
             bool authenticated = false;
 
@@ -271,21 +302,102 @@ namespace VCBackend.Controllers
                 WebSocketReceiveResult result = await socket.ReceiveAsync(buffer, CancellationToken.None);
                 if (socket.State == WebSocketState.Open)
                 {
-                    byte[] res;
-                    byte[] apdu = new byte[result.Count - 1];
-                    System.Array.Copy(buffer.Array, 1, apdu, 0, result.Count);
+                    byte[] res = null;
+                    byte[] msg = new byte[result.Count - 1];
+                    System.Array.Copy(buffer.Array, 1, msg, 0, result.Count);
                     byte type = buffer.Array[0];
 
                     switch (type)
                     {
                         case MSG_APDU:
-                            if (authenticated)
-                                res = card.IsoATxRxAPDU(apdu);
+                            if (authenticated && card != null)
+                            {
+                                byte[] tmp = card.IsoATxRxAPDU(msg);
+                                res = new byte[tmp.Length + 1];
+                                res[0] = OK;
+                                System.Array.Copy(tmp, 0, res, 1, tmp.Length);
+                            }
                             else res = new byte[] { ERROR_NOT_AUTHENTICATED };
                             break;
                         case MSG_AUTH_TOKEN:
+                            {
+                                authenticated = false;
+                                string token = Encoding.UTF8.GetString(msg, 0, msg.Length);
+                                var payload = AuthToken.ValidateToken(token);
+                                var unixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+                                var now = Math.Round((DateTime.UtcNow - unixEpoch).TotalSeconds);
+
+                                if (payload != null && payload["type"] == AuthToken.API_ACCESS_TOKEN_TYPE_AUTH)
+                                {
+                                    if ((long)payload["exp"] < now)
+                                    {
+                                        Device dev = uw.DeviceRepository.Get(filter: d => (d.AccessTokens.RefreshToken == token)).FirstOrDefault();
+
+                                        if (dev == null)
+                                        {
+                                            res = new byte[] { ERROR_INVALID_TOKEN };
+                                            break;
+                                        }
+
+                                        card = dev.Owner.Account.VCard;
+
+                                        authenticated = true;
+                                        res = new byte[] { OK };
+                                    }
+                                    else
+                                    {
+                                        res = new byte[] { ERROR_EXPIRED_TOKEN };
+                                    }
+                                }
+                                else
+                                {
+                                    res = new byte[] { ERROR_INVALID_TOKEN };
+                                }
+                            }
                             break;
                         case MSG_REFRESG_TOKEN:
+                            {
+                                authenticated = false;
+                                string token = Encoding.UTF8.GetString(msg, 0, msg.Length);
+                                var payload = AuthToken.ValidateToken(token);
+                                var unixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+                                var now = Math.Round((DateTime.UtcNow - unixEpoch).TotalSeconds);
+
+                                if (payload != null && payload["type"] == AuthToken.API_ACCESS_TOKEN_TYPE_REFRESH)
+                                {
+                                    if ((long)payload["exp"] < now)
+                                    {
+                                        Device dev = uw.DeviceRepository.Get(filter: d => (d.AccessTokens.RefreshToken == token)).FirstOrDefault();
+
+                                        if (dev == null)
+                                        {
+                                            res = new byte[] { ERROR_INVALID_TOKEN };
+                                            break;
+                                        }
+
+                                        User user = dev.Owner;
+
+                                        dev.AccessTokens.AuthToken = Utility.Security.AuthToken.GetAPIAuthJwt(user, dev);
+
+                                        uw.AccessTokensRepository.Update(dev.AccessTokens);
+
+                                        authenticated = true;
+                                        byte[] tmp = Encoding.UTF8.GetBytes(dev.AccessTokens.AuthToken);
+
+                                        res = new byte[tmp.Length + 1];
+                                        res[0] = OK;
+                                        System.Array.Copy(res, 1, tmp, 0, tmp.Length);
+                                    }
+                                    else
+                                    {
+                                        res = new byte[] { ERROR_EXPIRED_TOKEN };
+                                    }
+                                }
+                                else
+                                {
+                                    res = new byte[] { ERROR_INVALID_TOKEN };
+                                }
+                            }
                             break;
                     }
 
@@ -300,22 +412,10 @@ namespace VCBackend.Controllers
                 {
                     break;
                 }
+                
             }
 
-              //  trx.Commit();
-            //}
-        }
-
-        private static Device GetAuthenticatedDevice(AspNetWebSocketContext context, UnitOfWork uw)
-        {
-            var query = context.RequestUri.Query;
-            var queryCollection = System.Web.HttpUtility.ParseQueryString(query);
-            var token = queryCollection["t"];
-            var payload = AuthToken.ValidateToken(token);
-            var uid = payload["user_id"];
-            var did = payload["device_id"];
-            Device dev = uw.DeviceRepository.Get(filter: d => (d.Owner.Id == (int)uid && d.AccessTokens.AuthToken != token && d.Id == (int)did)).FirstOrDefault();
-            return dev;
+            uw.Dispose();
         }
 
     }

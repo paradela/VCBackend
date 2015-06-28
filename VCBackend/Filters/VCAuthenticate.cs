@@ -43,8 +43,10 @@ namespace VCBackend.Filters
                     throw new HttpResponseException(new BadTokenResponse(new InvalidAuthToken("Missing authentication token.")));
 
                 var payload = AuthToken.ValidateToken(token);
+                var unixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+                var now = Math.Round((DateTime.UtcNow - unixEpoch).TotalSeconds);
                 //3. Validate the token
-                if (payload == null)
+                if (payload == null || (long)payload["exp"] >= now)
                     throw new HttpResponseException(new BadTokenResponse(new InvalidAuthToken("The supplied token is not valid.")));
                 string type = (string)payload["type"];
 

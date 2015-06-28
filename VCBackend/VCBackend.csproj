@@ -227,6 +227,7 @@
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Dto\AccessTokensDto.cs" />
+    <Compile Include="Models\Dto\ApduResponseDto.cs" />
     <Compile Include="Models\Dto\CardBalanceDto.cs" />
     <Compile Include="Models\Dto\LoadResultDto.cs" />
     <Compile Include="Models\Dto\PBKeyDto.cs" />
@@ -247,6 +248,7 @@
     <Compile Include="Services\LoadVCardService.cs" />
     <Compile Include="Services\ReadVCardBalanceService.cs" />
     <Compile Include="Services\RefreshAccessTokenService.cs" />
+    <Compile Include="Services\RunApduService.cs" />
     <Compile Include="User.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
