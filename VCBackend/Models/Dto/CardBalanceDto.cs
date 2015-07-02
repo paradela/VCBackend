@@ -7,6 +7,6 @@ namespace VCBackend.Models.Dto
 {
     public class CardBalanceDto
     {
-        public double Balance { get; set; }
+        public double CardBalance { get; set; }
     }
 }

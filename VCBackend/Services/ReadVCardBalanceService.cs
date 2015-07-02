@@ -22,7 +22,7 @@ namespace VCBackend.Services
             if (balance >= 0)
             {
                 BalanceDto = new CardBalanceDto();
-                BalanceDto.Balance = balance;
+                BalanceDto.CardBalance = balance;
                 return true;
             }
             else return false;

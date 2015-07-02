@@ -46,8 +46,13 @@ namespace VCBackend.Filters
                 var unixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
                 var now = Math.Round((DateTime.UtcNow - unixEpoch).TotalSeconds);
                 //3. Validate the token
-                if (payload == null || (long)payload["exp"] >= now)
-                    throw new HttpResponseException(new BadTokenResponse(new InvalidAuthToken("The supplied token is not valid.")));
+                if(payload != null)
+                {
+                    var exp = payload["exp"];
+                    if (now > (int)exp) throw new HttpResponseException(new BadTokenResponse(new InvalidAuthToken("The supplied token is expired.")));
+                }
+                else throw new HttpResponseException(new BadTokenResponse(new InvalidAuthToken("The supplied token is not valid.")));
+                    
                 string type = (string)payload["type"];
 
                 if(type != AuthToken.API_ACCESS_TOKEN_TYPE_AUTH)

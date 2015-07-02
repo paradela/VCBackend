@@ -7,11 +7,11 @@ namespace VCBackend.Models.Dto
 {
     public class BalanceDto : IDto<Account>
     {
-        public Double Balance { get; set; }
+        public Double AccountBalance { get; set; }
 
         public void Serialize(Account entity)
         {
-            Balance = entity.Balance;
+            AccountBalance = entity.Balance;
         }
     }
 }
