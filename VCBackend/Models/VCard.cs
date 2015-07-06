@@ -71,8 +71,8 @@ namespace VCBackend
 
             if (APDU != null && APDU.Length > 0)
             {
-                byte[] vAID = StringToByteArray(AID);
-                if (System.Array.Equals(APDU, vAID))
+                byte[] vAID = StringToByteArray(AID);   
+                if (APDU.SequenceEqual(vAID))
                 {
                     result = new byte[] { 0x43, 0x34, 0x42, 0x43, 0x54, 0x53, 0x35, 0x31, 0x32, 0x42, 0x90, 0x00 };
                 }
