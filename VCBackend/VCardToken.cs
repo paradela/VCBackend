@@ -20,6 +20,7 @@ namespace VCBackend
         public System.DateTime DateInitial { get; set; }
         public System.DateTime DateFinal { get; set; }
         public Nullable<double> Amount { get; set; }
+        public bool Used { get; set; }
     
         public virtual LoadRequest LoadRequest { get; set; }
     }

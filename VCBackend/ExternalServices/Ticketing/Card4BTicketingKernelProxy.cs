@@ -19,7 +19,7 @@ namespace VCBackend.ExternalServices.Ticketing
 
         public Card4BTicketingKernelProxy()
         {
-            Client = new HttpClient(); 
+            Client = new HttpClient();
         }
 
         //This method should validate the validity of the request in the catalog
@@ -45,7 +45,7 @@ namespace VCBackend.ExternalServices.Ticketing
                 if (Request.VCardToken == null) throw new InvalidLoadRequest("Load Token Request must have a VCardToken associated!");
                 if (Request.SaleDate.Date != DateTime.Today.Date) throw new InvalidLoadRequest("Internal error: sale date must be today");
                 if (Request.State != LoadRequest.STATE_CREATED) throw new InvalidLoadRequest("Internal error: request not valid!");
-                if (!Request.DateInitial.HasValue || Request.DateInitial.Value.AddMinutes(10).Date < DateTime.Today.Date) 
+                if (!Request.DateInitial.HasValue || Request.DateInitial.Value.AddMinutes(10).Date < DateTime.Today.Date)
                     throw new InvalidLoadRequest("Initial token date is not valid!");
 
                 Request.ProdId = "2065209";
@@ -60,7 +60,7 @@ namespace VCBackend.ExternalServices.Ticketing
         {
             string tkmsg = "<tkmsg><read /></tkmsg>";
             TKResult result = TKCommandEx(tkmsg, Card.Data);
-            if (result != null && 
+            if (result != null &&
                 result.status == (uint)TicketingKernel.Status.READ &&
                 result.result == (uint)TicketingKernel.Result.OK)
             {
@@ -72,10 +72,10 @@ namespace VCBackend.ExternalServices.Ticketing
 
         public bool LoadCard(LoadRequest Request)
         {
-            if (Request.State == LoadRequest.STATE_APPROVED 
+            if (Request.State == LoadRequest.STATE_APPROVED
                 && Request.Price >= 0)
             {
-                string tkmsg = 
+                string tkmsg =
                     "<tkmsg><load>" +
                     "<product card_value=\"2065208\"><attribs>" +
                     "<attrib type=\"stored_value\">" + (int)Request.Price * 100 + "</attrib>" +
@@ -142,11 +142,31 @@ namespace VCBackend.ExternalServices.Ticketing
             return false;
         }
 
+        public TKTransactionData GetTransactionData(String transaction)
+        {
+            TKTransactionData trx = new TKTransactionData();
+
+            String tkmsg_in =
+                "<tkmsg><decode><transaction>" +
+                transaction +
+                "</transaction></decode></tkmsg>";
+            TKResult result = TKCommandEx(tkmsg_in, null);
+            if (result != null)
+            {
+                if (result.result == (uint)TicketingKernel.Result.OK)
+                {
+                    trx = ParseTKDecodeResult(result.msg);
+                }
+                else return null;
+            }
+            return trx;
+        }
+
         private TKResult TKCommandEx(String TKMsg, String CardData)
         {
             //Call WS to get a server url to load the card
             var getURLTask = Client.GetAsync(ServerUri);
-            
+
             //While waiting for the response, do some work
             var card = new JObject();
             card["type"] = "CTS512B";
@@ -166,7 +186,7 @@ namespace VCBackend.ExternalServices.Ticketing
             if (!r.IsMatch(tkUri)) return null;
 
             //call the loading server
-            var loadTask = Client.PostAsJsonAsync(tkUri, loadReq); 
+            var loadTask = Client.PostAsJsonAsync(tkUri, loadReq);
 
             strRsp = loadTask.Result.Content.ReadAsStringAsync().Result;
             jsonRsp = JObject.Parse(strRsp);
@@ -243,6 +263,107 @@ namespace VCBackend.ExternalServices.Ticketing
             }
             return attribs;
         }
+
+        private TKTransactionData ParseTKDecodeResult(String TKMsg)
+        {
+            TKTransactionData trx = new TKTransactionData();
+
+            using (XmlReader reader = XmlReader.Create(new StringReader(TKMsg)))
+            {
+                string type = "";
+                string date_time = "";
+                string result = "";
+                string usecs = "";
+                while (reader.Read())
+                {
+                    if (reader.NodeType == XmlNodeType.Element && reader.Name == "task")
+                    {
+                        type = reader.GetAttribute("type");
+                        date_time = reader.GetAttribute("date_time");
+                        result = reader.GetAttribute("result");
+                        usecs = reader.GetAttribute("usecs");
+
+                        if (type == "Validate")
+                            trx.Task = TicketingKernel.Status.VALIDATE;
+                        else trx.Task = TicketingKernel.Status.READ;
+
+                        DateTime date = new DateTime(1970, 1, 1, 0, 0, 0).AddSeconds(long.Parse(date_time));
+                        trx.Date = date;
+
+                        int res;
+                        if (Int32.TryParse(result, out res))
+                        {
+                            if (res == 0)
+                                trx.Result = TicketingKernel.Result.OK;
+                            else trx.Result = TicketingKernel.Result.GENERAL_ERROR;
+                        }
+
+                        int t = 0;
+                        Int32.TryParse(usecs, out t);
+                        trx.TransactionDuration = TimeSpan.FromMilliseconds(t/1000);
+                        
+                        reader.ReadToFollowing("after");
+
+                        while (reader.Read())
+                        {
+                            if (reader.NodeType == XmlNodeType.Element && reader.Name == "card") 
+                            {
+                                String sn = reader.GetAttribute("sn");
+                                int snmber;
+                                if (Int32.TryParse(sn, out snmber))
+                                    trx.CardSN = snmber;
+                                else trx.CardSN = 0;
+
+                                ParseActions(reader, trx);
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                return trx;
+            }
+        }
+
+        private void ParseActions(XmlReader reader, TKTransactionData data)
+        {
+            do
+            {
+                if (reader.NodeType == XmlNodeType.Element && reader.Name == "actions")
+                {
+                    while (reader.Read())
+                    {
+                        if (reader.NodeType == XmlNodeType.Element && reader.Name == "action")
+                        {
+                            string attrib = reader.GetAttribute("type");
+                            if (attrib == "Validate")
+                            {
+                                ParseProduct(reader, data);
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+            while (reader.Read());
+        }
+
+        private void ParseProduct(XmlReader reader, TKTransactionData data)
+        {
+            do
+            {
+                if (reader.NodeType == XmlNodeType.Element && reader.Name == "product")
+                {
+                    int card_value;
+                    String attrib = reader.GetAttribute("card_value");
+                    if (Int32.TryParse(attrib, out card_value))
+                        data.ProdId = card_value;
+                    else data.ProdId = 0;
+                    break;
+                }
+            }
+            while (reader.Read());
+        }
     }
 
     public class ProductAttribs
@@ -291,6 +412,16 @@ namespace VCBackend.ExternalServices.Ticketing
         {
             card_messages = new List<VCardWriteOperation>();
         }
+    }
+
+    public class TKTransactionData
+    {
+        public TicketingKernel.Status Task { get; set; }
+        public TicketingKernel.Result Result { get; set; }
+        public DateTime Date { get; set; }
+        public TimeSpan TransactionDuration { get; set; }
+        public int CardSN { get; set; }
+        public int ProdId { get; set; }
     }
 
     public class TicketingKernel

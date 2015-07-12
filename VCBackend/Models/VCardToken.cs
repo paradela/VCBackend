@@ -7,10 +7,14 @@ namespace VCBackend
 {
     public partial class VCardToken
     {
-        public VCardToken() { }
+        public VCardToken() 
+        {
+            this.Used = false;
+        }
         public VCardToken(byte[] Data)
         {
             this.Data = System.Convert.ToBase64String(Data);
+            this.Used = false;
         }
 
         public byte[] Read(uint Offset, uint Length)

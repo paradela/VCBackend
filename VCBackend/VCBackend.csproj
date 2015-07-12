@@ -247,6 +247,7 @@
     <Compile Include="Services\GetUserDevicesService.cs" />
     <Compile Include="Services\LoadVCardService.cs" />
     <Compile Include="Services\ReadVCardBalanceService.cs" />
+    <Compile Include="Services\ReconciliationService.cs" />
     <Compile Include="Services\RefreshAccessTokenService.cs" />
     <Compile Include="Services\RunApduService.cs" />
     <Compile Include="User.cs">

@@ -2,7 +2,7 @@
 -- --------------------------------------------------
 -- Entity Designer DDL Script for SQL Server 2005, 2008, 2012 and Azure
 -- --------------------------------------------------
--- Date Created: 06/23/2015 00:19:08
+-- Date Created: 07/10/2015 15:37:04
 -- Generated from EDMX file: C:\Users\Ricardo\Source\Repos\VCBackend\VCBackend\Model.edmx
 -- --------------------------------------------------
 
@@ -41,6 +41,9 @@ GO
 IF OBJECT_ID(N'[dbo].[FK_DeviceAccessTokens]', 'F') IS NOT NULL
     ALTER TABLE [dbo].[DeviceSet] DROP CONSTRAINT [FK_DeviceAccessTokens];
 GO
+IF OBJECT_ID(N'[dbo].[FK_UserPBKey]', 'F') IS NOT NULL
+    ALTER TABLE [dbo].[UserSet] DROP CONSTRAINT [FK_UserPBKey];
+GO
 
 -- --------------------------------------------------
 -- Dropping existing tables
@@ -69,6 +72,9 @@ IF OBJECT_ID(N'[dbo].[LoadRequestSet]', 'U') IS NOT NULL
 GO
 IF OBJECT_ID(N'[dbo].[AccessTokensSet]', 'U') IS NOT NULL
     DROP TABLE [dbo].[AccessTokensSet];
+GO
+IF OBJECT_ID(N'[dbo].[PBKeySet]', 'U') IS NOT NULL
+    DROP TABLE [dbo].[PBKeySet];
 GO
 
 -- --------------------------------------------------
@@ -120,6 +126,7 @@ CREATE TABLE [dbo].[VCardTokenSet] (
     [DateInitial] datetime  NOT NULL,
     [DateFinal] datetime  NOT NULL,
     [Amount] float  NULL,
+    [Used] bit  NOT NULL,
     [AccountVCardToken_VCardToken_Id] int  NOT NULL,
     [LoadRequest_Id] int  NOT NULL
 );

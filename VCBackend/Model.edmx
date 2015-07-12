@@ -99,6 +99,7 @@
     <Property Name="DateInitial" Type="datetime" Nullable="false" />
     <Property Name="DateFinal" Type="datetime" Nullable="false" />
     <Property Name="Amount" Type="float" Nullable="true" />
+    <Property Name="Used" Type="bit" Nullable="false" />
     <Property Name="AccountVCardToken_VCardToken_Id" Type="int" Nullable="false" />
     <Property Name="LoadRequest_Id" Type="int" Nullable="false" />
   </EntityType>
@@ -384,6 +385,7 @@
           <Property Name="DateFinal" Type="DateTime" Nullable="false" />
           <Property Name="Amount" Type="Double" Nullable="true" />
           <NavigationProperty Name="LoadRequest" Relationship="Model.VCardTokenLoadRequest" FromRole="VCardToken" ToRole="LoadRequest" />
+          <Property Name="Used" Type="Boolean" Nullable="false" />
         </EntityType>
         <Association Name="AccountVCardToken">
           <End Type="Model.Account" Role="Account" Multiplicity="1" />
@@ -529,6 +531,7 @@
           <ScalarProperty Name="DateInitial" ColumnName="DateInitial" />
           <ScalarProperty Name="DateFinal" ColumnName="DateFinal" />
           <ScalarProperty Name="Amount" ColumnName="Amount" />
+          <ScalarProperty Name="Used" ColumnName="Used" />
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>
