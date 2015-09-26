@@ -241,7 +241,7 @@ namespace VCBackend.Controllers
 
         [Route("vcard/run/apdu")]
         [VCAuthenticate]
-        public ApduResponseDto PostCardApdu([FromUri] String b64apdu)
+        public ApduResponseDto PostCardApdu([FromUri] String hexapdu)
         {
             try
             {
@@ -249,7 +249,7 @@ namespace VCBackend.Controllers
                 int AuthDev = VCAuthenticate.GetAuthenticatedDevice(ActionContext);
                 Device dev = uw.DeviceRepository.GetByID(AuthDev);
                 RunApduService service = new RunApduService(uw, dev);
-                service.B64Apdu = b64apdu;
+                service.HexApdu = hexapdu;
                 service.Execute();
                 return service.ResponseDto;
             }

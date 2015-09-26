@@ -10,7 +10,7 @@ namespace VCBackend.Services
     public class RunApduService : IService
     {
         public ApduResponseDto ResponseDto { get; private set; }
-        public String B64Apdu { private get; set; }
+        public String HexApdu { private get; set; }
 
         public RunApduService(UnitOfWork uw, Device dev)
             : base(uw, dev) { }
@@ -18,7 +18,7 @@ namespace VCBackend.Services
         protected override bool ExecuteService()
         {
             VCard card = AuthDevice.Owner.Account.VCard;
-            byte[] apdu = System.Convert.FromBase64String(B64Apdu);
+            byte[] apdu = VCard.HexStringToByteArray(HexApdu);
             byte[] res = card.IsoATxRxAPDU(apdu);
             UnitOfWork.Save();
             ResponseDto = new ApduResponseDto();

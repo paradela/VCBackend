@@ -71,7 +71,7 @@ namespace VCBackend
 
             if (APDU != null && APDU.Length > 0)
             {
-                byte[] vAID = StringToByteArray(AID);   
+                byte[] vAID = HexStringToByteArray(AID);   
                 if (APDU.SequenceEqual(vAID))
                 {
                     result = new byte[] { 0x43, 0x34, 0x42, 0x43, 0x54, 0x53, 0x35, 0x31, 0x32, 0x42, 0x90, 0x00 };
@@ -129,7 +129,7 @@ namespace VCBackend
         }
 
         //From: http://stackoverflow.com/questions/321370/how-can-i-convert-a-hex-string-to-a-byte-array
-        private static byte[] StringToByteArray(string hex)
+        public static byte[] HexStringToByteArray(string hex)
         {
             return Enumerable.Range(0, hex.Length)
                              .Where(x => x % 2 == 0)
